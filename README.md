@@ -1,11 +1,9 @@
 **CSSS 508: Introduction to R for Social Scientists**
 
-**Autumn 2018**
+**Autumn 2022**
 
-Charles Lanfear
-
-Department of Sociology
-
+Michael Pearce
+Department of Statistics
 University of Washington
 
-This repository contains lecture notes and other course materials for CSSS 508 taught at University of Washington, most recently in Spring 2019. This material is partially based on content from Rebecca Ferrell.
+This repository contains lecture notes and other course materials for CSSS 508 taught at University of Washington. This material is partially based on content from Rebecca Ferrell, Charles Lanfear, and Breon Haskett.
