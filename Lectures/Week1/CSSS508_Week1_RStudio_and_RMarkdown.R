@@ -23,8 +23,13 @@ new.object
 
 sqrt(new.object)
 
+# install.packages('rmarkdown')
+# install.packages('tinytex')
+# tinytex::install_tinytex()
+
 summary(cars)
 
+#install.package("knitr")
 library(knitr)
 
 x <- sqrt(77) # <- is how we assign objects

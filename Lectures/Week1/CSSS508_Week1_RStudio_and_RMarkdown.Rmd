@@ -1,8 +1,8 @@
 ---
-title: "CSSS508, Week 1"
-subtitle: "RStudio and RMarkdown"
-author: "Chuck Lanfear"
-date: "Mar 31, 2020<br>Updated: `r gsub(' 0', ' ', format(Sys.Date(), format='%b %d, %Y'))`"
+title: "CSSS 508, Week 1"
+subtitle: "Syllabus and Lecture 1: Introduction to R, RStudio, and RMarkdown"
+author: "Michael Pearce<br>(based on slides from Chuck Lanfear)"
+date: "September 29, 2022"
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -19,189 +19,212 @@ options(htmltools.dir.version = FALSE)
 knitr::opts_chunk$set(comment = "##")
 ```
 
+
+# Welcome to CSSS 508: Introduction to R for Social Scientists
+
+Today, we will:
+
+* Introduce ourselves
+
+* Go through the syllabus
+
+* Go through Lecture 1: Introduction to R, RStudio, and RMarkdown
+
+---
+
+# Introductions
+
+We'll go around the room and each share our:
+
+* Name and preferred pronouns
+
+* Program, year, and research interests (if applicable)
+
+* Experience with programming (in R or generally)
+
+* Something fun you did over the summer
+
+---
+
+# Syllabus 
+
+The syllabus (as well as lots of other information) can be found on our course website:
+
+<br>
+
+**https://pearce790.github.io/CSSS508**
+
+<br>
+
+Feel free to follow along online as I run through the syllabus!
+
+---
+
 # Course Goals
 
-* Develop intermediate data management and visualization skills in R
+This course is intended to give students a foundational understanding of programming in the statistical language R. General topics include:
+
+
+* Exploring data with graphics and summaries
 
 --
 
-* Learn basic programming
+* Cleaning, preparing, and linking data for analyses
 
 --
 
-* Introduce reproducible research practices
+* Foundational programming skills such as functions and loops
 
 --
 
-* Prepare you for statistics and CSSS courses
+* Organizing projects and creating reproducible research
 
----
-# Who is this guy?
-
-**Chuck Lanfear**
-
-* Instructor (*not professor*)
-
---
-
-* 7th (and last) Year Sociology PhD student
-
---
-
-* Research:
---
-
-  + Quantitative Sociology
---
-
-  + Computational Social Science
---
-
-  + Experimental Criminology
-  
---
-
-* Translation:
---
-
-  + I write code every day
---
-
-  + I am a turbo-nerd 
---
-
-  + I think programming is incredibly important
+We will cover almost no statistics here, but I hope you'll leave being able to focus on <i>statistics instead of coding</i> in future CSSS or STAT courses!
 
 
 ---
-# Who is that guy?
 
-**Breon Haskett**
-
-* Rhymes with Neon
-
---
-
-* 4th Year Sociology PhD Student
-
---
-
-* Research
-
---
-  + Labor, Collective Action, Pay Setting Institutions
-
---
-  + Econometrics, Counterfactual Reasoning, Computational Data Collection
-
---
-  + Reproducible Research
-
---
-
-* About Me
-
---
-  + Also, I write code every day
-
---
-  + A nerd, but only between the hours of 9 - 6
-
---
-  + Social Science programming is magical
-
----
 # Logistics
 
-Location: 
-* Lecture: [Zoom (848-704-242)](https://washington.zoom.us/j/848704242) on Wednesdays, 3:30-5:20
-* Recommended Lab: [Zoom (848-704-242)](https://washington.zoom.us/j/848704242) on Mondays, 3:30-5:20
-* Office Hours: 
-   * Breon: Thursdays, 11 - 12
-   * Chuck: By appointment
+Sessions: 
 
-Materials: http://clanfear.github.io/CSSS508
+* **Lecture:** Thursdays, 3:30-5:20 (Savery 117) -- Interactive sessions in which we'll learn key skills, concepts, and principles
+* **Lab:** Tuesdays, 3:30-5:20 (Savery 117) -- Optional and mostly unstructured sessions to work on homework and review
+* **Office Hours:** Wednesdays, 9-10am (on Zoom; link on Canvas)
 
-Grading:
-* Final grade: C/NC, 60% to get Credit
-* **Homework** most weeks (75% of grade), combination of reading and programming
-* **Peer Grading** of homeworks (25% of grade)
-* Both handed in via Canvas.
+
+Course Website: https://pearce790.github.io/CSSS508
+
+Contact: Feel free to email me at [mpp790 at uw dot edu]
+
 
 ---
+
+# Schedule
+
+* Week 0 (Th 9/29): Introduction to R, RStudio, and RMarkdown
+* Week 1 (Th 10/6): Visualizing Data
+* Week 2 (Th 10/13): Manipulating and Summarizing Data
+* Week 3 (Th 10/20): Understanding R Data Structures
+* Week 4 (Th 10/27): Importing, Exporting, and Cleaning Data
+* Week 5 (Th 11/3): Using Loops
+* Week 6 (Th 11/10): Writing Functions
+* Week 7 (Th 11/17): Working with Text Data
+* Week 8 (Th 11/24): Thanksgiving Holiday (No class; following lab will review past homeworks)
+* Week 9 (Th 12/1): Working with Geographical Data
+* Week 10 (Th 12/8): Reproducibility and Model Results
+
+
+This course will have no meeting during final exam week.
+
+---
+
+# Prereqs, Materials, and Texts
+
+
+Prerequisites: None
+
+Materials: All course materials are provided on the [course website](https://pearce790.github.io/CSSS508). This includes:
+
+* These slides and the code used to generate them.
+* An R script for the slides to follow along in class.
+* PDFs of slides if you like those.
+* Homework instructions and/or templates
+* Useful links to other resources.
+
+Laptops: It's help to bring a laptop to class. If you don't have one, you can use the lab computers or borrow one for free from the UW Student Technology Loan Program.
+
+Textbooks: This course has no textbook. However, the website has links to a few texts which I have found useful!
+
+
+---
+
+# Grading
+
+* Final grade: C/NC, 60% to get Credit
+* **Homework** (75%; assessed by peers): 9 total homeworks; assessed on a 0-3 point rubric. Assigned after Thursday lectures and due the following Thursday before lecture.
+* **Peer Grading** (25%; assessed by the instructor): One per homework, assessed on a binary "good"/"not good" scale. Due the following Tuesday before lab.
+* Both handed in via Canvas.
+
+Homework instructions/templates, peer grading instructions, and the homework schedule can be found on the [Homework](https://pearce790.github.io/CSSS508/homework.html) page of the course website.
+
+
+---
+
 
 # Ugh, peer grading?
 
 Yes, because:
 
---
-
 * You will write your reports better knowing others will see them
---
 
 * You learn alternate approaches to the same problem
 
---
-
-### Format:
-
-* Randomly assigned peers, due before the following Wednesday
-* Follow the [grading rubric](https://clanfear.github.io/CSSS508/docs/peer_review.html)
-* Leave constructive comments--more than just a "good job!"
-   + On assignments 1-3 I expect *a few sentences at least*.
-   + Assignments 4+ may follow labs and need less feedback if perfect.
-* **Email us** if you want more feedback
-
----
-
-# Materials
-
-All course materials are on the course website. This includes:
-
-* These slides and the code used to generate them.
-* An R script for the slides to follow along in class.
-* PDFs of slides if you like those.
-* Homework templates (HW 4+).
-* Video recordings of the lectures and labs.
-* Useful links to other resources.
-
-If you find something on the website doesn't work, please Slack or email me.
-
----
-
-# Lab
-
-Lab is optional but strongly recommended. They will be recorded this term.
+Learning to code is hard and requires lots of practice. Peer grading is a great way to help your coding skills sink in and develop faster!
 
 --
 
-### Labs 1-3
+How to peer review:
 
-I will provide general technical support and answer any R related questions you have, whether for the
-homework or not.
+* Leave constructive comments -- more than just saying "good job!"
+    + I expect at least 3-4 sentences saying what was good, interesting, could use improvement, etc.
+    + Earlier assignments will need more feedback, late assignments less.
+* **Email me** if you would like the instructor to regrade your assignment or provide feedback if no peer review was given.
 
---
-
-### Labs 4+
-
-In the latter two-thirds of the course, we will *walk through homeworks together*. 
-This provides students guidance through the more complex homeworks.
-
-This gives students the option of (1) working independently on homeworks for maximum
-learning, (2) reserving homeworks for lab if they are too challenging or time consuming, or
-(3) a bit of both.
 
 ---
 
-# Using the Mailing List
+# Academic Integrity
+
+Academic integrity is essential to this course and to your learning. Violations of the academic integrity policy include but are not limited to: 
+
+* Copying from a peer
+* Copying from an online resource
+* Using resources from a previous iteration of the course. 
+
+--
+
+I hope you will collaborate with peers on assignments and use Internet resources when questions arise to help solve issues. The key is that you **ultimately submit your own work**. 
+
+--
+
+Anything found in violation of this policy will be automatically given a score of 0 with no exceptions. If the situation merits, it will also be reported to the UW Student Conduct Office, at which point it is out of my hands. If you have any questions about this policy, please do not hesitate to reach out and ask.
+
+
+---
+
+# Classroom Environment
+
+**I am absolutely committed to fostering a friendly and inclusive classroom environment in which all students have an equal opportunity to learn and succeed.**
+
+--
+
+* Names & Pronouns: Everyone should be addressed respectfully and correctly. Feel free to send me your preferred name/pronouns anytime.
+
+--
+
+* Covid: Covid creates unique circumstances for each of us, which may limit your ability to fully participate in this course. You never need to apologize to me for anything pandemic related. Let me know how I can help!
+
+--
+
+* Accessibility & Accomodations: See course website for information on health, disability, and religious accomodations.
+
+--
+
+* Feedback: I encourage feedback at any point in the quarter. I will also send out a mid-quarter evaluation around Week 5.
+
+--
+
+* Getting Help: If you ever find yourself struggling to keep up, please let me know! I am here to help. Try chatting after class, office hours, or email.
+
+
+---
+
+# Asking Questions Over Email
 
 Don't ask like this:
 
 > tried lm(y~x) but it iddn't work wat do
-
-.footnote[
-Note: If you're not enrolled but want to be on the mailing list, email me!
-]
 
 --
 
@@ -223,25 +246,20 @@ drop.unused.levels = TRUE) : variable lengths differ
 </pre>
 </blockquote>
 
+I may send out your question (anonymously) and my answer to the course mailing list!
 
 
 ---
 
-# Slack Channel
+# Questions?
 
-This course uses a [Slack Channel](https://uwcsss508.slack.com/) for additional communication.
+  
 
-You will receive a link to join via the email list.
+---
+class: inverse
 
-Use it like the mailing list to ask questions, particularly for *short questions*.
+# Lecture 1: Introduction to R, RStudio, and RMarkdown
 
-Use the mailing list for *long questions* or those requiring you to attach a file.
-
-I encourage you to answer each others' questions!
-
-.footnote[
-Note: If you're not enrolled but want to be Slack, email me!
-]
 
 ---
 
@@ -267,45 +285,6 @@ Code chunks that span the page represent *actual R code embedded in the slides*.
 ```
 
 The lines preceded by `##` represent the output, or result, of running the code in the code chunk. We'll talk about this more later!
-
----
-
-# Lecture Plan
-
-1. RStudio and R Markdown
---
-
-2. Visualizing Data
---
-
-3. Manipulating and Summarizing Data
---
-
-4. Understanding R Data Structures
---
-
-5. Importing, Exporting, Cleaning Data
---
-
-6. Using Loops
---
-
-7. Writing Functions
---
-
-8. Working with Text Data
---
-
-9. Working with Geographical Data
---
-
-10. Reproducibility and Model Results
-
-
----
-class: inverse
-
-# R and RStudio
 
 
 ---
@@ -411,6 +390,20 @@ The ability to create R Markdown files is a powerful advantage of R:
 --
 
 We'll get back to this shortly!
+
+---
+
+# Downloading R and RStudio
+
+If you don't already have R and RStudio on your machine, now is the time to do so!
+
+1. Go to the course homepage, https://pearce790.github.io/CSSS508
+2. Click the *Download R* link and download R to your machine.
+3. Afterwards, click the *Download RStudio* link and download RStudio to your machine.
+
+
+We'll take a ~10 minute break now to stretch and solve any software issues!
+
 
 ---
 
@@ -635,6 +628,16 @@ Let's try making an R Markdown file:
 
 You may also open up the file in your computer's browser if you so desire, using the *Open in Browser* button at the top of the preview window.
 
+--
+
+If you ever have trouble knitting your file (especially if creating a PDF), try running the following code in the command line:
+
+```{r RMDHelp, eval=FALSE}
+install.packages('rmarkdown')
+install.packages('tinytex')
+tinytex::install_tinytex()
+```
+
 ---
 
 # R Markdown Headers
@@ -782,7 +785,8 @@ there
 $$\frac{1}{n} \sum_{i=1}^{n}
 x_i = \bar{x}_n$$
 
-Or a sentence with `code-looking font`.
+Or a sentence with 
+`code-looking font`.
 
 Or a block of code:
 
@@ -1139,26 +1143,13 @@ class: inverse
 
 # Homework
 
-Write up a .Rmd file showing some exploratory analyses of the Swiss fertility data. Upload both the `.Rmd` file and the `.html` file to Canvas. You must upload *both* for credit.
+Visit [Homework Page](https://pearce790.github.io/CSSS508/homework.html) for details.
 
-Mix in-line R calculations, tables, R output, and plots with text describing the relationships you see. Include *at least* one plot and one table. You are encouraged to include more! You must use in-line R calculations/references at least once (e.g. functions like `nrow()`, `mean()`, `sd()`, `cor()`, `median()`, `min()`) and *may not hard-code any numbers referenced in your text*.
-
-Your document should be pleasant for a peer to look at, with some organization using sections or lists, and all plots labeled clearly. Use chunk options `echo` and `results` to limit the code/output you show in the .html. Discussion of specific values should be summarized in sentences in your text---*not as printed code and output*---and rounded so as not to be absurdly precise (e.g. round `x` with `round(x, 2)`).
 
 ---
 
-# Grading Rubric
+# See you on Tuesday for lab!
 
-0 - Didn't turn anything in.
+(I'll stay for a bit after class to chat!)
 
---
 
-1 - Turned in but low effort, ignoring many directions.
-
---
-
-2 - Decent effort, followed directions with some minor issues.
-
---
-
-3 - Nailed it!
