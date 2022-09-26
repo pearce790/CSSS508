@@ -22,13 +22,13 @@ knitr::opts_chunk$set(comment = "##")
 
 # Welcome to CSSS 508: Introduction to R for Social Scientists
 
-Today, we will:
+Today, we will do:
 
-* Introduce ourselves
+* Introductions
 
-* Go through the syllabus
+* Syllabus
 
-* Go through Lecture 1: Introduction to R, RStudio, and RMarkdown
+* Lecture 1: Introduction to R, RStudio, and RMarkdown
 
 ---
 
@@ -38,7 +38,7 @@ We'll go around the room and each share our:
 
 * Name and preferred pronouns
 
-* Program, year, and research interests (if applicable)
+* Program and year
 
 * Experience with programming (in R or generally)
 
@@ -122,31 +122,31 @@ This course will have no meeting during final exam week.
 # Prereqs, Materials, and Texts
 
 
-Prerequisites: None
+**Prerequisites:** None
 
-Materials: All course materials are provided on the [course website](https://pearce790.github.io/CSSS508). This includes:
+**Materials:** All course materials are provided on the [course website](https://pearce790.github.io/CSSS508). This includes:
 
 * These slides and the code used to generate them.
 * An R script for the slides to follow along in class.
-* PDFs of slides if you like those.
 * Homework instructions and/or templates
 * Useful links to other resources.
 
-Laptops: It's help to bring a laptop to class. If you don't have one, you can use the lab computers or borrow one for free from the UW Student Technology Loan Program.
+**Laptops:** It's help to bring a laptop to class. If you don't have one, you can use the lab computers or borrow one for free from the UW Student Technology Loan Program.
 
-Textbooks: This course has no textbook. However, the website has links to a few texts which I have found useful!
+**Textbooks:** This course has no textbook. However, the website has links to a few texts which I have found useful!
 
 
 ---
 
 # Grading
 
-* Final grade: C/NC, 60% to get Credit
+**Final grade:** C/NC, 60% to get Credit.
+
 * **Homework** (75%; assessed by peers): 9 total homeworks; assessed on a 0-3 point rubric. Assigned after Thursday lectures and due the following Thursday before lecture.
 * **Peer Grading** (25%; assessed by the instructor): One per homework, assessed on a binary "good"/"not good" scale. Due the following Tuesday before lab.
-* Both handed in via Canvas.
 
-Homework instructions/templates, peer grading instructions, and the homework schedule can be found on the [Homework](https://pearce790.github.io/CSSS508/homework.html) page of the course website.
+
+Assignment/peer grading instructions and deadlines can be found on the [Homework](https://pearce790.github.io/CSSS508/homework.html) page of the course website. All homework will be turned in on Canvas.
 
 
 ---
@@ -160,16 +160,17 @@ Yes, because:
 
 * You learn alternate approaches to the same problem
 
-Learning to code is hard and requires lots of practice. Peer grading is a great way to help your coding skills sink in and develop faster!
+* You will have more opportunities to practice and have the material sink in
+
 
 --
 
 How to peer review:
 
-* Leave constructive comments -- more than just saying "good job!"
+* Leave **constructive comments** -- more than just saying "good job!"
     + I expect at least 3-4 sentences saying what was good, interesting, could use improvement, etc.
-    + Earlier assignments will need more feedback, late assignments less.
-* **Email me** if you would like the instructor to regrade your assignment or provide feedback if no peer review was given.
+    + Earlier assignments will need more feedback, later assignments less.
+* **Email me** if you would like your assignment to be regraded or provide feedback if no peer review was given.
 
 
 ---
@@ -215,12 +216,12 @@ Anything found in violation of this policy will be automatically given a score o
 
 --
 
-* Getting Help: If you ever find yourself struggling to keep up, please let me know! I am here to help. Try chatting after class, office hours, or email.
+* Getting Help: If you ever find yourself struggling to keep up, please let me know! I am here to help. Try Canvas discussion boards or chatting after class, office hours, or via email.
 
 
 ---
 
-# Asking Questions Over Email
+# Asking Questions
 
 Don't ask like this:
 
