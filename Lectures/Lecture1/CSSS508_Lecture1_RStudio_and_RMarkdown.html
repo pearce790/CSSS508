@@ -97,16 +97,16 @@ We will cover almost no statistics here, but I hope you'll leave being able to f
 
 # Logistics
 
-Sessions: 
+**Sessions: **
 
 * **Lecture:** Thursdays, 3:30-5:20 (Savery 117) -- Interactive sessions in which we'll learn key skills, concepts, and principles
 * **Lab:** Tuesdays, 3:30-5:20 (Savery 117) -- Optional and mostly unstructured sessions to work on homework and review
 * **Office Hours:** Wednesdays 10:30-11:30am and 3:30-4:30pm (on Zoom; link on Canvas)
 
 
-Course Website: https://pearce790.github.io/CSSS508
+**Course Website:** https://pearce790.github.io/CSSS508
 
-Contact: Feel free to email me at [mpp790 at uw dot edu]
+**Contact:** Feel free to email me at [mpp790 at uw dot edu]
 
 
 ---
@@ -227,7 +227,7 @@ Anything found in violation of this policy will be automatically given a score o
 
 --
 
-* Getting Help: If you ever find yourself struggling to keep up, please let me know! I am here to help. Try Canvas discussion boards or chatting after class, office hours, or via email.
+* Getting Help: If you ever find yourself struggling, know I'm here to help! Try Canvas discussion boards, chatting after class, email, or office hours.
 
 
 ---
@@ -277,11 +277,7 @@ class: inverse
 
 # A Note on Slide Formatting
 
-**Bold** usually indicates an important vocabulary term. Remember these!
-
---
-
-*Italics* indicate emphasis but also are used to point out things you must click with a mouse, for example: "Please click *File &gt; Print*"
+**Bold** and *Italics* usually indicate emphasis or important terms! 
 
 --
 
@@ -301,7 +297,6 @@ Code chunks that span the page represent *actual R code embedded in the slides*.
 ## [1] 343
 ```
 
-The lines preceded by `##` represent the output, or result, of running the code in the code chunk. We'll talk about this more later!
 
 
 ---
@@ -313,7 +308,7 @@ R is a programming language built for statistical computing.
 If one already knows Stata or similar software, why use R?
 --
 
-* R is *free*, so you don't need a terminal server.
+* R is *free*.
 
 --
 
@@ -438,7 +433,6 @@ Then, let's get oriented with the interface:
 
 * *Bottom Right*: Tabs for browsing files, viewing plots, managing packages, and viewing help files.
 
-You can change the layout in *Preferences &gt; Pane Layout*
 
 ---
 
@@ -557,9 +551,9 @@ new.object &lt;- 144
 --
 
 **Operators** like `&lt;-` are functions that look like symbols but typically sit between their arguments 
-(e.g. numbers or objects) instead of having them inside `()` like in `sqrt(x)`&lt;sup&gt;1&lt;/sup&gt;. 
+(e.g. numbers or objects) instead of having them inside `()` like in `sqrt(x)`. 
 
-.footnote[[1] We can actually call operators like other functions by stuffing them between backticks: &lt;code  class="r"&gt;``` \`+\`(x,y) ```&lt;/code&gt;]
+
 
 --
 
@@ -693,7 +687,7 @@ You may also open up the file in your computer's browser if you so desire, using
 
 --
 
-If you ever have trouble knitting your file (especially if creating a PDF), try running the following code in the command line:
+If you ever have trouble knitting your file (especially if creating a PDF), try running the following code in the console:
 
 
 ```r
@@ -879,7 +873,7 @@ To keep R Markdown dead-simple, it lacks some features you might occasionally wa
 
 * Templates
 * Use HTML with CSS for custom formatting&lt;sup&gt;1&lt;/sup&gt;
-* Use LaTeX and .Rnw files instead of .Rmd&lt;sup&gt;2&lt;/sup&gt;
+* Use LaTeX files instead of .Rmd&lt;sup&gt;2&lt;/sup&gt;
 
 For day-to-day use, plain vanilla R Markdown does the job.
 
@@ -889,7 +883,7 @@ For handouts, memos, and homeworks, default R Markdown PDFs look surprisingly go
 .footnote[
 [1] These slides were created using [Xaringan](https://github.com/yihui/xaringan), a blend of RMarkdown and CSS.
 
-[2] Here be dragons! LaTeX is powerful but exacts a terrible price.
+[2] LaTeX is powerful but exacts a terrible price.
 ]
 
 ---
@@ -1018,7 +1012,7 @@ Fancier option: Use this instead to take today's date and make it read nicely:&l
 
     date: "`r format(Sys.Date(), format='%B %d, %Y')`"
 
-.footnote[[1] `format(Sys.Date(), format='%B %d, %Y')` says "format system date as month name (`%B`), day-of-month (`%d`), and four-digit year (`%Y`): September 26, 2022. See `?strptime` for these format codes.]
+.footnote[[1] `format(Sys.Date(), format='%B %d, %Y')` says "format system date as month name (`%B`), day-of-month (`%d`), and four-digit year (`%Y`): September 28, 2022. See `?strptime` for these format codes.]
 ---
 class: inverse
 
@@ -1256,7 +1250,6 @@ library(pander) # loads pander, do once in your session
 | Max.   :92.50 | Max.   :89.70 | Max.   :37.00 | Max.   :53.00 | Max.   :100.000 |  Max.   :26.60   |
 ]
 
-.footnote[Note that we put the `summary(swiss)` function call inside the `pander()` call. This is called *nesting functions* and is very common. I'll introduce a method next week to avoid confusion from nesting too many functions inside each other.]
 
 ---
 
@@ -1285,6 +1278,8 @@ class: inverse
 # Homework
 
 Visit [Homework Page](https://pearce790.github.io/CSSS508/homework.html) for details.
+
+Advice: Start with the provided template, then modify!
 
 
 ---

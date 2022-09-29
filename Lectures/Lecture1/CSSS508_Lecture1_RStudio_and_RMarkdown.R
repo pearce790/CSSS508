@@ -27,13 +27,10 @@ sqrt(new.object)
 # install.packages('tinytex')
 # tinytex::install_tinytex()
 
-summary(cars)
-
-#install.package("knitr")
-library(knitr)
-
 x <- sqrt(77) # <- is how we assign objects
 
+data(cars)
+View(cars)
 head(cars, 5) # prints first 5 rows, see tail() too
 
 str(cars) # str[ucture]
@@ -59,15 +56,16 @@ plot(dist ~ speed, data = cars, #<<
 abline(h = dist_mean, col = "firebrick")
 abline(v = speed_mean, col = "cornflowerblue")
 
+# ?swiss
+
+data(swiss)
+
 pairs(swiss, pch = 8, col = "violet", #<<
       main = "Pairwise comparisons of Swiss variables")
 
 ## library(pander) # loads pander, do once in your session
-## pander(summary(swiss), style = "rmarkdown", split.tables = 120) #<<
-
 library(pander) # loads pander, do once in your session
-pander(summary(swiss), style = "rmarkdown", split.tables = 120)
 
-## pander(head(swiss, 5), style = "rmarkdown", split.tables = 120)
+pander(summary(swiss), style = "rmarkdown", split.tables = 120)
 
 pander(head(swiss, 5), style = "rmarkdown", split.tables = 120)
