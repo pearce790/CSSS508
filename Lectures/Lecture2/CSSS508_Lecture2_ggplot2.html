@@ -77,7 +77,23 @@ Installing a packages *does not* mean it's loaded in our R session. To do so, we
 library(gapminder)
 ```
 
-We need to do this every time we open a new R session. Where should be put this code?
+We need to run this code every time we open a new R session: **Where should we put this code?**
+
+
+---
+
+# File Types
+
+We mainly work with four file types in this class:
+
+* `.Rmd`: These are **markdown** *syntax* files, where you write code to *make documents*.
+
+* `.R`: These are **R** *syntax* files, where you write code to process and analyze data *without making an output document*.
+
+* `.html` or `.pdf`: These are the output documents created when you *knit* a markdown document.
+
+Make sure you understand the difference!
+
 
 ---
 
@@ -108,19 +124,7 @@ setwd("C:/Users/pearce790/CSSS508/HW2")
 
 *Don't set a working directory in R Markdown documents!* They automatically set the directory they are in as the working directory.
 
----
 
-# File Types
-
-We mainly work with four file types in this class:
-
-* `.Rmd`: These are **markdown** *syntax* files, where you write code to *make documents*.
-
-* `.R`: These are **R** *syntax* files, where you write code to process and analyze data *without making an output document*.
-
-* `.html` or `.pdf`: These are the output documents created when you *knit* a markdown document.
-
-Make sure you understand the difference!
 
 ---
 
@@ -422,7 +426,7 @@ Or we can combine multiple logical conditions:
 
 --
 
-We'll use these a lot so don't worry too much right now!
+We'll practice these a lot, so don't worry right now if it's unclear!
 
 ---
 
@@ -1099,43 +1103,14 @@ ggplot(data = gapminder,
 ![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-54-1.svg)&lt;!-- --&gt;
 ]
 
-.footnote[Better, but could bring that legend in.]
+.footnote[Better. Do we even need the legend anymore?]
 
 ---
 
 
 # Plotting All Countries
 
-### 8: Legend Position
-.pull-left[
- .small[
-
-```r
-ggplot(data = gapminder, 
-       aes(x = year, y = lifeExp, 
-           group = country, 
-           color = continent)) +
-  geom_line() +
-  xlab("Year") + 
-  ylab("Life expectancy") +
-  ggtitle("Life expectancy over time") +
-  theme_bw() +  
-  facet_wrap(~ continent) +
-* theme(legend.position = c(0.8, 0.25))
-```
-]
-]
-.pull-right[
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-56-1.svg)&lt;!-- --&gt;
-]
-
-.footnote[Better... but do we even need it?]
----
-
-
-# Plotting All Countries
-
-### 9: No Legend
+### 8: No Legend
 .pull-left[
  .small[
 
@@ -1155,7 +1130,7 @@ ggplot(data = gapminder,
 ]
 ]
 .pull-right[
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-58-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-56-1.svg)&lt;!-- --&gt;
 ]
 
 .footnote[Looking good!]
@@ -1168,7 +1143,7 @@ class: inverse
 
 Next, we'll discuss:
 
-* Storing and saving plots
+* Storing, modifying, and saving ggplots
 
 * Advanced axis changes (scales, text, ticks)
 
@@ -1209,7 +1184,7 @@ The graph won't be displayed when you do this. You can show the graph using a si
 lifeExp_by_year
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-60-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-58-1.svg)&lt;!-- --&gt;
 
 ---
 
@@ -1221,7 +1196,7 @@ lifeExp_by_year +
     theme(legend.position = "bottom")
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-61-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-59-1.svg)&lt;!-- --&gt;
 
 
 ---
@@ -1267,7 +1242,7 @@ ggplot(data = China, aes(x = year, y = gdpPercap)) +
     xlim(1940, 2010) + ggtitle("Chinese GDP per capita")
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-63-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-61-1.svg)&lt;!-- --&gt;
 
 ---
 
@@ -1281,7 +1256,7 @@ ggplot(data = China, aes(x = year, y = lifeExp)) +
 *   theme_gray(base_size = 20)
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-64-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-62-1.svg)&lt;!-- --&gt;
 
 ---
 
@@ -1304,7 +1279,25 @@ Note: `theme()` is a different layer than `theme_gray()` or `theme_bw()`, which 
 
 I recommend using `theme()` *after* `theme_bw()` or other *global themes*.
 
+
 ---
+
+## Precise Legend Position
+.small[
+
+```r
+lifeExp_by_year +
+  theme(legend.position = c(0.8, 0.2)) 
+```
+
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-63-1.svg)&lt;!-- --&gt;
+]
+
+Instead of coordinates, you could also use "top", "bottom", "left", or "right".
+
+
+---
+
 
 # Scales for Color, Shape, etc.
 
@@ -1338,7 +1331,7 @@ lifeExp_by_year +
                "Asia" = "royalblue", "Europe" = "violetred1", "Oceania" = "yellow"))
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-65-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-64-1.svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -1353,7 +1346,7 @@ class: inverse
 
 We're going to *slowly* build up a *really detailed plot* now!
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-66-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-65-1.svg)&lt;!-- --&gt;
 
 
 ---
@@ -1373,7 +1366,7 @@ We're going to *slowly* build up a *really detailed plot* now!
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-67-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-66-1.svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -1396,7 +1389,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-68-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-67-1.svg)&lt;!-- --&gt;
 ]
 ---
 
@@ -1418,7 +1411,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-69-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-68-1.svg)&lt;!-- --&gt;
 ]
 
 .footnote[Note: A [*loess* curve](https://en.wikipedia.org/wiki/Local_regression) is something like a moving average.]
@@ -1442,7 +1435,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-70-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-69-1.svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -1465,7 +1458,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-71-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-70-1.svg)&lt;!-- --&gt;
 ]
 ---
 
@@ -1486,7 +1479,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-72-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-71-1.svg)&lt;!-- --&gt;
 ]
 ---
 
@@ -1508,7 +1501,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-73-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-72-1.svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -1531,7 +1524,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-74-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-73-1.svg)&lt;!-- --&gt;
 ]
 ---
 
@@ -1553,7 +1546,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-75-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-74-1.svg)&lt;!-- --&gt;
 ]
 ---
 
@@ -1575,7 +1568,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
 * theme(axis.text.x = element_text(angle = 45))
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-76-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-75-1.svg)&lt;!-- --&gt;
 ]
 
 .footnote[Note: Fewer values might be better than angled labels!]
@@ -1599,7 +1592,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
 * theme(legend.position=c(0.82, 0.15), axis.text.x = element_text(angle = 45))
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-77-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-76-1.svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -1660,7 +1653,7 @@ ggplot(gapminder,aes(x=lifeExp))
 ]
 ]
 .pull-right[
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-79-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-78-1.svg)&lt;!-- --&gt;
 ]
 
 
@@ -1679,16 +1672,16 @@ ggplot(gapminder,aes(x=lifeExp))+
 ]
 ]
 .pull-right[
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-81-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-80-1.svg)&lt;!-- --&gt;
 ]
 
-.footnote[Setting the `bins` argument removes a pesky message!]
+.footnote[Setting the `bins` aesthetic removes a pesky message!]
 
 ---
 
 # My Solution
 
-### 3: Add Aesthetics
+### 3: Add Label Layers
 .pull-left[
  .small[
 
@@ -1703,7 +1696,7 @@ ggplot(gapminder,aes(x=lifeExp))+
 ]
 ]
 .pull-right[
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-83-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-82-1.svg)&lt;!-- --&gt;
 ]
 
 ---

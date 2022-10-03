@@ -4,10 +4,9 @@ library(gapminder)
 
 getwd()
 
-# setwd("C:/Users/pearce790/CSSS508/HW2")
+# setwd("INSERT YOUR WORKING DIRECTORY NAME HERE")
 
 new.object <- 1:10 # Making vector of 1 to 10 
-
 # save(new.object, file="new_object.RData")
 # load("new_object.RData")
 
@@ -42,7 +41,6 @@ library(ggplot2)
 
 ggplot(data = China,  #<<
        aes(x = year, y = lifeExp)) #<<
-
 
 ggplot(data = China, 
        aes(x = year, y = lifeExp)) +
@@ -163,18 +161,6 @@ ggplot(data = gapminder,
   ggtitle("Life expectancy over time") +
   theme_bw() +  
   facet_wrap(~ continent) +
-  theme(legend.position = c(0.8, 0.25)) #<<
-
-ggplot(data = gapminder, 
-       aes(x = year, y = lifeExp, 
-           group = country, 
-           color = continent)) +
-  geom_line() +
-  xlab("Year") + 
-  ylab("Life expectancy") +
-  ggtitle("Life expectancy over time") +
-  theme_bw() +  
-  facet_wrap(~ continent) +
   theme(legend.position = "none") #<<
 
 lifeExp_by_year <- 
@@ -208,6 +194,9 @@ ggplot(data = China, aes(x = year, y = lifeExp)) +
   geom_line() +
   ggtitle("Chinese life expectancy") +
   theme_gray(base_size = 20) #<<
+
+lifeExp_by_year +
+  theme(legend.position = c(0.8, 0.2))
 
 lifeExp_by_year +
   theme(legend.position = c(0.8, 0.2)) +

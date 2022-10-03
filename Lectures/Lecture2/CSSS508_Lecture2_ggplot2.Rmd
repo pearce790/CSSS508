@@ -64,7 +64,23 @@ Installing a packages *does not* mean it's loaded in our R session. To do so, we
 library(gapminder)
 ```
 
-We need to do this every time we open a new R session. Where should be put this code?
+We need to run this code every time we open a new R session: **Where should we put this code?**
+
+
+---
+
+# File Types
+
+We mainly work with four file types in this class:
+
+* `.Rmd`: These are **markdown** *syntax* files, where you write code to *make documents*.
+
+* `.R`: These are **R** *syntax* files, where you write code to process and analyze data *without making an output document*.
+
+* `.html` or `.pdf`: These are the output documents created when you *knit* a markdown document.
+
+Make sure you understand the difference!
+
 
 ---
 
@@ -89,19 +105,7 @@ setwd("C:/Users/pearce790/CSSS508/HW2")
 
 *Don't set a working directory in R Markdown documents!* They automatically set the directory they are in as the working directory.
 
----
 
-# File Types
-
-We mainly work with four file types in this class:
-
-* `.Rmd`: These are **markdown** *syntax* files, where you write code to *make documents*.
-
-* `.R`: These are **R** *syntax* files, where you write code to process and analyze data *without making an output document*.
-
-* `.html` or `.pdf`: These are the output documents created when you *knit* a markdown document.
-
-Make sure you understand the difference!
 
 ---
 
@@ -333,7 +337,7 @@ Or we can combine multiple logical conditions:
 
 --
 
-We'll use these a lot so don't worry too much right now!
+We'll practice these a lot, so don't worry right now if it's unclear!
 
 ---
 
@@ -1076,54 +1080,14 @@ ggplot(data = gapminder,
 ```
 ]
 
-.footnote[Better, but could bring that legend in.]
+.footnote[Better. Do we even need the legend anymore?]
 
 ---
 
 
 # Plotting All Countries
 
-### 8: Legend Position
-.pull-left[
- .small[
-```{r, fig.height=4, dev='svg', eval=FALSE}
-ggplot(data = gapminder, 
-       aes(x = year, y = lifeExp, 
-           group = country, 
-           color = continent)) +
-  geom_line() +
-  xlab("Year") + 
-  ylab("Life expectancy") +
-  ggtitle("Life expectancy over time") +
-  theme_bw() +  
-  facet_wrap(~ continent) +
-  theme(legend.position = c(0.8, 0.25)) #<<
-```
-]
-]
-.pull-right[
-```{r,  dev='svg', echo=FALSE}
-ggplot(data = gapminder, 
-       aes(x = year, y = lifeExp, 
-           group = country, 
-           color = continent)) +
-  geom_line() +
-  xlab("Year") + 
-  ylab("Life expectancy") +
-  ggtitle("Life expectancy over time") +
-  theme_bw() + 
-  facet_wrap(~ continent) +
-  theme(legend.position = c(0.8, 0.25)) #<<
-```
-]
-
-.footnote[Better... but do we even need it?]
----
-
-
-# Plotting All Countries
-
-### 9: No Legend
+### 8: No Legend
 .pull-left[
  .small[
 ```{r, fig.height=4, dev='svg', eval=FALSE}
@@ -1167,7 +1131,7 @@ class: inverse
 
 Next, we'll discuss:
 
-* Storing and saving plots
+* Storing, modifying, and saving ggplots
 
 * Advanced axis changes (scales, text, ticks)
 
@@ -1289,7 +1253,22 @@ Note: `theme()` is a different layer than `theme_gray()` or `theme_bw()`, which 
 
 I recommend using `theme()` *after* `theme_bw()` or other *global themes*.
 
+
 ---
+
+## Precise Legend Position
+.small[
+```{r, fig.height=4, dev='svg'}
+lifeExp_by_year +
+  theme(legend.position = c(0.8, 0.2)) 
+```
+]
+
+Instead of coordinates, you could also use "top", "bottom", "left", or "right".
+
+
+---
+
 
 # Scales for Color, Shape, etc.
 
@@ -1645,13 +1624,13 @@ ggplot(gapminder,aes(x=lifeExp))+
 ```
 ]
 
-.footnote[Setting the `bins` argument removes a pesky message!]
+.footnote[Setting the `bins` aesthetic removes a pesky message!]
 
 ---
 
 # My Solution
 
-### 3: Add Aesthetics
+### 3: Add Label Layers
 .pull-left[
  .small[
 ```{r, fig.height=4, dev='svg', eval=FALSE}
