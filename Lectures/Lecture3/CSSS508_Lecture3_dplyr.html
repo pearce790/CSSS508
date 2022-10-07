@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>CSSS 508, Lecture 3</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Michael Pearce (based on slides from Chuck Lanfear)" />
+    <meta name="date" content="2022-10-13" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, top, title-slide
+
+.title[
+# CSSS 508, Lecture 3
+]
+.subtitle[
+## Manipulating and Summarizing Data
+]
+.author[
+### Michael Pearce<br>(based on slides from Chuck Lanfear)
+]
+.date[
+### October 13, 2022
+]
+
+---
+
+
+
+
+class: inverse
+
+# Topics
+
+Last time, we learned about,
+
+1. Useful coding tips: packages, directories, and saving data
+1. Advanced data manipulation tools
+1. Basics of ggplot: layers and aesthetics
+1. Advanced ggplot tools
+
+--
+
+Today, we will cover,
+
+1. Subsetting data
+1. Modifying data 
+1. Summarizing data
+1. Joining data
+
+---
+class: inverse
+
+# Death to Spreadsheets
+
+
+
+You may be familiar with tools like Excel or Google Sheets, which let you manipulate data in a spreadsheet using functions. Spreadsheets are *not reproducible*: It's hard to know how someone changed the raw data!
+
+Today we'll talk more about `dplyr`: an R package that does ust about any calculation you've tried to do in Excel, but more *transparently*, *reproducibly*, and *safely*. 
+
+Don't be the next sad research assistant who makes headlines with an Excel error ([Reinhart &amp; Rogoff, 2010](http://www.bloomberg.com/news/articles/2013-04-18/faq-reinhart-rogoff-and-the-excel-error-that-changed-history))
+
+---
+class: inverse
+
+# Subsetting data
+
++ `filter()`
++ `distinct()`
++ `select()`
++ `pull()`
+
+
+---
+# Reminder: Pipes (%&gt;%)
+
+In `dplyr`, we use the **pipe** operator (`%&gt;%`) to make code readable. A keyboard shortcut to create pipes is `Ctrl+Shift+M` (Windows) or `Command+Shift+M` (OS).
+
+--
+
+Pipes take the object on the *left* and apply to it the function on the *right*:
+
+
+```r
+library(dplyr)
+library(gapminder)
+gapminder %&gt;% filter(country == "Canada") %&gt;% head(2)
+```
+
+```
+## # A tibble: 2 × 6
+##   country continent  year lifeExp      pop gdpPercap
+##   &lt;fct&gt;   &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+## 1 Canada  Americas   1952    68.8 14785584    11367.
+## 2 Canada  Americas   1957    70.0 17010154    12490.
+```
+
+In words, we (1) take the gapminder data, (2) filter to observations where the country is "Canada", and (3) display the first two observations.
+
+
+---
+# Subsetting rows
+
+We often get *big* datasets, but only want to use a portion of them. We can subset portions of our data using the `filter()` function.
+
+--
+
+Last week we used the `filter()` command to subset data:
+
+```r
+Canada &lt;- gapminder %&gt;% filter(country == "Canada")
+```
+
+We now have the object `Canada` saved in our environment, which contains all observations of the gapminder data from the country Canada.
+
+.footnote[[1] Reminder: `==` is an operator that tests for equality.]
+
+---
+# Another Operator: `%in%`
+
+What if I want to subset data from multiple countries at once?! Use the `%in%` operator!
+
+--
+
+We can use `%in%` like `==` but for matching *any element* in the vector on its right&lt;sup&gt;1&lt;/sup&gt;. 
+
+
+```r
+former_yugoslavia &lt;- c("Bosnia and Herzegovina", "Croatia", 
+                       "Montenegro", "Serbia", "Slovenia")
+Yugoslavia &lt;- gapminder %&gt;% filter(country %in% former_yugoslavia)
+head(Yugoslavia, 4)
+```
+
+```
+## # A tibble: 4 × 6
+##   country                continent  year lifeExp     pop gdpPercap
+##   &lt;fct&gt;                  &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;
+## 1 Bosnia and Herzegovina Europe     1952    53.8 2791000      974.
+## 2 Bosnia and Herzegovina Europe     1957    58.4 3076000     1354.
+## 3 Bosnia and Herzegovina Europe     1962    61.9 3349000     1710.
+## 4 Bosnia and Herzegovina Europe     1967    64.8 3585000     2172.
+```
+
+
+.footnote[[1] Reminder: The `c()` function is how we make **vectors** in R.]
+
+---
+## Finding unique values
+
+Sometimes you want to see the unique combinations of variables that exist in your dataset. You can do this using the function `distinct()`.
+
+--
+
+For example, what if we want to see what unique combinations of "continent" and "year" are in gapminder:
+
+
+```r
+gapminder %&gt;% distinct(continent, year) %&gt;% head(6)
+```
+
+```
+## # A tibble: 6 × 2
+##   continent  year
+##   &lt;fct&gt;     &lt;int&gt;
+## 1 Asia       1952
+## 2 Asia       1957
+## 3 Asia       1962
+## 4 Asia       1967
+## 5 Asia       1972
+## 6 Asia       1977
+```
+
+---
+## `distinct()` drops variables!
+
+
+By default, `distinct()` drops all unused variables. If you don't want to drop the others, use `distinct(.keep_all=TRUE)`:
+
+
+```r
+gapminder %&gt;% distinct(continent, year, .keep_all=TRUE) %&gt;% head(6)
+```
+
+```
+## # A tibble: 6 × 6
+##   country     continent  year lifeExp      pop gdpPercap
+##   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+## 1 Afghanistan Asia       1952    28.8  8425333      779.
+## 2 Afghanistan Asia       1957    30.3  9240934      821.
+## 3 Afghanistan Asia       1962    32.0 10267083      853.
+## 4 Afghanistan Asia       1967    34.0 11537966      836.
+## 5 Afghanistan Asia       1972    36.1 13079460      740.
+## 6 Afghanistan Asia       1977    38.4 14880372      786.
+```
+
+---
+## Keeping or dropping variables
+
+What if we want to subset *variables* (as opposed to observations)? Use the `select()` function!
+
+--
+
+If we want to view the variables "country", "year", and "pop" (in that order), we can do so using the following code: 
+
+```r
+Yugoslavia %&gt;% select(country, year, pop) %&gt;% head(4)
+```
+
+```
+## # A tibble: 4 × 3
+##   country                 year     pop
+##   &lt;fct&gt;                  &lt;int&gt;   &lt;int&gt;
+## 1 Bosnia and Herzegovina  1952 2791000
+## 2 Bosnia and Herzegovina  1957 3076000
+## 3 Bosnia and Herzegovina  1962 3349000
+## 4 Bosnia and Herzegovina  1967 3585000
+```
+
+---
+## Dropping columns
+
+Alternatively, we can use `select()` to drop variables using a `-` sign: 
+
+
+```r
+Yugoslavia %&gt;% select(-continent, -pop, -lifeExp) %&gt;% head(4)
+```
+
+```
+## # A tibble: 4 × 3
+##   country                 year gdpPercap
+##   &lt;fct&gt;                  &lt;int&gt;     &lt;dbl&gt;
+## 1 Bosnia and Herzegovina  1952      974.
+## 2 Bosnia and Herzegovina  1957     1354.
+## 3 Bosnia and Herzegovina  1962     1710.
+## 4 Bosnia and Herzegovina  1967     2172.
+```
+
+Now, we're showing all variables *except* "continent", "pop", and "lifeExp".
+
+---
+
+## Extracting a single column?
+
+Sometimes you want to extract a single column from a data frame as a *vector* (or single value). `pull()` *pulls* a column of a data frame out as a vector.
+
+--
+
+
+```r
+gapminder %&gt;% pull(lifeExp) %&gt;% head(4)
+```
+
+```
+## [1] 28.801 30.332 31.997 34.020
+```
+
+--
+
+
+```r
+gapminder %&gt;% select(lifeExp) %&gt;% head(4)
+```
+
+```
+## # A tibble: 4 × 1
+##   lifeExp
+##     &lt;dbl&gt;
+## 1    28.8
+## 2    30.3
+## 3    32.0
+## 4    34.0
+```
+
+.pull-right[.footnote[Note the difference between these two operations: The second yields only one column but is still a data frame.]]
+---
+
+## In-Line `pull()`
+
+`pull()` is particularly useful when you want to use a vector-only command in a `dplyr` chain of functions (say, in an in-line expression).
+
+--
+
+This in-line code...
+
+&lt;p&gt;&lt;code&gt;The average life expectancy in Afghanistan from 1952 to 2007 was &lt;/code&gt;&lt;code  class="r"&gt;`&lt;/code&gt;&lt;code class="r"&gt;r gapminder %&gt;% filter(country=="Afghanistan") %&gt;% pull(lifeExp) %&gt;% mean() %&gt;% round(1)`&lt;/code&gt;&lt;code&gt; years.&lt;/code&gt;&lt;/p&gt;
+
+--
+
+... will produce this output:
+
+The average life expectancy in Afghanistan from 1952 to 2007 was 37.5 years.
+
+
+NOTE: `mean()` can only take a *vector* input, not a data frame. So this won't work with `select(lifeExp)` instead of `pull(lifeExp)`.
+
+---
+class:inverse
+
+# Check Your Understanding:
+
+With a neighbor or two, write one line of code to answer each of the following questions:
+
+1. Create an object that includes all rows in gapminder from the continents Asia and Oceania
+
+2. Remove the variables "lifeExp" and "gdpPercap" from your subsetted data.
+
+3. Display the distinct combinations of "country" and "continent" from your subsetted data, but do not drop the remaining variables!
+
+---
+
+# My Solution
+
+### 1: Filter Asia and Oceania:
+
+```r
+Asia_and_Oceania &lt;- gapminder %&gt;% 
+  filter(continent %in% c("Asia", "Oceania"))
+head(Asia_and_Oceania,4)
+```
+
+```
+## # A tibble: 4 × 6
+##   country     continent  year lifeExp      pop gdpPercap
+##   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+## 1 Afghanistan Asia       1952    28.8  8425333      779.
+## 2 Afghanistan Asia       1957    30.3  9240934      821.
+## 3 Afghanistan Asia       1962    32.0 10267083      853.
+## 4 Afghanistan Asia       1967    34.0 11537966      836.
+```
+
+
+---
+
+# My Solution
+
+### 2: Drop "lifeExp" and "gdpPercap":
+
+
+```r
+Asia_and_Oceania &lt;- Asia_and_Oceania %&gt;% select(-lifeExp,-gdpPercap)
+head(Asia_and_Oceania,4)
+```
+
+```
+## # A tibble: 4 × 4
+##   country     continent  year      pop
+##   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;    &lt;int&gt;
+## 1 Afghanistan Asia       1952  8425333
+## 2 Afghanistan Asia       1957  9240934
+## 3 Afghanistan Asia       1962 10267083
+## 4 Afghanistan Asia       1967 11537966
+```
+
+
+---
+
+# My Solution
+
+### 3: Display distinct "country" and "continent" without dropping:
+
+
+```r
+Asia_and_Oceania %&gt;% 
+  distinct(country,continent,.keep_all=TRUE) %&gt;%
+  head(4)
+```
+
+```
+## # A tibble: 4 × 4
+##   country     continent  year      pop
+##   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;    &lt;int&gt;
+## 1 Afghanistan Asia       1952  8425333
+## 2 Australia   Oceania    1952  8691212
+## 3 Bahrain     Asia       1952   120447
+## 4 Bangladesh  Asia       1952 46886859
+```
+
+---
+class: inverse
+
+# Modifying data
+
++ `arrange()`
++ `rename()`
++ `mutate()`
++ `recode()`
+
+
+---
+## Sorting data by rows
+
+Sometimes we want to sort data by row, in either ascending (lower to high) or descending (high to low) order. We can do that with `arrange()`.
+
+`arrange` uses ascending order by default. Arrange by descending order using the function `desc`.
+
+--
+
+For example, we can sort Yugoslavia first by year and population:
+
+
+```r
+Yugoslavia %&gt;% arrange(year, desc(pop))
+```
+
+```
+## # A tibble: 60 × 6
+##    country                continent  year lifeExp     pop gdpPercap
+##    &lt;fct&gt;                  &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;
+##  1 Serbia                 Europe     1952    58.0 6860147     3581.
+##  2 Croatia                Europe     1952    61.2 3882229     3119.
+##  3 Bosnia and Herzegovina Europe     1952    53.8 2791000      974.
+##  4 Slovenia               Europe     1952    65.6 1489518     4215.
+##  5 Montenegro             Europe     1952    59.2  413834     2648.
+##  6 Serbia                 Europe     1957    61.7 7271135     4981.
+##  7 Croatia                Europe     1957    64.8 3991242     4338.
+##  8 Bosnia and Herzegovina Europe     1957    58.4 3076000     1354.
+##  9 Slovenia               Europe     1957    67.8 1533070     5862.
+## 10 Montenegro             Europe     1957    61.4  442829     3682.
+## # … with 50 more rows
+```
+
+
+---
+## Rename variables
+
+You may receive data with unintuitive variable names. You can change them using `rename()`.
+
+
+
+```r
+Yugoslavia %&gt;% select(country,year,lifeExp) %&gt;%
+  rename(Life_Expectancy = lifeExp) %&gt;%
+    head(4)
+```
+
+```
+## # A tibble: 4 × 3
+##   country                 year Life_Expectancy
+##   &lt;fct&gt;                  &lt;int&gt;           &lt;dbl&gt;
+## 1 Bosnia and Herzegovina  1952            53.8
+## 2 Bosnia and Herzegovina  1957            58.4
+## 3 Bosnia and Herzegovina  1962            61.9
+## 4 Bosnia and Herzegovina  1967            64.8
+```
+
+(NOTE: I did *not* re-save the object Yugoslavia, so the name change is *not* permanent!)
+
+---
+## Column Naming Practices
+
+* *Good* column names are self-describing. Don't use inscrutable abbreviations to save typing, since RStudio can autocomplete.
+
+--
+
+* *Valid* "naked" column names can contain upper or lowercase letters, numbers, periods, and underscores. They must start with a letter or period and not be a special reserved word (e.g. `TRUE`, `if`).
+
+--
+
+* Names are case-sensitive: `Year` and `year` are not the same thing!
+
+--
+
+* You can include spaces if you put backticks around the name.
+
+---
+## Column Name with Space Example
+
+
+```r
+library(pander)
+Yugoslavia %&gt;% filter(country == "Serbia") %&gt;%
+    select(year, lifeExp) %&gt;%
+*   rename(Year = year, `Life Expectancy` = lifeExp) %&gt;%
+    head(5) %&gt;%
+    pander(style = "rmarkdown", caption = "Serbian life expectancy")
+```
+
+
+
+| Year | Life Expectancy |
+|:----:|:---------------:|
+| 1952 |       58        |
+| 1957 |      61.69      |
+| 1962 |      64.53      |
+| 1967 |      66.91      |
+| 1972 |      68.7       |
+
+Table: Serbian life expectancy
+
+---
+## Create new columns
+
+You can add new columns to a data frame using `mutate()`. 
+
+--
+
+For example, we could add a new variable that provides the population in millions: 
+
+
+```r
+Yugoslavia %&gt;% select(country, year, pop) %&gt;%
+*   mutate(pop_million = pop / 1000000) %&gt;%
+    head(5)
+```
+
+```
+## # A tibble: 5 × 4
+##   country                 year     pop pop_million
+##   &lt;fct&gt;                  &lt;int&gt;   &lt;int&gt;       &lt;dbl&gt;
+## 1 Bosnia and Herzegovina  1952 2791000        2.79
+## 2 Bosnia and Herzegovina  1957 3076000        3.08
+## 3 Bosnia and Herzegovina  1962 3349000        3.35
+## 4 Bosnia and Herzegovina  1967 3585000        3.58
+## 5 Bosnia and Herzegovina  1972 3819000        3.82
+```
+
+Note you can create multiple variables in a single `mutate()` call by separating the expressions with commas.
+
+---
+# Recoding variables
+
+We've seen how to rename *variables*, but what if we want to rename variable *values*?
+
+--
+
+We can use the function `recode()` inside `mutate()`, which allows us to change specific values to others. This is best for categorical data. You can change multiple values at the same time!
+
+
+```r
+Yugoslavia %&gt;% 
+  mutate(country = recode(country, 
+*                       `Bosnia and Herzegovina`="B and H",
+                        Montenegro="M")) %&gt;%
+  distinct(country, .keep_all=TRUE)
+```
+
+```
+## # A tibble: 5 × 6
+##   country  continent  year lifeExp     pop gdpPercap
+##   &lt;fct&gt;    &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;
+## 1 B and H  Europe     1952    53.8 2791000      974.
+## 2 Croatia  Europe     1952    61.2 3882229     3119.
+## 3 M        Europe     1952    59.2  413834     2648.
+## 4 Serbia   Europe     1952    58.0 6860147     3581.
+## 5 Slovenia Europe     1952    65.6 1489518     4215.
+```
+
+---
+class:inverse
+
+# Check Your Understanding:
+
+Try to answer the following questions on your own, then share your solutions with a neighbhor
+
+1. Sort the gapminder data by population in ascending order and print the first 5 rows. What's the country/year with the smallest population?
+
+2. Filter the gapminder data to the countries "United States and "United Kingdom". Then, recode the country values to "US" and "UK", respectively. Print the unique combinations of country and continent.
+
+---
+
+# My Solution
+
+### 1: Sort by population
+
+```r
+gapminder %&gt;% arrange (pop) %&gt;%  head(5)
+```
+
+```
+## # A tibble: 5 × 6
+##   country               continent  year lifeExp   pop gdpPercap
+##   &lt;fct&gt;                 &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt; &lt;int&gt;     &lt;dbl&gt;
+## 1 Sao Tome and Principe Africa     1952    46.5 60011      880.
+## 2 Sao Tome and Principe Africa     1957    48.9 61325      861.
+## 3 Djibouti              Africa     1952    34.8 63149     2670.
+## 4 Sao Tome and Principe Africa     1962    51.9 65345     1072.
+## 5 Sao Tome and Principe Africa     1967    54.4 70787     1385.
+```
+
+---
+
+# My Solution
+
+### 2: Display US and UK
+
+```r
+gapminder %&gt;% filter(country %in% c("United States","United Kingdom")) %&gt;%
+  mutate(country = recode(country,"United States" = "US","United Kingdom"="UK")) %&gt;%
+  distinct(country,continent)
+```
+
+```
+## # A tibble: 2 × 2
+##   country continent
+##   &lt;fct&gt;   &lt;fct&gt;    
+## 1 UK      Europe   
+## 2 US      Americas
+```
+
+---
+class: inverse
+
+# Summarizing data
+
+1. `summarize()`
+2. `across()`
+
+---
+## General Aggregation: `summarize()`
+
+**`summarize()`** takes your column(s) of data and computes something using every row: 
+
+* Count how many rows there are
+* Calculate the mean
+* Compute the sum
+* Obtain a minimum or maximum value
+
+You can use any function in `summarize()` that aggregates *multiple values* into a *single value* (like `sd()`, `mean()`, or `max()`).
+
+---
+# `summarize()` Example
+
+For the year 1982, let's get the number of observations, total population, mean life expectancy, and range of life expectancy for former Yugoslavian countries.
+
+
+```r
+Yugoslavia %&gt;%
+    filter(year == 1982) %&gt;%
+    summarize(n_obs          = n(),
+              total_pop      = sum(pop),
+              mean_life_exp  = mean(lifeExp),
+              range_life_exp = max(lifeExp) - min(lifeExp))
+```
+
+```
+## # A tibble: 1 × 4
+##   n_obs total_pop mean_life_exp range_life_exp
+##   &lt;int&gt;     &lt;int&gt;         &lt;dbl&gt;          &lt;dbl&gt;
+## 1     5  20042685          71.3           3.94
+```
+
+These new variables are calculated using *all of the rows* in `Yugoslavia`
+
+---
+# Avoiding Repetition
+
+### `summarize(across())`
+
+
+Maybe you need to calculate the mean and standard deviation of a bunch of columns. With **`across()`**, put the variables to compute over first (using `c()` or `select()` syntax) and put the functions to use in a `list()` after.
+
+.smallish[
+
+```r
+Yugoslavia %&gt;%
+  filter(year == 1982) %&gt;%
+  summarize(across(c(lifeExp, pop), list(avg = ~mean(.), sd = ~sd(.))))
+```
+
+```
+## # A tibble: 1 × 4
+##   lifeExp_avg lifeExp_sd pop_avg   pop_sd
+##         &lt;dbl&gt;      &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+## 1        71.3       1.60 4008537 3237282.
+```
+]
+
+Note it automatically names the summarized variables based on the names given in `list()`.
+
+---
+# Whoa, too many `(` and `)`
+
+It can get hard to read code with lots of **nested** functions--functions inside others.
+
+Break things up when it gets confusing!
+
+
+```r
+Yugoslavia %&gt;%
+  filter(year == 1982) %&gt;%
+  summarize(
+    across( 
+      c(lifeExp, pop), 
+      list(
+        avg = ~mean(.), 
+        sd = ~sd(.)
+      )
+    )
+  )
+```
+
+RStudio also helps you by tracking parentheses: Put your cursor after a `)` and see!
+
+---
+# Avoiding Repetition
+
+There are additional ways to use `across()` for repetitive operations:
+
+* `across(everything())` will summarize / mutate *all* variables sent to it in the same way. For instance, getting the mean and standard deviation of an entire dataframe:
+
+.smallish[
+
+```r
+dataframe %&gt;% 
+  summarize(across(everything(), list(mean = ~mean(.), sd = ~sd(.))))
+```
+]
+
+* `across(where())` will summarize / mutate all variables that satisfy some logical condition. For instance, summarizing every numeric column in a dataframe at once:
+
+.smallish[
+
+```r
+dataframe %&gt;% 
+  summarize(across(where(is.numeric), list(mean = ~mean(.), sd = ~sd(.))))
+```
+]
+
+You can use all of these to avoid typing out the same code repeatedly!
+
+---
+# `group_by()`
+
+
+The special function `group_by()` changes how functions operate on the data, most importantly `summarize()`.
+
+Functions after `group_by()` are computed *within each group* as defined by variables given, rather than over all rows at once. Typically the variables you group by will be integers, factors, or characters, and not continuous real values.
+
+Excel analogue: pivot tables
+
+.image-50[![Pivot table](http://www.excel-easy.com/data-analysis/images/pivot-tables/two-dimensional-pivot-table.png)]
+
+---
+# `group_by()` example
+
+
+
+```r
+Yugoslavia %&gt;%
+* group_by(year) %&gt;%
+    summarize(num_countries     = n_distinct(country),
+              total_pop         = sum(pop),
+              total_gdp_per_cap = sum(pop*gdpPercap)/total_pop) %&gt;%
+    head(5)
+```
+
+```
+## # A tibble: 5 × 4
+##    year num_countries total_pop total_gdp_per_cap
+##   &lt;int&gt;         &lt;int&gt;     &lt;int&gt;             &lt;dbl&gt;
+## 1  1952             5  15436728             3030.
+## 2  1957             5  16314276             4187.
+## 3  1962             5  17099107             5257.
+## 4  1967             5  17878535             6656.
+## 5  1972             5  18579786             8730.
+```
+
+Because we did `group_by()` with `year` then used `summarize()`, we get *one row per value of `year`*!
+
+Each value of year is its own **group**!
+
+---
+## Window Functions
+
+Grouping can also be used with `mutate()` or `filter()` to give rank orders within a group, lagged values, and cumulative sums. You can read more about window functions in this [vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html).
+
+
+```r
+Yugoslavia %&gt;% 
+  select(country, year, pop) %&gt;%
+  filter(year &gt;= 2002) %&gt;% 
+  group_by(country) %&gt;%
+  mutate(lag_pop = lag(pop, order_by = year),
+         pop_chg = pop - lag_pop) %&gt;%
+  head(4)
+```
+
+```
+## # A tibble: 4 × 5
+## # Groups:   country [2]
+##   country                 year     pop lag_pop pop_chg
+##   &lt;fct&gt;                  &lt;int&gt;   &lt;int&gt;   &lt;int&gt;   &lt;int&gt;
+## 1 Bosnia and Herzegovina  2002 4165416      NA      NA
+## 2 Bosnia and Herzegovina  2007 4552198 4165416  386782
+## 3 Croatia                 2002 4481020      NA      NA
+## 4 Croatia                 2007 4493312 4481020   12292
+```
+
+---
+class: inverse
+##Joining (Merging) Data Frames
+
+---
+## When Do We Need to Join Tables?
+
+* Want to make columns using criteria too complicated for `ifelse()` or `case_when()`
+
+  + We can work with small sets of variables then combine them back together.
+
+* Combine data stored in separate data sets: e.g. UW registrar data with police stop records.
+
+  + Often large surveys are broken into different data sets for each level (e.g. household, individual, neighborhood)
+
+---
+## Joining in Concept
+
+We need to think about the following when we want to merge data frames `A` and `B`:
+
+* Which *rows* are we keeping from each data frame?
+
+* Which *columns* are we keeping from each data frame?
+
+* Which variables determine whether rows *match*?
+
+---
+## Join Types: Rows and columns kept
+
+There are many types of joins&lt;sup&gt;1&lt;/sup&gt;...
+
+* `A %&gt;% left_join(B)`: keep all rows from `A`, matched with `B` wherever possible (`NA` when not), keep columns from both `A` and `B`
+
+* `A %&gt;% right_join(B)`: keep all rows from `B`, matched with `A` wherever possible (`NA` when not), keep columns from both `A` and `B`
+
+* `A %&gt;% inner_join(B)`: keep only rows from `A` and `B` that match, keep columns from both `A` and `B`
+
+* `A %&gt;% full_join(B)`: keep all rows from both `A` and `B`, matched wherever possible (`NA` when not), keep columns from both `A` and `B`
+
+* `A %&gt;% semi_join(B)`: keep rows from `A` that match rows in `B`, keep columns from only `A`
+
+* `A %&gt;% anti_join(B)`: keep rows from `A` that *don't* match a row in `B`, keep columns from only `A`
+
+.pull-right[.footnote[[1] Usually `left_join()` does the job.]]
+
+---
+## Matching Criteria
+
+We say rows should *match* because they have some columns containing the same value. We list these in a `by = ` argument to the join.
+
+Matching Behavior:
+
+* No `by`: Match using all variables in `A` and `B` that have identical names
+
+--
+
+* `by = c("var1", "var2", "var3")`: Match on identical values of `var1`, `var2`, and `var3` in both `A` and `B`
+
+--
+
+* `by = c("Avar1" = "Bvar1", "Avar2" = "Bvar2")`: Match identical values of `Avar1` variable in `A` to `Bvar1` variable in `B`, and `Avar2` variable in `A` to `Bvar2` variable in `B`
+
+Note: If there are multiple matches, you'll get *one row for each possible combination* (except with `semi_join()` and `anti_join()`).
+
+Need to get more complicated? Break it into multiple operations.
+
+---
+## `nycflights13` Data
+
+We'll use data in the [`nycflights13` package](https://cran.r-project.org/web/packages/nycflights13/nycflights13.pdf). Install and load it:
+
+```r
+# install.packages("nycflights13") # Uncomment to run
+library(nycflights13)
+```
+
+It includes five dataframes, some of which contain missing data (`NA`):
+
+* `flights`: flights leaving JFK, LGA, or EWR in 2013
+* `airlines`: airline abbreviations
+* `airports`: airport metadata
+* `planes`: airplane metadata
+* `weather`: hourly weather data for JFK, LGA, and EWR
+
+Note these are *separate data frames*, each needing to be *loaded separately*:
+
+
+```r
+data(flights)
+data(airlines)
+data(airports)
+# and so on...
+```
+
+---
+## Join Example #1
+
+Who manufactures the planes that flew to Seattle?
+
+```r
+flights %&gt;% filter(dest == "SEA") %&gt;% select(tailnum) %&gt;%
+*   left_join(planes %&gt;% select(tailnum, manufacturer),
+              by = "tailnum") %&gt;%
+    count(manufacturer) %&gt;% # Count observations by manufacturer
+    arrange(desc(n)) # Arrange data descending by count
+```
+
+```
+## # A tibble: 6 × 2
+##   manufacturer           n
+##   &lt;chr&gt;              &lt;int&gt;
+## 1 BOEING              2659
+## 2 AIRBUS               475
+## 3 AIRBUS INDUSTRIE     394
+## 4 &lt;NA&gt;                 391
+## 5 BARKER JACK L          2
+## 6 CIRRUS DESIGN CORP     2
+```
+
+Note you can perform operations on the data inside functions such as `left_join()` and the *output* will be used by the function.
+
+---
+## Join Example #2
+
+Which airlines had the most flights to Seattle from NYC?
+
+```r
+flights %&gt;% filter(dest == "SEA") %&gt;% 
+    select(carrier) %&gt;%
+    left_join(airlines, by = "carrier") %&gt;%
+    group_by(name) %&gt;% 
+*   tally() %&gt;%
+    arrange(desc(n))
+```
+
+```
+## # A tibble: 5 × 2
+##   name                       n
+##   &lt;chr&gt;                  &lt;int&gt;
+## 1 Delta Air Lines Inc.    1213
+## 2 United Air Lines Inc.   1117
+## 3 Alaska Airlines Inc.     714
+## 4 JetBlue Airways          514
+## 5 American Airlines Inc.   365
+```
+
+`tally()` is a shortcut for `summarize(n(.))`: It creates a variable `n` equal to the number of rows in each group.
+
+---
+## Join Example #3
+
+Is there a relationship between departure delays and wind gusts?
+
+
+```r
+library(ggplot2)
+flights %&gt;% 
+    select(origin, year, month, day, hour, dep_delay) %&gt;%
+    inner_join(weather, 
+           by = c("origin", "year", "month", "day", "hour")) %&gt;%
+    select(dep_delay, wind_gust) %&gt;%
+    # removing rows with missing values
+    filter(!is.na(dep_delay) &amp; !is.na(wind_gust)) %&gt;% 
+    ggplot(aes(x = wind_gust, y = dep_delay)) +
+      geom_point() + 
+      geom_smooth()
+```
+
+Because the data are the first argument for `ggplot()`, we can pipe them straight into a plot.
+
+---
+## Wind Gusts and Delays
+
+![](CSSS508_Lecture3_dplyr_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+
+Check out those 1200 mph winds!&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[[1] These observations appear to have been fixed in the current data.]
+
+---
+## Redo After Removing Extreme Outliers, Just Trend
+
+.small[
+
+```r
+flights %&gt;% 
+    select(origin, year, month, day, hour, dep_delay) %&gt;%
+    inner_join(weather, by = c("origin", "year", "month", "day", "hour")) %&gt;%
+    select(dep_delay, wind_gust) %&gt;%
+*   filter(!is.na(dep_delay) &amp; !is.na(wind_gust) &amp; wind_gust &lt; 250) %&gt;%
+    ggplot(aes(x = wind_gust, y = dep_delay)) +
+      geom_smooth() + 
+      theme_bw(base_size = 16) +
+      xlab("Wind gusts in departure hour (mph)") +
+      ylab("Average departure delay (minutes)")
+```
+]
+
+I removed `geom_point()` to focus on the mean trend produced by `geom_smooth()`.
+
+---
+## Wind Gusts and Delays: Mean Trend
+
+![](CSSS508_Lecture3_dplyr_files/figure-html/unnamed-chunk-34-1.svg)&lt;!-- --&gt;
+
+---
+## Tinkering Suggestions
+
+Some possible questions to investigate:
+
+* What are the names of the most common destination airports?
+* Which airlines fly from NYC to your home city?
+* Is there a relationship between departure delays and precipitation?
+*  What is the distribution of departure times for flights leaving NYC over a 24 hour period?
+    + Are especially late or early arrivals departures to some regions or for some airlines?
+
+**Warning:** `flights` has 336776 rows, so if you do a sloppy join, you can end up with **many** matches per observation and have the data *explode* in size.
+
+---
+class: inverse
+
+# Homework 3
+
+Pick something to look at in the `nycflights13` data and write up a .Rmd file showing your investigation. Upload both the .Rmd file and the .html file to Canvas. You must use at least once: `mutate()`, `summarize()`, `group_by()`, and any join. *Include at least one nicely formatted plot (`ggplot2`) and one table (`pander`)*. In plots and tables, use "nice" variable names (try out spaces!) and rounded values (&lt;= 3 digits).
+
+This time, *include all your code in your output document* (`echo=TRUE`), using comments and line breaks separating commands so that it is clear to a peer what you are doing (or trying to do!). You must write up your observations briefly in words as well.  
+
+Note: If you want to see the `nycflights13` dataframes in the environment, you will need to load *each one*: `airlines`, `airports`, `flights`, `planes`, and `weather` (e.g. `data(flights)`).
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "tomorrow-night-bright",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
