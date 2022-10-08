@@ -14,12 +14,26 @@ output:
       titleSlideClass: ["center","top"]
 ---
 
-```{r setup, include=FALSE, purl=FALSE}
+```{r setup, include=FALSE,purl=FALSE}
 options(htmltools.dir.version = FALSE)
 knitr::opts_chunk$set(comment = "##")
-library(ggplot2)
+# setwd("/Users/pearce790/CSSS508/Lectures/Lecture3/")
+# knitr::purl("CSSS508_Lecture3_dplyr.Rmd")
 ```
 
+# A Quick Note
+
+The last two lectures have been jam-packed with content! This makes it hard to answer individual-level questions as we get started with R and RStudio.
+
+--
+
+Luckily, today's lecture has **less content** and **more time for questions!** To keep things moving along,
+
++ Please try to **limit very-individual questions while I'm running through slides** (e.g., "I'm getting this error message, why is that?"). I'm happy to answer these while we're working on exercises, during a break/lab/office hour, or before/after class.
+
++ Please **interrupt me with questions about content during lecture!** If something isn't clear on the slides, it's best to discuss it right away!
+
+---
 class: inverse
 
 # Topics
@@ -38,7 +52,7 @@ Today, we will cover,
 1. Subsetting data
 1. Modifying data 
 1. Summarizing data
-1. Joining data
+1. Joining (merging) data
 
 ---
 class: inverse
@@ -51,7 +65,7 @@ options(width = 90)
 
 You may be familiar with tools like Excel or Google Sheets, which let you manipulate data in a spreadsheet using functions. Spreadsheets are *not reproducible*: It's hard to know how someone changed the raw data!
 
-Today we'll talk more about `dplyr`: an R package that does ust about any calculation you've tried to do in Excel, but more *transparently*, *reproducibly*, and *safely*. 
+Today we'll talk more about `dplyr`: an R package that does just about anything Excel can, but more *transparently*, *reproducibly*, and *safely*. 
 
 Don't be the next sad research assistant who makes headlines with an Excel error ([Reinhart & Rogoff, 2010](http://www.bloomberg.com/news/articles/2013-04-18/faq-reinhart-rogoff-and-the-excel-error-that-changed-history))
 
@@ -342,7 +356,7 @@ Yugoslavia %>% select(country, year, pop) %>%
 Note you can create multiple variables in a single `mutate()` call by separating the expressions with commas.
 
 ---
-# Recoding variables
+## Recoding variables
 
 We've renamed *variables*, but what about variable *values*?
 
@@ -363,7 +377,7 @@ class:inverse
 
 # Check Your Understanding:
 
-Try to answer the following questions on your own, then share your solutions with a neighbhor
+Try to answer the following questions on your own, then share your solutions with a neighbor
 
 1. Sort the gapminder data by population in ascending order and print the first 5 rows. What's the country/year with the smallest population?
 
@@ -398,10 +412,10 @@ class: inverse
 # Summarizing data
 
 1. `summarize()`
-2. `across()`
+3. `group_by()`
 
 ---
-## General Aggregation: `summarize()`
+## Summarizing data
 
 **`summarize()`** takes your column(s) of data and computes something using every row: 
 
@@ -410,16 +424,15 @@ class: inverse
 * Compute the sum
 * Obtain a minimum or maximum value
 
-You can use any function in `summarize()` that aggregates *multiple values* into a *single value* (like `sd()`, `mean()`, or `max()`).
+You can use any function inside `summarize()` that aggregates *multiple values* into a *single value* (like `sd()`, `mean()`, or `max()`).
 
 ---
-# `summarize()` Example
+## `summarize()` Example
 
 For the year 1982, let's get the number of observations, total population, mean life expectancy, and range of life expectancy for former Yugoslavian countries.
 
 ```{r}
-Yugoslavia %>%
-    filter(year == 1982) %>%
+Yugoslavia %>% filter(year == 1982) %>%
     summarize(n_obs          = n(),
               total_pop      = sum(pop),
               mean_life_exp  = mean(lifeExp),
@@ -429,94 +442,31 @@ Yugoslavia %>%
 These new variables are calculated using *all of the rows* in `Yugoslavia`
 
 ---
-# Avoiding Repetition
+## Summarizing data by groups
 
-### `summarize(across())`
+You may be interested in summarizing data by a categorical variable. For example, what is the combined population of countries in former Yugoslavia by year?
 
+The function `group_by()` helps us do this by changing how functions operate on the data.
 
-Maybe you need to calculate the mean and standard deviation of a bunch of columns. With **`across()`**, put the variables to compute over first (using `c()` or `select()` syntax) and put the functions to use in a `list()` after.
+--
 
-.smallish[
-```{r}
-Yugoslavia %>%
-  filter(year == 1982) %>%
-  summarize(across(c(lifeExp, pop), list(avg = ~mean(.), sd = ~sd(.))))
-```
-]
-
-Note it automatically names the summarized variables based on the names given in `list()`.
-
----
-# Whoa, too many `(` and `)`
-
-It can get hard to read code with lots of **nested** functions--functions inside others.
-
-Break things up when it gets confusing!
-
-```{r, eval = FALSE}
-Yugoslavia %>%
-  filter(year == 1982) %>%
-  summarize(
-    across( 
-      c(lifeExp, pop), 
-      list(
-        avg = ~mean(.), 
-        sd = ~sd(.)
-      )
-    )
-  )
-```
-
-RStudio also helps you by tracking parentheses: Put your cursor after a `)` and see!
-
----
-# Avoiding Repetition
-
-There are additional ways to use `across()` for repetitive operations:
-
-* `across(everything())` will summarize / mutate *all* variables sent to it in the same way. For instance, getting the mean and standard deviation of an entire dataframe:
-
-.smallish[
-```{r, eval=FALSE}
-dataframe %>% 
-  summarize(across(everything(), list(mean = ~mean(.), sd = ~sd(.))))
-```
-]
-
-* `across(where())` will summarize / mutate all variables that satisfy some logical condition. For instance, summarizing every numeric column in a dataframe at once:
-
-.smallish[
-```{r, eval=FALSE}
-dataframe %>% 
-  summarize(across(where(is.numeric), list(mean = ~mean(.), sd = ~sd(.))))
-```
-]
-
-You can use all of these to avoid typing out the same code repeatedly!
-
----
-# `group_by()`
-
-
-The special function `group_by()` changes how functions operate on the data, most importantly `summarize()`.
-
-Functions after `group_by()` are computed *within each group* as defined by variables given, rather than over all rows at once. Typically the variables you group by will be integers, factors, or characters, and not continuous real values.
+Functions after `group_by()` are computed *within each group* as defined by variables given, rather than over all rows at once. `group_by()` works best on discrete variables.
 
 Excel analogue: pivot tables
 
 .image-50[![Pivot table](http://www.excel-easy.com/data-analysis/images/pivot-tables/two-dimensional-pivot-table.png)]
 
 ---
-# `group_by()` example
+## `group_by()` Example
 
 
 ```{r}
 Yugoslavia %>%
   group_by(year) %>% #<<
-    summarize(num_countries     = n_distinct(country),
-              total_pop         = sum(pop),
-              total_gdp_per_cap = sum(pop*gdpPercap)/total_pop) %>%
-    head(5)
+  summarize(num_countries     = n_distinct(country),
+            total_pop         = sum(pop),
+            total_gdp_per_cap = sum(pop*gdpPercap)/total_pop) %>%
+  head(5)
 ```
 
 Because we did `group_by()` with `year` then used `summarize()`, we get *one row per value of `year`*!
@@ -524,96 +474,129 @@ Because we did `group_by()` with `year` then used `summarize()`, we get *one row
 Each value of year is its own **group**!
 
 ---
-## Window Functions
+class:inverse
 
-Grouping can also be used with `mutate()` or `filter()` to give rank orders within a group, lagged values, and cumulative sums. You can read more about window functions in this [vignette](https://cran.r-project.org/web/packages/dplyr/vignettes/window-functions.html).
+# Check Your Understanding:
 
+Try to answer the following questions on your own, then share your solutions with a neighbor.
+
+1. Calculate the mean GDP for Canada, United States, and Mexico between 2000 and 2010. *HINT: Filter the data based on countries and years, then group the data by country, and then summarize.*
+
+2. Plot the mean GDP for each country during the decade 2000-2010 using `ggplot`. Try to make sure the axis labels and limits look nice, and add a title. 
+
+---
+
+# My Solution
+
+### 1: Mean GDP by Country in North America, 2000-2010.
 ```{r}
-Yugoslavia %>% 
-  select(country, year, pop) %>%
-  filter(year >= 2002) %>% 
+meanGDP_2000s <- gapminder %>% 
+  filter(country %in% c("Canada","United States","Mexico"), 
+         year > 2000 & year <= 2010) %>% 
   group_by(country) %>%
-  mutate(lag_pop = lag(pop, order_by = year),
-         pop_chg = pop - lag_pop) %>%
-  head(4)
+  summarize(meanGDP = mean(gdpPercap))
+meanGDP_2000s
 ```
 
 ---
+
+# My Solution
+
+### 2: Plot the data
+
+.smallish[
+```{r fig.height=5}
+library(ggplot2)
+ggplot(meanGDP_2000s,aes(country,meanGDP)) +geom_col() + 
+  xlab("Country") + ylab("Mean GDP") + ylim(c(0,45000)) + 
+  ggtitle("Average GDP by Country (2000-2010)",subtitle = "North America")
+```
+]
+
+---
 class: inverse
-##Joining (Merging) Data Frames
+##Joining (Merging) Data
+
+1. `left_join()`
+3. `full_join()`
 
 ---
 ## When Do We Need to Join Tables?
 
-* Want to make columns using criteria too complicated for `ifelse()` or `case_when()`
+In practice, you may need to collect data from different sources. Merging those datasets can be tricky!
 
-  + We can work with small sets of variables then combine them back together.
+--
 
-* Combine data stored in separate data sets: e.g. UW registrar data with police stop records.
+For example, imagine you would like to study county-level patterns with respect to age and grocery spending. However, you can only find,
 
-  + Often large surveys are broken into different data sets for each level (e.g. household, individual, neighborhood)
+* County level age data from the US Census, and 
+* County level grocery spending data from the US Department of Agriculture
+
+Solution: Join the datasets!
+
 
 ---
 ## Joining in Concept
 
 We need to think about the following when we want to merge data frames `A` and `B`:
 
-* Which *rows* are we keeping from each data frame?
+* Which **rows** are we keeping from each data frame?
 
-* Which *columns* are we keeping from each data frame?
+  + *Example: One row for each county*
 
-* Which variables determine whether rows *match*?
+* Which **columns** are we keeping from each data frame?
+
+  + *Example: County name, mean age, mean grocery spending*
+
+* Which variables determine whether rows **match**?
+
+  + *Example: County name*
 
 ---
 ## Join Types: Rows and columns kept
 
-There are many types of joins<sup>1</sup>...
+We'll focus on two types of joins:<sup>1</sup>...
 
 * `A %>% left_join(B)`: keep all rows from `A`, matched with `B` wherever possible (`NA` when not), keep columns from both `A` and `B`
 
-* `A %>% right_join(B)`: keep all rows from `B`, matched with `A` wherever possible (`NA` when not), keep columns from both `A` and `B`
-
-* `A %>% inner_join(B)`: keep only rows from `A` and `B` that match, keep columns from both `A` and `B`
-
 * `A %>% full_join(B)`: keep all rows from both `A` and `B`, matched wherever possible (`NA` when not), keep columns from both `A` and `B`
 
-* `A %>% semi_join(B)`: keep rows from `A` that match rows in `B`, keep columns from only `A`
 
-* `A %>% anti_join(B)`: keep rows from `A` that *don't* match a row in `B`, keep columns from only `A`
-
-.pull-right[.footnote[[1] Usually `left_join()` does the job.]]
+.pull-right[.footnote[[1] Other types include `right_join`, `inner_join`, `semi_join`, and `anti_join`, but we won't study those here.]]
 
 ---
 ## Matching Criteria
 
 We say rows should *match* because they have some columns containing the same value. We list these in a `by = ` argument to the join.
 
+--
+
 Matching Behavior:
 
-* No `by`: Match using all variables in `A` and `B` that have identical names
+* `by = c("var1", "var2")`: Match on identical values of `var1`, and `var2` in both `A` and `B`.
 
 --
 
-* `by = c("var1", "var2", "var3")`: Match on identical values of `var1`, `var2`, and `var3` in both `A` and `B`
+* `by = c("A_var1" = "B_var1", "A_var2" = "B_var2")`: Match identical values of `A_var1` variable in `A` to `B_var1` variable in `B`, and `A_var2` variable in `A` to `B_var2` variable in `B`.
 
 --
 
-* `by = c("Avar1" = "Bvar1", "Avar2" = "Bvar2")`: Match identical values of `Avar1` variable in `A` to `Bvar1` variable in `B`, and `Avar2` variable in `A` to `Bvar2` variable in `B`
+* If you don't include `by`: Match using all variables in `A` and `B` that have identical names.
 
-Note: If there are multiple matches, you'll get *one row for each possible combination* (except with `semi_join()` and `anti_join()`).
-
-Need to get more complicated? Break it into multiple operations.
+Note: If there are multiple matches, you'll get *one row for each possible combination*.
 
 ---
 ## `nycflights13` Data
 
 We'll use data in the [`nycflights13` package](https://cran.r-project.org/web/packages/nycflights13/nycflights13.pdf). Install and load it:
+.smallish[
 ```{r}
 # install.packages("nycflights13") # Uncomment to run
 library(nycflights13)
 ```
+]
 
-It includes five dataframes, some of which contain missing data (`NA`):
+It includes five data frames, some of which contain missing data (`NA`):
 
 * `flights`: flights leaving JFK, LGA, or EWR in 2013
 * `airlines`: airline abbreviations
@@ -622,118 +605,90 @@ It includes five dataframes, some of which contain missing data (`NA`):
 * `weather`: hourly weather data for JFK, LGA, and EWR
 
 Note these are *separate data frames*, each needing to be *loaded separately*:
-
+.smallish[
 ```{r, eval=FALSE}
 data(flights)
 data(airlines)
 data(airports)
-# and so on...
+data(planes)
+data(weather)
 ```
-
+]
 ---
 ## Join Example #1
 
-Who manufactures the planes that flew to Seattle?
+The "flights" data doesn't has carrier abbreviations, but not full names. That information is in the "airlines" data. Let's join them together!
+
+--
+
 ```{r}
-flights %>% filter(dest == "SEA") %>% select(tailnum) %>%
-    left_join(planes %>% select(tailnum, manufacturer), #<<
-              by = "tailnum") %>%
-    count(manufacturer) %>% # Count observations by manufacturer
-    arrange(desc(n)) # Arrange data descending by count
+flights %>% left_join(airlines, by = "carrier") %>%
+  select(flight,origin,dest,carrier,name) %>%
+  head(5)
 ```
 
-Note you can perform operations on the data inside functions such as `left_join()` and the *output* will be used by the function.
+Why use `left_join` and not `full_join`?
 
 ---
 ## Join Example #2
 
-Which airlines had the most flights to Seattle from NYC?
+Which airlines had the most flights to Seattle?
+
+--
+
 ```{r}
-flights %>% filter(dest == "SEA") %>% 
-    select(carrier) %>%
-    left_join(airlines, by = "carrier") %>%
-    group_by(name) %>% 
-    tally() %>% #<<
-    arrange(desc(n))
+flights %>% left_join(airlines, by = "carrier") %>%
+  filter(dest == "SEA") %>%
+  group_by(name) %>% 
+  summarize(num_flights = n())
 ```
 
-`tally()` is a shortcut for `summarize(n(.))`: It creates a variable `n` equal to the number of rows in each group.
 
 ---
 ## Join Example #3
 
-Is there a relationship between departure delays and wind gusts?
+The "flights" data doesn't has plane manufacturer information, but "manufacturer" does. Let's join them together!
 
-```{r, warning=FALSE, message=FALSE, eval=FALSE}
-library(ggplot2)
-flights %>% 
-    select(origin, year, month, day, hour, dep_delay) %>%
-    inner_join(weather, 
-           by = c("origin", "year", "month", "day", "hour")) %>%
-    select(dep_delay, wind_gust) %>%
-    # removing rows with missing values
-    filter(!is.na(dep_delay) & !is.na(wind_gust)) %>% 
-    ggplot(aes(x = wind_gust, y = dep_delay)) +
-      geom_point() + 
-      geom_smooth()
+--
+
+
+```{r}
+flights %>% left_join(planes, by = "tailnum") %>%
+  select(flight,origin,dest,tailnum,manufacturer) %>%
+  head(5)
 ```
 
-Because the data are the first argument for `ggplot()`, we can pipe them straight into a plot.
+Why use `left_join` and not `full_join`?
 
 ---
-## Wind Gusts and Delays
+## Join Example #4
 
-```{r, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE, fig.height=4, dev='png', dpi=600}
-flights %>% select(origin, year, month, day, hour, dep_delay) %>%
-    inner_join(weather, by = c("origin", "year", "month", "day", "hour")) %>%
-    select(dep_delay, wind_gust) %>%
-    # removing rows with missing values
-    filter(!is.na(dep_delay) & !is.na(wind_gust)) %>%
-    # Funky 1200 mph observations were dropped so I make new ones!
-    mutate(wind_gust = if_else(row_number() %in% c(1,2,3), 1200, wind_gust)) %>%
-    ggplot(aes(x = wind_gust, y = dep_delay)) +
-      geom_point() + geom_smooth()
+How many flights from JFK to Seattle were made by each manufacturer?
+
+--
+
+```{r}
+flights %>% left_join(planes, by = "tailnum") %>%
+  filter(origin == "JFK",dest == "SEA") %>% 
+  group_by(manufacturer) %>% 
+  summarize(count_flights = n())
 ```
-
-Check out those 1200 mph winds!<sup>1</sup>
-
-.footnote[[1] These observations appear to have been fixed in the current data.]
-
 ---
-## Redo After Removing Extreme Outliers, Just Trend
+## Join Example #5
 
-.small[
-```{r, warning=FALSE, message=FALSE, eval=FALSE}
-flights %>% 
-    select(origin, year, month, day, hour, dep_delay) %>%
-    inner_join(weather, by = c("origin", "year", "month", "day", "hour")) %>%
-    select(dep_delay, wind_gust) %>%
-    filter(!is.na(dep_delay) & !is.na(wind_gust) & wind_gust < 250) %>% #<<
-    ggplot(aes(x = wind_gust, y = dep_delay)) +
-      geom_smooth() + 
-      theme_bw(base_size = 16) +
-      xlab("Wind gusts in departure hour (mph)") +
-      ylab("Average departure delay (minutes)")
+Let's plot who manufactures the planes that flew from JFK to Seattle:
+
+--
+
+.smallish[
+```{r fig.height=4,fig.width=9}
+JFK_Seattle_manufacturers <- flights %>% left_join(planes, by = "tailnum") %>%
+  filter(origin == "JFK",dest == "SEA") %>% 
+  group_by(manufacturer) %>% summarize(count_manufacturer = n())
+ggplot(JFK_Seattle_manufacturers,aes(manufacturer,count_manufacturer))+
+  geom_col()+xlab("Manufacturer")+ylab("Count")
 ```
 ]
-
-I removed `geom_point()` to focus on the mean trend produced by `geom_smooth()`.
-
----
-## Wind Gusts and Delays: Mean Trend
-
-```{r, warning=FALSE, message=FALSE, echo=FALSE, cache=FALSE, fig.height=4, dev='svg'}
-flights %>% 
-    select(origin, year, month, day, hour, dep_delay) %>%
-    inner_join(weather, by = c("origin", "year", "month", "day", "hour")) %>%
-    select(dep_delay, wind_gust) %>%
-    filter(!is.na(dep_delay) & !is.na(wind_gust) & wind_gust < 250) %>% 
-    ggplot(aes(x = wind_gust, y = dep_delay)) +
-      geom_smooth() + 
-      theme_bw(base_size = 16) +
-      xlab("Wind gusts in departure hour (mph)") +
-      ylab("Average departure delay (minutes)")
-```
 
 ---
 ## Tinkering Suggestions
@@ -742,7 +697,6 @@ Some possible questions to investigate:
 
 * What are the names of the most common destination airports?
 * Which airlines fly from NYC to your home city?
-* Is there a relationship between departure delays and precipitation?
 *  What is the distribution of departure times for flights leaving NYC over a 24 hour period?
     + Are especially late or early arrivals departures to some regions or for some airlines?
 
@@ -753,8 +707,14 @@ class: inverse
 
 # Homework 3
 
-Pick something to look at in the `nycflights13` data and write up a .Rmd file showing your investigation. Upload both the .Rmd file and the .html file to Canvas. You must use at least once: `mutate()`, `summarize()`, `group_by()`, and any join. *Include at least one nicely formatted plot (`ggplot2`) and one table (`pander`)*. In plots and tables, use "nice" variable names (try out spaces!) and rounded values (<= 3 digits).
+Pick something to look at in the `nycflights13` data and write up a .Rmd file showing your investigation. Upload both the .Rmd file and the .html file to Canvas. 
 
-This time, *include all your code in your output document* (`echo=TRUE`), using comments and line breaks separating commands so that it is clear to a peer what you are doing (or trying to do!). You must write up your observations briefly in words as well.  
+You must:
 
-Note: If you want to see the `nycflights13` dataframes in the environment, you will need to load *each one*: `airlines`, `airports`, `flights`, `planes`, and `weather` (e.g. `data(flights)`).
+1. Use each of the following functions at least once: `mutate()`, `summarize()`, `group_by()`, and `left_join()`. 
+2. Include at least one nicely formatted plot (`ggplot2`) and at least one nicely formatted table (`pander`). In plots and tables, use "nice" variable names (try out spaces!) and rounded values (<= 3 digits).
+3. Briefly write down your question, observations from your analyses, and a summary of your work in words.
+
+
+This time, *include all your code in your output document* (`echo=TRUE`), using comments and line breaks separating commands so that it is clear to a peer what you are doing (or trying to do!).
+
