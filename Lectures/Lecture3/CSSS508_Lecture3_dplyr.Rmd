@@ -115,7 +115,7 @@ We now have the object `Canada` saved in our environment, which contains all obs
 .footnote[[1] Reminder: `==` is an operator that tests for equality.]
 
 ---
-# Another Operator: `%in%`
+## Another Operator: `%in%`
 
 What if I want to subset data from multiple countries at once?! Use the `%in%` operator!
 
@@ -136,11 +136,11 @@ head(Yugoslavia, 4)
 ---
 ## Finding unique values
 
-Sometimes you want to see the unique combinations of variables that exist in your dataset. You can do this using the function `distinct()`.
+You may want to find the unique combinations of variables in a dataset.  This can be performed using the function `distinct()`.
 
 --
 
-For example, what if we want to see what unique combinations of "continent" and "year" are in gapminder:
+For example, if we want to see what unique combinations of "continent" and "year" are in gapminder, run:
 
 ```{r}
 gapminder %>% distinct(continent, year) %>% head(6)
@@ -282,13 +282,13 @@ class: inverse
 ---
 ## Sorting data by rows
 
-Sometimes we want to sort data by row, in either ascending (lower to high) or descending (high to low) order. We can do that with `arrange()`.
+Sometimes we want to sort data by row, in either ascending (low to high) or descending (high to low) order. We can do that with `arrange()`.
 
 `arrange` uses ascending order by default. Arrange by descending order using the function `desc`.
 
 --
 
-For example, we can sort Yugoslavia first by year and population:
+For example, we can sort Yugoslavia first by year and then by population:
 
 ```{r}
 Yugoslavia %>% arrange(year, desc(pop)) %>% head(6)
@@ -316,7 +316,7 @@ Yugoslavia %>% select(country,year,lifeExp) %>%
 
 --
 
-* *Valid* "naked" column names can contain upper or lowercase letters, numbers, periods, and underscores. They must start with a letter or period and not be a special reserved word (e.g. `TRUE`, `if`).
+* *Valid* column names can contain upper or lowercase letters, numbers, periods, and underscores. They must start with a letter or period and not be a special reserved word (e.g. `TRUE`, `if`).
 
 --
 
@@ -353,7 +353,6 @@ Yugoslavia %>% select(country, year, pop) %>%
     head(5)
 ```
 
-Note you can create multiple variables in a single `mutate()` call by separating the expressions with commas.
 
 ---
 ## Recoding variables
@@ -362,7 +361,7 @@ We've renamed *variables*, but what about variable *values*?
 
 --
 
-We can use the function `recode()` inside `mutate()`, which allows us to change specific values to others. This is best for categorical data. You can change multiple values at the same time!
+We can use the function `recode()` inside `mutate()`, which allows us to change specific values to others. This is best for categorical data.
 
 ```{r}
 Yugoslavia %>% 
@@ -444,17 +443,14 @@ These new variables are calculated using *all of the rows* in `Yugoslavia`
 ---
 ## Summarizing data by groups
 
-You may be interested in summarizing data by a categorical variable. For example, what is the combined population of countries in former Yugoslavia by year?
-
-The function `group_by()` helps us do this by changing how functions operate on the data.
+What if we want to summarize data by category? For example, what's the population of countries in former Yugoslavia by year?
 
 --
 
-Functions after `group_by()` are computed *within each group* as defined by variables given, rather than over all rows at once. `group_by()` works best on discrete variables.
+We can do this by applying the function `group_by()` and then `summarize()`.
 
-Excel analogue: pivot tables
+Functions after `group_by()` are computed *within each group* as defined by variables given, rather than over all rows at once.
 
-.image-50[![Pivot table](http://www.excel-easy.com/data-analysis/images/pivot-tables/two-dimensional-pivot-table.png)]
 
 ---
 ## `group_by()` Example
@@ -464,8 +460,7 @@ Excel analogue: pivot tables
 Yugoslavia %>%
   group_by(year) %>% #<<
   summarize(num_countries     = n_distinct(country),
-            total_pop         = sum(pop),
-            total_gdp_per_cap = sum(pop*gdpPercap)/total_pop) %>%
+            total_pop         = sum(pop)) %>%
   head(5)
 ```
 
@@ -538,15 +533,19 @@ Solution: Join the datasets!
 ---
 ## Joining in Concept
 
-We need to think about the following when we want to merge data frames `A` and `B`:
+When merging dataframes `A` and `B`, we think about:
 
-* Which **rows** are we keeping from each data frame?
+* Which **rows** to keep from each data frame?
 
   + *Example: One row for each county*
 
-* Which **columns** are we keeping from each data frame?
+--
+
+* Which **columns** to keep from each data frame?
 
   + *Example: County name, mean age, mean grocery spending*
+  
+--
 
 * Which variables determine whether rows **match**?
 
@@ -567,13 +566,13 @@ We'll focus on two types of joins:<sup>1</sup>...
 ---
 ## Matching Criteria
 
-We say rows should *match* because they have some columns containing the same value. We list these in a `by = ` argument to the join.
+We say rows *match* when they have some columns containing the same value. We list these in a `by = ` argument to the join.
 
 --
 
 Matching Behavior:
 
-* `by = c("var1", "var2")`: Match on identical values of `var1`, and `var2` in both `A` and `B`.
+* `by = c("var1", "var2")`: Match on identical values of `var1` and `var2` in both `A` and `B`.
 
 --
 
@@ -617,7 +616,7 @@ data(weather)
 ---
 ## Join Example #1
 
-The "flights" data doesn't has carrier abbreviations, but not full names. That information is in the "airlines" data. Let's join them together!
+The "flights" data has carrier abbreviations, but not full names. That information is in the "airlines" data. Let's join them together!
 
 --
 
@@ -627,10 +626,10 @@ flights %>% left_join(airlines, by = "carrier") %>%
   head(5)
 ```
 
-Why use `left_join` and not `full_join`?
+We now have one row per flight, with both carrier abbreviations and full names!
 
 ---
-## Join Example #2
+## Join Example #1 (cont.)
 
 Which airlines had the most flights to Seattle?
 
@@ -645,9 +644,9 @@ flights %>% left_join(airlines, by = "carrier") %>%
 
 
 ---
-## Join Example #3
+## Join Example #2
 
-The "flights" data doesn't has plane manufacturer information, but "manufacturer" does. Let's join them together!
+The "flights" data doesn't has plane manufacturer information, but "manufacturer" does. Both have the variable "tailnum". Let's join them together!
 
 --
 
@@ -658,10 +657,10 @@ flights %>% left_join(planes, by = "tailnum") %>%
   head(5)
 ```
 
-Why use `left_join` and not `full_join`?
+We now have one row per flight, with plane manufacturer names!
 
 ---
-## Join Example #4
+## Join Example #2 (cont.)
 
 How many flights from JFK to Seattle were made by each manufacturer?
 
@@ -674,7 +673,7 @@ flights %>% left_join(planes, by = "tailnum") %>%
   summarize(count_flights = n())
 ```
 ---
-## Join Example #5
+## Join Example #2 (cont.)
 
 Let's plot who manufactures the planes that flew from JFK to Seattle:
 
