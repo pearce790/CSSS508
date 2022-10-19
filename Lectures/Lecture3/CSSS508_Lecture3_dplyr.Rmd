@@ -646,7 +646,7 @@ flights %>% left_join(airlines, by = "carrier") %>%
 ---
 ## Join Example #2
 
-The "flights" data doesn't has plane manufacturer information, but "manufacturer" does. Both have the variable "tailnum". Let's join them together!
+The "flights" data doesn't has plane manufacturer information, but "planes" does. Both have the variable "tailnum". Let's join them together!
 
 --
 

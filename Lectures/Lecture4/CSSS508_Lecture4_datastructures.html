@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>CSSS 508, Lecture 4</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Michael Pearce (based on slides from Chuck Lanfear)" />
+    <meta name="date" content="2022-10-20" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, top, title-slide
+
+.title[
+# CSSS 508, Lecture 4
+]
+.subtitle[
+## Data Structures
+]
+.author[
+### Michael Pearce<br>(based on slides from Chuck Lanfear)
+]
+.date[
+### October 20, 2022
+]
+
+---
+
+class:inverse
+
+
+
+
+# Preamble: R Data Structures
+
+So far, we've been manipulating, summarizing, and making visuals out of data. That's pretty great!!
+
+But now, we need to get more into the weeds of programming...
+
+Today is all about *types of data* in R.
+
+---
+class: inverse
+
+# Topics
+
+Last time, we learned about,
+
+1. Subsetting data
+1. Modifying data 
+1. Summarizing data
+1. Joining (merging) data
+
+--
+
+Today, we will cover,
+
+1. Types of Data
+1. Vectors
+1. Matrices
+1. Lists
+1. Data Frames and Tibbles
+
+---
+class: inverse
+# 1. Types of Data
+
++ `numeric`
++ `character`
++ `factor`
++ `logical`
++ `NA`, `NaN`, and `Inf`
+
+---
+## How is my data stored?
+
+Under the hood, R stores different types of data in different ways.
+
+--
+
++ e.g., R knows that `4.0` is a number, and that `"Michael"` is not a number.
+
+--
+
+So what exactly are the common data types, and how do we know what R is doing?
+
+---
+## Data Types
+
+* **numeric**: `c(1, 10*3, 4, -3.14)`
+
+--
+
+* **character**: `c("red", "blue", "blue")`
+
+--
+
+* **factor**: `factor(c("red", "blue", "blue"))`
+
+
+--
+
+* **logical**: `c(FALSE, TRUE, TRUE)`
+
+---
+## Note on Factor Vectors
+
+Factors are categorical data that encode a (modest) number of **levels**, like for experimental group or geographic region: 
+
+
+```r
+test_group &lt;- factor(c("Treatment", "Placebo", 
+                       "Placebo", "Treatment"))
+test_group
+```
+
+```
+## [1] Treatment Placebo   Placebo   Treatment
+## Levels: Placebo Treatment
+```
+
+--
+
+Why use `factor` instead of `character`? Because `factor` data can go into a statistical model.&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[[1] Most R models will automatically convert character data to factors. The default reference is chosen alphabetically.]
+
+---
+## Note on Logical Vectors
+
+Remember that `logical` data in R takes on boolean `TRUE` or `FALSE` values.
+
+--
+
+You can do math with logical values, because R makes `TRUE`=1 and `FALSE`=0:
+
+
+```r
+my_booleans &lt;- c(TRUE, TRUE, FALSE, FALSE, FALSE)
+sum(my_booleans)
+```
+
+```
+## [1] 2
+```
+
+```r
+mean(my_booleans)
+```
+
+```
+## [1] 0.4
+```
+
+
+---
+## Missing or Infinite Data Types
+
+Sometimes, your data may be missing or infinite (basically, not one of the types I just showed):
+
+1. **Not Applicable** `NA` 
+
+    + Used when data simply is missing or "not available"
+
+2. **Not a Number** `NaN`
+
+    + Used when you try to perform a bad math operation, e.g., `0 / 0 `
+
+3. **Infinite** `Inf`, `-Inf`
+
+    + Used when you divide by 0, e.g., `-5/0` or `5/0`
+
+---
+## Checking Data Types
+
+`class()` tells us what type of data we have:
+
+
+```r
+class4    &lt;- class(4)
+classAB   &lt;- class(c("A","B"))
+classABFac&lt;- class(factor("A","B"))
+classTRUE &lt;- class(TRUE)
+
+c(class4,classAB,classABFac,classTRUE)
+```
+
+```
+## [1] "numeric"   "character" "factor"    "logical"
+```
+
+---
+## Testing Data Types
+
+There are also functions to **test** for certain data types:
+
+
+
+```r
+c(is.numeric(5),  is.character("A"))
+```
+
+```
+## [1] TRUE TRUE
+```
+
+```r
+is.logical(TRUE)
+```
+
+```
+## [1] TRUE
+```
+
+```r
+c(is.infinite(-Inf),  is.na(NA),  is.nan(NaN))
+```
+
+```
+## [1] TRUE TRUE TRUE
+```
+
+Warning: `NA` is not `NaN`!!!
+
+---
+class:inverse
+
+## Mini-Check
+
+In each case, what will R return?
+
++ `is.numeric(3.14)`
+
+--
+
+    + `TRUE`
+
+--
+
++ `is.numeric(pi)`
+
+--
+
+    + `TRUE`
+
+--
+
++ `is.logical(FALSE)`
+
+--
+
+    + `TRUE`
+
+--
+
++ `is.nan(NA)`
+
+--
+
+    + `FALSE`
+
+---
+class: inverse
+# 2. Vectors
+
++ Creating Vectors
++ Vector Math
++ Subsetting Vectors
+
+---
+## Making Vectors
+
+In R, we call a set of values of the same type a **vector**. We can create vectors using the `c()` function ("c" for **c**ombine or **c**oncatenate).
+
+
+```r
+c(1, 3, 7, -0.5)
+```
+
+```
+## [1]  1.0  3.0  7.0 -0.5
+```
+
+--
+
+Vectors have one dimension: **length**
+
+```r
+length(c(1, 3, 7, -0.5))
+```
+
+```
+## [1] 4
+```
+
+--
+
+All elements of a vector are the same type (e.g. numeric or character)!
+
+If you mix character and numeric data, it will convert everything to *characters*!
+
+---
+## Generating Numeric Vectors
+
+There are shortcuts for generating numeric vectors:
+
+```r
+1:10
+```
+
+```
+##  [1]  1  2  3  4  5  6  7  8  9 10
+```
+
+```r
+seq(-3, 6, by = 1.75) # Sequence from -3 to 6, increments of 1.75
+```
+
+```
+## [1] -3.00 -1.25  0.50  2.25  4.00  5.75
+```
+
+```r
+rep(c(-1, 0, 1), times = 3) # Repeat c(-1,0,1) 3 times
+```
+
+```
+## [1] -1  0  1 -1  0  1 -1  0  1
+```
+
+```r
+rep(c(-1, 0, 1), each = 3) # Repeat each element 3 times
+```
+
+```
+## [1] -1 -1 -1  0  0  0  1  1  1
+```
+
+---
+## Element-wise Vector Math
+
+When doing arithmetic operations on vectors, R handles these *element-wise*:
+
+```r
+c(1, 2, 3) + c(4, 5, 6)
+```
+
+```
+## [1] 5 7 9
+```
+
+```r
+c(1, 2, 3, 4)^3 # exponentiation with ^
+```
+
+```
+## [1]  1  8 27 64
+```
+
+Common operations: `*`, `/`, `exp()` = `\(e^x\)`, `log()` = `\(\log_e(x)\)`
+
+---
+## Vector Recycling
+
+If we work with vectors of different lengths, R will **recycle** the shorter one by repeating it to make it match up with the longer one:
+
+```r
+c(0.5, 3) * c(1, 2, 3, 4)
+```
+
+```
+## [1]  0.5  6.0  1.5 12.0
+```
+
+```r
+c(0.5, 3, 0.5, 3) * c(1, 2, 3, 4) # same thing
+```
+
+```
+## [1]  0.5  6.0  1.5 12.0
+```
+
+---
+## Scalars as Recycling
+
+A special case of recycling involves arithmetic with **scalars** (a single number). These are vectors of length 1 that are recycled to make a longer vector:
+
+```r
+3 * c(-1, 0, 1, 2) + 1
+```
+
+```
+## [1] -2  1  4  7
+```
+
+---
+## Warning on Recycling
+
+Recycling doesn't work so well with vectors of incommensurate lengths:
+
+
+```r
+c(1, 2, 3, 4) + c(0.5, 1.5, 2.5)
+```
+
+```
+## Warning in c(1, 2, 3, 4) + c(0.5, 1.5, 2.5): longer object length is
+## not a multiple of shorter object length
+```
+
+```
+## [1] 1.5 3.5 5.5 4.5
+```
+
+Be careful!!
+
+---
+## Example: Standardizing Data
+
+Let's say we had some test scores and we wanted to put these on a standardized scale: 
+
+`$$z_i = \frac{x_i - \text{mean}(x)}{\text{SD}(x)}$$`
+
+--
+
+
+```r
+x &lt;- c(97, 68, 75, 77, 69, 81, 80, 92, 50, 34, 66, 83, 62)
+z &lt;- (x - mean(x)) / sd(x)
+round(z, 2)
+```
+
+```
+##  [1]  1.49 -0.23  0.19  0.31 -0.17  0.54  0.48  1.19 -1.30 -2.24 -0.35
+## [12]  0.66 -0.58
+```
+
+
+---
+## Math with Missing Values
+
+Even one `NA` "poisons the well": You'll get `NA` out of your calculations unless you add the extra argument `na.rm = TRUE` (in some functions):
+
+--
+
+
+
+```r
+vector_w_missing &lt;- c(1, 2, NA, 4, 5, 6, NA)
+mean(vector_w_missing)
+```
+
+```
+## [1] NA
+```
+
+```r
+mean(vector_w_missing, na.rm=TRUE)
+```
+
+```
+## [1] 3.6
+```
+
+---
+## Subsetting Vectors
+
+We can **subset** a vector in a number of ways:
+
+* Passing a single index or vector of entries to **keep**:
+
+
+```r
+first_names &lt;- c("Andre","Brady","Cecilia",
+                 "Danni","Edgar","Francie")
+first_names[1]
+```
+
+```
+## [1] "Andre"
+```
+
+```r
+first_names[c(1,2)]
+```
+
+```
+## [1] "Andre" "Brady"
+```
+
+--
+
+* Passing a single index or vector of entries to **drop**:
+
+
+```r
+first_names[-3]
+```
+
+```
+## [1] "Andre"   "Brady"   "Danni"   "Edgar"   "Francie"
+```
+
+---
+class:inverse
+## Mini-Check
+
+
++ What does `sum(c(1,2,NA))` output?
+
+--
+
+    + `NA`. The code `sum(c(1,2,NA),na.rm=TRUE)` would output `3`.
+
+--
+
++ What does `rep(c(0,1),times=2)` output?
+
+--
+
+    + `c(0,1,0,1)`
+
+--
+
++ I want to get the first and second elements of my vector, `a_vector`. What's wrong with the code `a_vector[1,2]` ?
+
+--
+
+    + `a_vector[c(1,2)]`
+
+
+
+---
+class: inverse
+# 3. Matrices
+
+---
+
+## Matrices: Two Dimensions
+
+**Matrices** extend vectors to two **dimensions**: **rows** and **columns**. We can construct them directly using `matrix`.
+
+R fills in a matrix column-by-column (**not** row-by-row!)
+
+
+```r
+(a_matrix &lt;- matrix(first_names, nrow=2, ncol=3))
+```
+
+```
+##      [,1]    [,2]      [,3]     
+## [1,] "Andre" "Cecilia" "Edgar"  
+## [2,] "Brady" "Danni"   "Francie"
+```
+
+---
+## Binding Vectors
+
+We can also make matrices by *binding* vectors together with `rbind()` (**r**ow **bind**) and `cbind()` (**c**olumn **bind**).
+
+
+```r
+(b_matrix &lt;- cbind(c(1, 2), c(3, 4), c(5, 6)))
+```
+
+```
+##      [,1] [,2] [,3]
+## [1,]    1    3    5
+## [2,]    2    4    6
+```
+
+```r
+(c_matrix &lt;- rbind(c(1, 2, 3), c(4, 5, 6)))
+```
+
+```
+##      [,1] [,2] [,3]
+## [1,]    1    2    3
+## [2,]    4    5    6
+```
+
+---
+## Subsetting Matrices
+
+We subset matrices using the same methods as with vectors, except we index them with `[rows, columns]`:
+
+
+```r
+a_matrix[1, 2] # row 1, column 2
+```
+
+```
+## [1] "Cecilia"
+```
+
+```r
+a_matrix[1, c(2,3)] # row 1, columns 2 and 3
+```
+
+```
+## [1] "Cecilia" "Edgar"
+```
+
+--
+
+We can obtain the dimensions of a matrix using `dim()`.
+
+
+```r
+dim(a_matrix)
+```
+
+```
+## [1] 2 3
+```
+
+
+---
+## Matrices Becoming Vectors
+
+If a matrix ends up having just one row or column after subsetting, by default R will make it into a vector. 
+
+
+```r
+a_matrix[, 1] 
+```
+
+```
+## [1] "Andre" "Brady"
+```
+
+--
+
+You can prevent this behavior using `drop=FALSE`.
+
+
+```r
+a_matrix[, 1, drop=FALSE] 
+```
+
+```
+##      [,1]   
+## [1,] "Andre"
+## [2,] "Brady"
+```
+
+---
+## Matrix Data Type Warning
+
+Matrices can contain numeric, integer, factor, character, or logical. But just like vectors, *all elements must be the same data type*.
+
+
+```r
+(bad_matrix &lt;- cbind(1:2, c("Michael","Pearce")))
+```
+
+```
+##      [,1] [,2]     
+## [1,] "1"  "Michael"
+## [2,] "2"  "Pearce"
+```
+
+In this case, everything was converted to characters!
+
+---
+## Matrix Dimension Names
+
+We can access dimension names or name them ourselves:
+
+
+```r
+rownames(bad_matrix) &lt;- c("First", "Last")
+colnames(bad_matrix) &lt;- c("Number", "Name")
+bad_matrix
+```
+
+```
+##       Number Name     
+## First "1"    "Michael"
+## Last  "2"    "Pearce"
+```
+
+```r
+bad_matrix[ ,"Name", drop=FALSE]
+```
+
+```
+##       Name     
+## First "Michael"
+## Last  "Pearce"
+```
+
+---
+## Matrix Arithmetic
+
+Matrices of the same dimensions can have math performed entry-wise with the usual arithmetic operators:
+
+
+```r
+matrix(c(2,4,6,8),nrow=2,ncol=2) / matrix(c(2,1,3,1),nrow=2,ncol=2)
+```
+
+```
+##      [,1] [,2]
+## [1,]    1    2
+## [2,]    4    8
+```
+
+---
+## "Proper" Matrix Math
+
+To do matrix transpositions, use `t()`.
+
+
+```r
+(e_matrix &lt;- t(c_matrix))
+```
+
+```
+##      [,1] [,2]
+## [1,]    1    4
+## [2,]    2    5
+## [3,]    3    6
+```
+
+--
+
+To do actual matrix multiplication (not entry-wise), use `%*%`.
+
+
+```r
+(f_matrix &lt;- c_matrix %*% e_matrix)
+```
+
+```
+##      [,1] [,2]
+## [1,]   14   32
+## [2,]   32   77
+```
+
+---
+## "Proper" Matrix Math (cont.)
+
+To invert an invertible square matrix, use `solve()`.
+
+
+```r
+(g_matrix &lt;- solve(f_matrix))
+```
+
+```
+##            [,1]       [,2]
+## [1,]  1.4259259 -0.5925926
+## [2,] -0.5925926  0.2592593
+```
+
+---
+class:inverse
+
+## Check Your Understanding
+
++ Write code to create the following matrix:
+
+
+```
+##      [,1] [,2] [,3]
+## [1,] "A"  "B"  "C" 
+## [2,] "D"  "E"  "F"
+```
+
++ Write a line of code to extract the second column. Ensure the output is still a *matrix*.
+
+
+```
+##      [,1]
+## [1,] "B" 
+## [2,] "E"
+```
+
+---
+
+## My Answers
+
++ Write code to create the following matrix:
+
+
+```r
+mat_test &lt;- matrix(c("A","B","C","D","E","F"),nrow=2,byrow=TRUE)
+```
+
+--
+
++ Write a line of code to extract the second column. Ensure the output is still a *matrix*.
+
+
+```r
+mat_test[,2,drop=FALSE]
+```
+
+
+---
+class: inverse
+# 4. Lists
+
+---
+## What are Lists?
+
+**Lists** are objects that can store multiple types of data.
+
+.small[
+
+```r
+my_list &lt;- list("first_thing"  = 1:5,
+                 "second_thing" = matrix(8:11, nrow = 2))
+my_list
+```
+
+```
+## $first_thing
+## [1] 1 2 3 4 5
+## 
+## $second_thing
+##      [,1] [,2]
+## [1,]    8   10
+## [2,]    9   11
+```
+]
+
+---
+## Accessing List Elements
+
+You can access a list element by its name or number in `[[ ]]`, or a `$` followed by its name:
+
+
+```r
+my_list[["first_thing"]]
+```
+
+```
+## [1] 1 2 3 4 5
+```
+
+```r
+my_list[[1]]
+```
+
+```
+## [1] 1 2 3 4 5
+```
+
+```r
+my_list$first_thing
+```
+
+```
+## [1] 1 2 3 4 5
+```
+
+---
+## Why Two Brackets `[[` `]]`?
+
+Double brackets get *the actual element*—as whatever data type it is stored as—in that location in the list.
+
+
+```r
+str(my_list[[1]])
+```
+
+```
+##  int [1:5] 1 2 3 4 5
+```
+
+--
+
+If you use single brackets to access list elements, you get a **list** back. 
+
+
+```r
+str(my_list[1])
+```
+
+```
+## List of 1
+##  $ first_thing: int [1:5] 1 2 3 4 5
+```
+
+
+---
+## `names()` and List Elements
+
+You can use `names()` to get a vector of list element names:
+
+
+```r
+names(my_list)
+```
+
+```
+## [1] "first_thing"  "second_thing"
+```
+
+---
+## Example: Regression Output
+
+When you perform linear regression in R, the output is a list!
+
+
+```r
+lm_output &lt;- lm(speed~dist,data=cars)
+is.list(lm_output)
+```
+
+```
+## [1] TRUE
+```
+
+```r
+names(lm_output)
+```
+
+```
+##  [1] "coefficients"  "residuals"     "effects"       "rank"         
+##  [5] "fitted.values" "assign"        "qr"            "df.residual"  
+##  [9] "xlevels"       "call"          "terms"         "model"
+```
+
+```r
+lm_output$coefficients
+```
+
+```
+## (Intercept)        dist 
+##   8.2839056   0.1655676
+```
+
+
+
+---
+class:inverse
+
+# 5. Matrices, Data Frames, and Tibbles
+
++ `matrix`
++ `data.frame`
++ `tibble`
+
+
+---
+## Matrices, Data Frames, and Tibbles
+
+All of these structures display data in two dimensions
+
++ `matrix`
+
+    + Base R
+    + Single data type allowed
+
+--
+
++ `data.frame`
+
+    + Base R (default for data storage)
+    + Stores multiple data types
+    
+--
+
++ `tibbles`
+
+    + tidyverse
+    + Stores multiple data types
+    + Displays nicely
+
+--
+
+In practice, data.frames and tibbles are very similar!
+
+---
+class:inverse
+
+## Check Your Understanding
+
+1. Complete the following sentence: "Lists are to vectors, what data frames are to..."
+
+1. Create a list that contains 3 elements: "ten_numbers" (integers between 1 and 10), "my_name" (your name as a character), and "booleans" (vector of `TRUE` and `FALSE` alternating three times).
+
+---
+
+## My Solution
+
+1. Complete the following sentence: "Lists are to vectors, what data frames are to...**Matrices!**" Lists and data frames can contain mixed data types, while vectors and matrices can only contain one data type.
+
+1. Create a list that contains 3 elements:
+
+
+```r
+my_new_list &lt;- list("ten_numbers"=1:10,
+                    "my_name"="Michael Pearce",
+                    "booleans"=rep(c(TRUE,FALSE),times=3))
+my_new_list
+```
+
+```
+## $ten_numbers
+##  [1]  1  2  3  4  5  6  7  8  9 10
+## 
+## $my_name
+## [1] "Michael Pearce"
+## 
+## $booleans
+## [1]  TRUE FALSE  TRUE FALSE  TRUE FALSE
+```
+
+
+---
+class: inverse
+
+## Homework 4
+
+For Homework 4, you will fill in an RMarkdown template on my website that walks you through the process of creating, accessing, and manipulating R data structures. Enter values in the RMarkdown document and knit it to check your answers!
+
++ *Knit after entering each answer!!*  If you get an error, check to see if undoing your last edit solves the problem. Coding an assignment to handle all possible mistakes is really hard! 
+
++ This assignment is also long, so *start early*.
+
+On the due date, I will provide a key for the written answers. You will grade those answers as part of your peer review. In addition, you'll be asked to comment on the style of your peer's code and what you yourself did similarly/different. Please remember to provide a numerical grade (0-3), as always.
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "tomorrow-night-bright",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
