@@ -125,7 +125,7 @@ example2[6] <- 10
 vec_num <- NULL
 # 2) Use ":" to create an integer vector of the numbers 11 through 20.
 vec_int <- NULL
-# 3) "LETTERS" contains the 26 capital letters in order. Use "LETTRS" and "[ ]" to create a vector of the last 10 capital letters.
+# 3) "LETTERS" contains the 26 capital letters in order. Use "LETTERS" and "[ ]" to create a vector of the last 10 capital letters.
 vec_cha <- NULL
 # 4) Use letters and "[ ]" to create a factor variable using the first ten lower case letters.
 vec_fac <- NULL
