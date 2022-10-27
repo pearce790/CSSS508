@@ -1,0 +1,567 @@
+---
+title: "CSSS508, Lecture 5"
+subtitle: "Importing, Exporting, and Cleaning Data"
+author: "Michael Pearce<br>(based on slides from Chuck Lanfear)"
+date: "October 27, 2022"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: tomorrow-night-bright
+      highlightLines: true
+      countIncrementalSlides: false
+      titleSlideClass: ["center","top"]
+---
+class: inverse
+
+```{r setup, include=FALSE, purl=FALSE}
+options(htmltools.dir.version = FALSE, width=70)
+knitr::opts_chunk$set(comment = "##")
+```
+
+# Topics
+
+Last time, we learned about,
+
+1. Types of Data
+1. Vectors
+1. Matrices
+1. Lists
+1. Data Frames and Tibbles
+
+--
+
+Today, we will cover,
+
+1. Importing and exporting data
+1. Cleaning and reshaping data
+1. Dates and times
+
+---
+class: inverse
+# 1. Importing and Exporting Data
+
+---
+## Data Packages
+
+R has a *big* user base.  If you are working with a popular data source, it will often have a devoted R package on *CRAN* or *Github*. 
+
+--
+
+Examples:
+
+* `WDI`: World Development Indicators (World Bank)
+* `WHO`: World Health Organization API
+* `tidycensus`: Census and American Community Survey <sup>1</sup>
+* `quantmod`: financial data from Yahoo, FRED, Google
+
+.footnote[[1] We'll use this in our lecture on geographical data!]
+
+--
+
+You can also import data into R in a few ways...
+
+---
+## Delimited Text Files
+
+Besides a package, it's easiest when data is stored in a text file. 
+
+--
+
+An example of a comma-separated values (**.csv**) file is below:
+
+```
+"Subject","Depression","Sex","Week","HamD","Imipramine"
+101,"Non-endogenous","Second",0,26,NA
+101,"Non-endogenous","Second",1,22,NA
+101,"Non-endogenous","Second",2,18,4.04305
+101,"Non-endogenous","Second",3,7,3.93183
+101,"Non-endogenous","Second",4,4,4.33073
+101,"Non-endogenous","Second",5,3,4.36945
+103,"Non-endogenous","First",0,33,NA
+103,"Non-endogenous","First",1,24,NA
+103,"Non-endogenous","First",2,15,2.77259
+```
+
+---
+## `readr`
+
+R has some built-in functions for importing data, such as `read.table()` and `read.csv()`. 
+
+--
+
+
+The `readr` package provides similar functions, like `read_csv()`, that have slightly better features:
+
+* Faster!
+* Better defaults (e.g. doesn't convert characters to factors)
+* A *little* smarter about dates and times
+* Loading bars for large files
+
+```{r}
+library(readr)
+```
+
+
+---
+## `readr` Importing Example
+
+Let's import some data about song ranks on the Billboard Hot 100 in 2000:
+
+.small[
+```{r}
+billboard_2000_raw <- read_csv(file = "https://clanfear.github.io/CSSS508/Lectures/Week5/data/billboard.csv")
+```
+]
+
+---
+## Did It Load?
+
+Look at the data types for the last few columns:
+
+.small[
+```{r}
+str(billboard_2000_raw[, 65:ncol(billboard_2000_raw)])
+```
+]
+
+---
+## What Went Wrong?
+
+Importing data can be tricky! 
+
+--
+
+`readr` uses the first 1000 rows to guess the data type of each column (integer, logical, numeric, character). 
+
+In this case, there was enough missing data that R wasn't able to successfully choose the data type!
+
+--
+
+You can address this using the `guess_max` argument (default is 1000).
+
+```{r, eval=FALSE}
+billboard_2000_raw <- read_csv(
+  file = "https://clanfear.github.io/CSSS508/Lectures/Week5/data/billboard.csv",
+  guess_max = 5000) # Default is 1000
+```
+
+
+---
+## Alternate Solution
+
+Import the data manually!
+
+In the upper right-hand console, select:
+
+`Import Dataset > From Text (readr)`
+
+--
+
+**Once you've imported the data, you can `copy/paste` the import code from the console into your file!!**
+
+This makes the process *reproducible!*
+
+
+---
+## Importing Other Data Types
+
++ For Excel files (`.xls` or `.xlsx`), use package `readxl`
++ For Google Docs Spreadsheets, use package `googlesheets4`
++ For Stata, SPSS, and SAS files, use package `haven` (`tidyverse`)
++ For Stata, SPSS, and Minitab, use package `foreign`
+
+
+You **won't** keep text formatting, color, comments, or merged cells!!
+
+
+---
+## Writing Delimited Files
+
+Getting data out of R into a delimited file is very similar to getting it into R:
+
+```{r, eval=FALSE}
+write_csv(billboard_2000_raw, path = "billboard_data.csv")
+```
+
+This saved the data we pulled off the web in a file called `billboard_data.csv` in my working directory.
+
+
+---
+class: inverse
+# 2. Cleaning and Reshaping Data
+
+.image-full[
+![](img/tidyr.svg)
+]
+
+---
+## Initial Spot Checks
+
+.smallish[
+First things to check after loading new data:
+]
+--
+
+.smallish[
+* Did all the rows/columns from the original file make it in?
+
+    + Check using `dim()` or `str()`
+]
+
+--
+
+.smallish[
+* Are the column names in good shape?
+
+    + Use `names()` to check; fix with `rename()`
+]
+--
+.smallish[
+
+* Are there "decorative" blank rows or columns to remove?
+
+    + `filter()` or `select()` out those rows/columns
+]
+--
+.smallish[
+
+* How are missing values represented: `NA`, `" "` (blank), `.` (period), `999`?
+
+    + Use `mutate()`
+]
+--
+.smallish[
+
+* Are there character data being incorrectly represented as numeric, or vice versa?
+
+    + Use `mutate()` and `as.numeric()`
+]
+
+---
+## Tidy Data
+
+**Tidy data** (aka "long data") are such that:
+
+--
+
+1. The values for a single observation are in their own row.
+--
+
+2. The values for a single variable are in their own column.
+--
+
+3. There is only one value per cell.
+
+--
+
+Why do we want tidy data?
+
+* **Easier to understand** many rows than many columns
+* Required for **plotting** in `ggplot2`
+* Required for many types of **statistical procedures** (e.g. hierarchical or mixed effects models)
+* Fewer issues with **missing values and "imbalanced"** repeated measures data
+
+---
+## Slightly "Messy" Data
+
+| **Program**     | **First Year** | **Second Year** |
+|-----------------|-----------:|---------:|
+| Evans School    |     10     |    6    |
+| Arts & Sciences |      5     |    6    |
+| Public Health   |      2     |    3    |
+| Other           |      5     |    1    |
+
+--
+
+* What is an **observation**?
+    + A group of students from a program of a given year
+    
+--
+
+* What are the **variables**?
+    + Program, Year
+
+--
+
+* What are the **values**?
+    + Program: Evans School, Arts & Sciences, Public Health, Other
+    + Year: First, Second -- **in column headings!**
+    + Count: **spread over two columns!**
+
+---
+## Tidy Version
+
+| **Program**     | **Year** | **Count** |
+|-----------------|-----------:|---------:|
+| Evans School    |     First |    10   |
+| Evans School    |     Second   |    6    |
+| Arts & Sciences |     First |    5    |
+| Arts & Sciences |     Second   |    6    |
+| Public Health   |     First |    2    |
+| Public Health   |     Second   |    3    |
+| Other           |     First |    5    |
+| Other           |     Second   |    1    |
+
+--
+
++ Each variable is a column.
++ Each observation is a row.
++ Each cell has a single value.
+
+
+---
+## Billboard is Just Ugly-Messy
+
+.small[
+```{r, echo=FALSE}
+library(pander)
+pander(head(billboard_2000_raw[,1:10], 10), split.tables=120, style="rmarkdown")
+```
+]
+
+Week columns continue up to `wk76`!
+
+---
+## Billboard
+
+* What are the **observations** in the data?
+
+--
+
+    + Week since entering the Billboard Hot 100 per song
+--
+
+* What are the **variables** in the data?
+--
+
+    + Year, artist, track, song length, date entered Hot 100, week since first entered Hot 100 (**spread over many columns**), rank during week (**spread over many columns**)
+--
+
+* What are the **values** in the data?
+--
+
+    + e.g. 2000; 3 Doors Down; Kryptonite; 3 minutes 53 seconds; April 8, 2000; Week 3 (**stuck in column headings**); rank 68 (**spread over many columns**)
+
+
+---
+## `tidyr`
+
+The `tidyr` package provides functions to tidy up data. 
+
+--
+
+Key functions:
+
+
+* **`pivot_longer()`**: takes a set of columns and pivots them down to make two new columns (which you can name yourself): 
+    * A `name` column that stores the original column names
+    * A `value` with the values in those original columns
+
+--
+
+* **`pivot_wider()`**: inverts `pivot_longer()` by taking two columns and pivoting them up into multiple columns
+
+--
+
+We're going to focus only on `pivot_longer` here, but know that it can be reversed!
+
+---
+## `pivot_longer()`
+
+This function usually takes three arguments:
+
+1. **cols**: The columns we want to modify
+1. **names_to**: New variable name to store original columns
+1. **values_to**: New variable name to store original values
+
+---
+## Example of `pivot_longer()`
+
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyr)
+library(dplyr)
+billboard_2000 <- billboard_2000_raw %>%
+  pivot_longer(cols=wk1:wk76,#<<
+               names_to ="week", #<<
+               values_to = "rank") #<<
+billboard_2000 %>% head(5)
+```
+
+Now we have a single week column!
+
+---
+## Lots of missing values?!
+
+```{r}
+summary(billboard_2000$rank)
+```
+
+We don't want to keep the `r sum(is.na(billboard_2000$rank))` rows with missing ranks.
+---
+## Pivoting Better: `values_drop_na`
+
+Adding the argument `values_drop_na = TRUE` to `pivot_longer()` will remove rows with missing ranks.
+```{r}
+billboard_2000 <- billboard_2000_raw %>%
+  pivot_longer(cols=wk1:wk76, 
+               names_to ="week", 
+               values_to = "rank", 
+               values_drop_na = TRUE) #<<
+summary(billboard_2000$rank)
+```
+
+--
+
+No more `NA` values!
+
+```{r}
+dim(billboard_2000)
+```
+And way fewer rows!
+
+---
+## `parse_number()`
+
+The week column is character, but should be numeric.
+
+```{r}
+head(billboard_2000$week)
+```
+
+--
+
+`parse_number()` grabs just the numeric information from a character string:
+
+```{r}
+billboard_2000 <- billboard_2000 %>%
+    mutate(week = parse_number(week)) #<<
+summary(billboard_2000$week)
+```
+
+More sophisticated tools for character strings will be covered later in this course!
+
+---
+class: inverse
+# 3. Dates and Times
+
+.image-full[
+![](img/lubridate.svg)
+]
+
+---
+## `lubridate`
+
+The package `lubridate` (part of the tidyverse!) has a *very large* number of functions you can use!
+
+--
+
++ Converting dates/times between formats (DD-MM-YY to YY-MM-DD)
++ Extracting dates/times (day of week, month, leap years, etc.)
++ Math with dates/times (time zone conversions, etc.)
+
+--
+
+There's too much to cover all of it, but I'll run through a few examples.
+
+---
+## Dates in `billboard_2000` 
+
+```{r}
+billboard_2000 %>% select(date.entered) %>% head(10)
+```
+
+---
+## Extracting Year, Month, or Day
+
+```{r warning=FALSE,message=FALSE}
+library(lubridate)
+head(billboard_2000$date.entered,5)
+year(billboard_2000$date.entered) %>% head(5)
+month(billboard_2000$date.entered) %>% head(5)
+day(billboard_2000$date.entered) %>% head(5)
+```
+
+---
+## Extracting Weekday, Quarter, and Leap Year Boolean
+
+```{r}
+wday(billboard_2000$date.entered) %>% head(5)
+quarter(billboard_2000$date.entered) %>% head(5)
+leap_year(billboard_2000$date.entered) %>% head(5)
+```
+
+---
+class: inverse
+# Activity!
+
+In groups of 2-3, you will use the Billboard data to investigate a question:
+
+1. Write down a question of interest that could be studied with this data
+  + *Which/how many artists had #1 hits?*
+  + *How does rank for each song change over time?*
+  + *Is there a relationship between highest rank and length of song?*
+  
+2. Make the Billboard data *tidy*, perhaps using the code from this lecture.
+
+3. Perform additional steps (if necessary) to help answer your question:
+  + Perhaps using `filter`, `select`, `group_by`, `mutate`, `summarize`, etc.
+
+4. Make a plot or table that answers your question and write down your answer in a sentence.
+
+5. Email me your question, plot/table, and written answer (`mpp790@uw.edu`)
+
+---
+## My Example: Question
+
+**Question:** Do songs that hit #1 have a different trajectory than those that don't?
+
+
+```{r}
+billboard_2000_question <- billboard_2000 %>%
+    group_by(artist, track) %>%
+    mutate(`Weeks at #1` = sum(rank == 1),
+           `Peak Rank`   = ifelse(any(rank == 1),
+                                  "Hit #1",
+                                  "Didn't #1")) 
+```
+
+Note: `any(min_rank==1)` checks to see if *any* value of `rank` is equal to one for the given `artist` and `track`
+
+
+---
+## My Example: Figure
+
+```{r, message=FALSE, warning=FALSE}
+library(ggplot2)
+billboard_trajectories <- 
+  ggplot(data = billboard_2000_question,
+         aes(x = week, y = rank, group = track,
+             color = `Peak Rank`)) +
+  geom_line(aes(size = `Peak Rank`), alpha = 0.4) +
+  theme_classic() +
+  xlab("Week") + ylab("Rank") +
+  scale_color_manual(values = c("black", "red")) +
+  scale_size_manual(values = c(0.25, 1)) +
+  theme(legend.position = c(0.90, 0.75),
+        legend.background = element_rect(fill="transparent"))
+```
+
+
+---
+## Charts of 2000: Beauty!
+
+```{r, cache=FALSE, echo=FALSE, dev="svg", fig.height=4}
+billboard_trajectories
+```
+
+Songs that reach #1 on the Billboard charts appear to last >20 weeks on the charts, while other songs very rarely make it past that point.
+
+---
+class:inverse
+
+# Homework
+
+*Coming soon!*
