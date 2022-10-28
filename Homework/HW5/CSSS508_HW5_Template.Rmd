@@ -24,37 +24,26 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Getting the data in
 
-> Download the data from <https://raw.githubusercontent.com/breonh/breonh.github.io/main/csss_508/homework/homework_5/king_county_elections_2016.txt>. It is a plain text file of data, about 60 MB in size. Values are separated with commas (you can see this by opening it with a *good* text editor, e.g. Atom or Sublime *but not Notepad*). **Save it in the same folder as this template** and read the file into R. You will want to use the `cache=TRUE` chunk option for this (and potentially other chunks). `cache=TRUE` will allow R to read the file only once to save time.
+> Download the data from <https://raw.githubusercontent.com/breonh/breonh.github.io/main/csss_508/homework/homework_5/king_county_elections_2016.txt>. It is a plain text file of data, about 60 MB in size. Values are separated with commas. Read the file into R. You will want to use the `cache=TRUE` chunk option for this (and potentially other chunks). `cache=TRUE` will allow R to read the file only once to save time.
 
 
-```{r import_data, cache=TRUE}
-# IMPORT YOUR DATA HERE; use cache=TRUE!
+```{r import_data, message=FALSE,warning=FALSE,cache=TRUE}
+# [YOUR CODE HERE]
 ```
 
 ## Inspecting the data
 
-> Use `glimpse()` to look at the data.  Describe the data in their current state. How many rows are there? What variables are there? What kinds of values do they take (don't list them all if there are many)? Are the column types sensible? 
+> Use `str()` and/or `summary()` to look at the data.  Describe the data in their current state. How many rows are there? What variables are there? What kinds of values do they take (don't list them all if there are many)? Are the column types sensible? 
 
 
 ```{r}
 # [YOUR CODE HERE]
 ```
 
-YOUR TEXT HERE
+[YOUR ANSWER HERE]
 
-> In addition to looking generally, look at each variable individually... except consider `LEG`, `CC` and `CG` at the same time (I will tell you now these three aren't likely to be useful to you, but maybe guess what they are!). Remember these are real administrative data so they may be *really strangely structured* and some variables are indecipherable; in real world data work, you often have to get by with intuition or poking around online with regard to the nature of your data. Here useful way to look at 10 unique values of individual columns, given some `data` and a `variable` of interest:
+> Now that you've looked at the data holistically, consider each variable individually (or in the case of `LEG`, `CC`, and `CG`, as a trio; I will tell you now that these variables won't be useful, but try to guess what they are). Remember these are real administrative data so they may be *really strangely structured* and some variables are indecipherable; in real world data work, you often have to get by with intuition or poking around online with regard to the nature of your data. As you look at each variable, present 1-2 reasonable summaries (such as a histogram, frequency table, etc.). If there are many categories, **don't** print them all out. Instead, print just the first few or provide a different type of summary.
 
-```
-data %>%
-    distinct(variable) %>%
-    head(10)
-```
-
-> Another thing you may want to do is get a frequency (count) of distinct values:
-
-```
-data %>% count(variable)
-```
 
 ### Precinct
 
@@ -92,11 +81,11 @@ data %>% count(variable)
 # [YOUR CODE HERE]
 ```
 
-> Notice something odd about CounterType in particular? It tells you what a given row of votes was for... but it also has `Registered Voters` and `Times Counted`. What is `Times Counted`?
+> Notice something odd about CounterType in particular? It tells you what a given row of votes was for... but it also has `Registered Voters` and `Times Counted`. What are these variables?
 
 ### SumOfCount
 
-```{r}
+```{r cache=TRUE}
 # [YOUR CODE HERE]
 ```
 
@@ -109,13 +98,16 @@ data %>% count(variable)
 > * Lieutenant Governor
 
 > With these races, we are interested in:
+
 > 1. **Turnout rates** for each of these races in each precinct. We will measure turnout as times votes were counted (including for a candidate, blank, write-in, or "over vote") divided by the number of registered voters.
+
 > 2. Differences between precincts *in Seattle* and precincts *elsewhere in King County*. Again, these data are not documented, so you will have to figure out how to do this.
-> 3. Precinct-level support for the Democratic candidates in King County in 2012 for each contest. We will measure support as the percentage of votes in a precinct for the Democratic candidate out of all votes for candidates or write-ins. Do not include blank votes or "over votes" (where the voter indicated multiple choices) in the overall vote count for the denominator.
 
-> You will perform most of the data management for #1 and #2 in Part 1. Part 2 will contain most of the work for #3 and also covers visualizing results.
+> 3. Precinct-level support for the Democratic candidates in King County in 2016 for each contest. We will measure support as the percentage of votes in a precinct for the Democratic candidate out of all votes for candidates or write-ins. Do not include blank votes or "over votes" (where the voter indicated multiple choices) in the overall vote count for the denominator.
 
-> The goal to accomplish over Parts 1 and 2 will be to get the data to one **row per precinct** with the following 7 columns:
+> You will perform most of the data management for #1 and #2 in this homework. Next week's homework will contain most of the work for #3 and also covers visualizing results.
+
+> The goal to accomplish over Homeworks 5 and 6 will be to get the data to one **row per precinct** with the following 7 columns:
 
 > * Precinct identifier
 > * Indicator for whether the precinct is in Seattle or not
@@ -137,9 +129,12 @@ data %>% count(variable)
 
 ## Seattle precincts
 
-> We want to determine which precincts are in Seattle and which are not. You should look at values of the `Precinct` variable and see if you can figure out what *uniquely identifies* Seattle precincts. Hint: All Seattle tracts have the same naming scheme... but some non-Seattle tracts are *similar* so be careful!
+> We want to determine which precincts are in Seattle and which are not. The following code will create a vector indicating if a precinct is in Seattle or not:
 
-> You will then want to create a binary variable that identifies Seattle tracts (for instance, with values `"Seattle"` and `"Not Seattle"`). One approach: You can use `stringr::str_sub()` or base R's `substr()` to grab a number of characters---a sub-string---from text (say, to test if they equal something); if you use this with `ifelse()` inside `mutate()` you can make a new variable based on whether the sub-string of `Precinct` equals a value.
+`ifelse(substr(YOUR_DATA_NAME$Precinct, start = 1, stop = 4) == "SEA ","Seattle","Not Seattle")`
+
+> Use and modify this code to create a variable in your dataset that indicates if a precinct is in Seattle or not. I would recommend using the `mutate()` function to make the new variable!
+
 
 
 ```{r}
@@ -149,7 +144,11 @@ data %>% count(variable)
 
 ## Registered voters and turnout rates
 
-> We want to calculate turnout rates as total votes (including normal votes, blank votes, over votes, write-ins) for the Presidential race divided by registered voters. $Turnout = \frac{Total Votes}{Registered Voters}$.  Hint: You will want to look at `CounterType` and `SumOfCount` at the same time, within each `Precinct` and `Race`. Examine how the `SumOfCount` values for `CounterType` value `"Times Counted"` relate to all the other `CounterType` values.
+> We want to calculate turnout rates as total votes (including normal votes, blank votes, over votes, write-ins) for each race divided by registered voters. $Turnout = \frac{Total Votes}{Registered Voters}$. Once you've calculated turnout by race and precinct, display the first 9 rows. Be sure to still include whether or not the precinct is in Seattle! 
+
+> Hint 1: The "Times Counted" rows in the `CounterType` variable includes the total number of votes in each race and precinct.
+
+> Hint 2: Consider filtering your data to get the total votes and number of registered voters into unique columns; you *could* `left_join()` after to combine the datasets.
 
 ```{r}
 # [YOUR CODE HERE]
