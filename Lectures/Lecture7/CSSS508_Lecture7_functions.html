@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>CSSS508, Lecture 7</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Michael Pearce (based on slides from Chuck Lanfear)" />
+    <meta name="date" content="2022-11-10" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, top, title-slide
+
+.title[
+# CSSS508, Lecture 7
+]
+.subtitle[
+## Functions
+]
+.author[
+### Michael Pearce<br>(based on slides from Chuck Lanfear)
+]
+.date[
+### November 10, 2022
+]
+
+---
+
+class:inverse
+
+
+# Reminders
+
++ Homework 6 is due *now*
+
++ Lab/Office Hours for next week are *modified:*
+
+  + Office Hours: Monday (11/14) 8:30-10:30am; Thursday (11/17) 10am-12pm
+  + Lab (11/15): Cancelled
+  
++ Homework 7 will be due on on 11/17 at *midnight*
+
+  + You will have time in class today to work on this homework!
+  + *No assignment due Thanksgiving!*
+
+---
+class:inverse
+# Topics
+
+Last time, we learned about,
+
+1. Why we use loops
+1. `for()` loops
+1. `while()` loops
+
+--
+
+Today, we will cover,
+
+1. Aside: Visualizing the Goal
+1. Building blocks of functions
+1. Simple functions
+1. Using functions with `apply()`
+
+---
+class:inverse
+
+# 1. Visualizing the Goal
+
+---
+## Visualizing the Goal
+
+Before you can write effective code, you need to know *exactly* what you want:
+
++ **Goal:** Do I want a single value? vector? one observation per person? per year?
+
+--
+
++ **Current State:** What do I currently have? matrix, vector? long or wide format?
+
+--
+
++ **Translate:** How can I take what I have and turn it into my goal?
+
+  + Sketch out the steps!
+  + Break it down into little operations
+  
+--
+
+**As we become more advanced coders, this concept is key!!**
+
+
+---
+class: inverse
+# 2. Building blocks of functions
+
+---
+## Why Functions?
+
+R (as well as mathematics in general) is full of functions! 
+
+--
+
+We use functions to:
+
+  + Compute summary statistics (`mean()`, `sd()`, `min()`)
+  + Fit models to data (`lm(Fertility~Agriculture,data=swiss)`)
+  + Load data (`read_csv()`)
+  + Create ggplots (`ggplot()`)
+  + And so much more!!
+  
+---
+## Examples of Existing Functions
+
+* `mean()`:
+    + Input: a vector
+    + Output: a single number
+
+--
+
+* `dplyr::filter()`:
+    + Input: a data frame, logical conditions
+    + Output: a data frame with rows removed using those conditions
+
+--
+
+* `readr::read_csv()`:
+    + Input: a file path, optionally variable names or types
+    + Output: a data frame containing info read in from file
+  
+--
+
+Each function requires **inputs**, and returns **outputs**
+
+---
+## Why Write Your Own Functions?
+
+Functions encapsulate actions you might perform often, such as:
+
+* Given a vector, compute some special summary stats
+* Given a vector and definition of "invalid" values, replace with `NA`
+* Defining a new logical operator
+
+--
+
+Advanced function applications (not covered in this class):
+
+* Parallel processing
+* Generating *other* functions
+* Making custom packages containing your functions
+
+---
+## Anatomy of a Function
+
+
+
+```r
+NAME &lt;- function(ARGUMENT1, ARGUMENT2=DEFAULT){
+  BODY
+  return(OUTPUT)
+}
+```
+
+
+* **Name**: What you call the function so you can use it later
+--
+
+* **Arguments** (aka inputs, parameters): things the user passes to the function that affect how it works
+    + e.g. `x` or `na.rm` in `my_new_func &lt;- function(x, na.rm = FALSE) {...}`
+    + `na.rm = FALSE` is example of setting a default value
+    + In this example, `x`, `na.rm` values won't exist outside of the function
+--
+
+* **Body**: The actual operations inside the function.
+--
+
+* **Return**: The output inside `return()`. Could be anything (or nothing!)
+    + If unspecified, will be the last thing calculated
+    
+
+---
+class: inverse
+# 3. Simple functions
+
+---
+## Example 1: Doubling A Number
+
+
+```r
+double_x &lt;- function(x){
+  double_x &lt;- x * 2
+  return(double_x)
+}
+```
+
+--
+
+Let's run it!
+
+
+```r
+double_x(5)
+```
+
+```
+## [1] 10
+```
+
+```r
+double_x(NA)
+```
+
+```
+## [1] NA
+```
+
+```r
+double_x(1:2)
+```
+
+```
+## [1] 2 4
+```
+---
+## Example 2: Extract First/Last
+
+
+```r
+first_and_last &lt;- function(x) {
+    first &lt;- x[1]
+    last  &lt;- x[length(x)]
+    return(c("first" = first, "last" = last))
+}
+```
+
+--
+
+Test it out:
+
+
+```r
+first_and_last(c(4, 3, 1, 8))
+```
+
+```
+## first  last 
+##     4     8
+```
+
+
+---
+## Example 2: Testing `first_and_last`
+
+What if I give `first_and_last()` a vector of length 1?
+
+
+```r
+first_and_last(7)
+```
+
+```
+## first  last 
+##     7     7
+```
+
+--
+
+Of length 0?
+
+
+```r
+first_and_last(numeric(0))
+```
+
+```
+## first 
+##    NA
+```
+
+--
+
+Maybe we want it to be a little smarter.
+
+---
+## Example 3: Checking Inputs
+
+Let's make sure we get an error message when the vector is too small:
+
+
+```r
+smarter_first_and_last &lt;- function(x) {
+    if(length(x) &lt; 2){
+      stop("Input is not long enough!")
+    } else{
+      first &lt;- x[1]
+      last  &lt;- x[length(x)]
+      return(c("first" = first, "last" = last))    
+    }
+}
+```
+
+.footnote[`stop()` ceases running the function and prints the text inside as an error message.]
+---
+## Example 3: Testing Smarter Function
+
+
+```r
+smarter_first_and_last(NA)
+```
+
+```
+## Error in smarter_first_and_last(NA): Input is not long enough!
+```
+
+```r
+smarter_first_and_last(c(4, 3, 1, 8))
+```
+
+```
+## first  last 
+##     4     8
+```
+
+---
+## Cracking Open Functions
+
+If you type a function name without any parentheses or arguments, you can see its contents:
+
+
+```r
+smarter_first_and_last
+```
+
+```
+## function(x) {
+##     if(length(x) &lt; 2){
+##       stop("Input is not long enough!")
+##     } else{
+##       first &lt;- x[1]
+##       last  &lt;- x[length(x)]
+##       return(c("first" = first, "last" = last))    
+##     }
+## }
+## &lt;bytecode: 0x7f7ce78f66a8&gt;
+```
+
+---
+class:inverse
+
+## Activity: Writing A Function
+
+In Olympic diving, a panel of 7 judges provide scores. After removing the worst and best scores, the mean of the remaining scores is given to the diver. We'll write code to calculate this score!
+
+1. Suppose I give you an ordered vector (lowest to greatest) of length 7. How can you keep elements 2 through 6 (i.e., remove the first and last values).
+
+2. Write a function to calculate a diver's score:
+  + Input: Ordered vector of length 7
+  + Output: Mean score after removing the first and last scores.
+  + Checks: Check that the vector has length 7.
+  
+3. Calculate the diver's score given `x &lt;- c(1,3:7,10)`
+
+---
+## Activity: My Solution
+
+1. Extract elements 2 through 6:
+
+  + **Answer:** Given vector `x`, use `x[2:6]`
+  
+--
+
+2. Function
+
+
+```r
+divers_score &lt;- function(x){
+  if(length(x) != 7){
+    stop("x is not of length 7!")
+  } else{
+    x_nofirst_nolast &lt;- x[2:6]
+    return(mean(x_nofirst_nolast))
+  }
+}
+```
+
+--
+
+3. Calculate the diver's score given `x &lt;- c(1,3:7,10)`
+
+
+```r
+divers_score(x = c(1,3:7,10))
+```
+
+```
+## [1] 5
+```
+
+---
+class: inverse
+# 4. Using functions with `apply()`
+
+---
+## Applying Functions Multiple Times?
+
+Last week, we saw an example where we wanted to take the mean of each column in the `swiss` data:
+
+
+```r
+for(col_index in seq_along(swiss)){
+  mean_swiss_col &lt;- mean(swiss[,col_index])
+  names_swiss_col &lt;- names(swiss)[col_index]
+  print(c(names_swiss_col,round(mean_swiss_col,3)))
+}
+```
+
+```
+## [1] "Fertility" "70.143"   
+## [1] "Agriculture" "50.66"      
+## [1] "Examination" "16.489"     
+## [1] "Education" "10.979"   
+## [1] "Catholic" "41.144"  
+## [1] "Infant.Mortality" "19.943"
+```
+
+*Isn't this kind of complex?!*
+
+---
+## `apply()`, don't loop!
+
+Writing loops can be challenging and prone to bugs!!
+
+--
+
+The `apply()` can solve this issue:
+
++ **apply** a function to values in each row or column of a matrix
++ Doesn't require preallocation
++ Can take built-in functions or user-created functions.
+
+---
+## Structure of `apply()`
+
+`apply()` takes 3 arguments:
+
+1. Data (a matrix or data frame)
+2. Margin (1 applies function to each *row*, 2 applies to each *column*)
+3. Function
+
+
+
+```r
+apply(DATA, MARGIN, FUNCTION)
+```
+
+--
+
+For example,
+
+
+```r
+apply(swiss, 2, mean)
+```
+
+```
+##        Fertility      Agriculture      Examination        Education 
+##         70.14255         50.65957         16.48936         10.97872 
+##         Catholic Infant.Mortality 
+##         41.14383         19.94255
+```
+
+---
+## Example 1
+
+
+
+```r
+row_max &lt;- apply(swiss,1,max) #maximum in each row
+head(row_max,20)
+```
+
+```
+##   Courtelary     Delemont Franches-Mnt      Moutier   Neuveville 
+##        80.20        84.84        93.40        85.80        76.90 
+##   Porrentruy        Broye        Glane      Gruyere       Sarine 
+##        90.57        92.85        97.16        97.67        91.38 
+##      Veveyse        Aigle      Aubonne     Avenches     Cossonay 
+##        98.61        64.10        67.50        68.90        69.30 
+##    Echallens     Grandson     Lausanne    La Vallee       Lavaux 
+##        72.60        71.70        55.70        54.30        73.00
+```
+
+---
+## Example 2
+
+
+```r
+apply(swiss,2,summary) # summary of each column
+```
+
+```
+##         Fertility Agriculture Examination Education  Catholic
+## Min.     35.00000     1.20000     3.00000   1.00000   2.15000
+## 1st Qu.  64.70000    35.90000    12.00000   6.00000   5.19500
+## Median   70.40000    54.10000    16.00000   8.00000  15.14000
+## Mean     70.14255    50.65957    16.48936  10.97872  41.14383
+## 3rd Qu.  78.45000    67.65000    22.00000  12.00000  93.12500
+## Max.     92.50000    89.70000    37.00000  53.00000 100.00000
+##         Infant.Mortality
+## Min.            10.80000
+## 1st Qu.         18.15000
+## Median          20.00000
+## Mean            19.94255
+## 3rd Qu.         21.70000
+## Max.            26.60000
+```
+
+**Note:* Matrix output!
+
+---
+## Example 3: User-Created Function
+
+
+```r
+scores &lt;- matrix(1:21,nrow=3)
+print(scores)
+```
+
+```
+##      [,1] [,2] [,3] [,4] [,5] [,6] [,7]
+## [1,]    1    4    7   10   13   16   19
+## [2,]    2    5    8   11   14   17   20
+## [3,]    3    6    9   12   15   18   21
+```
+
+```r
+apply(scores,1,divers_score)
+```
+
+```
+## [1] 10 11 12
+```
+
+---
+class:inverse
+## Activity
+
+*These are homework questions!!*
+
+1. What's similar/different between a `for` loop and `apply`?
+
+1. Write an `apply()` function to take the median value of each column in the `cars` dataset
+
+1. Using `ggplot`, make a scatterplot of the `speed` and `dist` variables in `cars`. Then, add an appropriate horizontal and vertical line symbolizing the median value of each variable.
+
+*Hint:* Using the layers `geom_vline(xintercept = )` and `geom_hline(yintercept = )`
+
+---
+## My Answers
+
+1. What's similar/different between a `for` loop and `apply`?
+
+  + **Possible Answer:** `for` loops and `apply` can usually accomplish the same tasks: Each uses code iteratively. 
+  + `for` loops are more flexible, in that you can provide different data using indices to the loop; they are harder to write. 
+  + `apply` loops are simpler and don't require preallocation; they require your data be a matrix or dataframe.
+
+--
+
+1. Write an `apply()` function to take the median value of each column in the `cars` dataset
+
+
+```r
+median_cars &lt;- apply(cars,2,median)
+median_cars
+```
+
+```
+## speed  dist 
+##    15    36
+```
+
+---
+## My Answers
+
+3. Make a ggplot
+
+
+
+```r
+library(ggplot2)
+ggplot(cars,aes(speed,dist))+geom_point()+
+  geom_vline(xintercept = median_cars[1])+
+  geom_hline(yintercept = median_cars[2])
+```
+
+![](CSSS508_Lecture7_functions_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+
+
+---
+class: inverse
+# Homework
+
+Time to work on Homework 7!
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "tomorrow-night-bright",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
