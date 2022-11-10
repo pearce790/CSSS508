@@ -32,12 +32,12 @@ class:inverse
 
 # Reminders
 
-+ Homework 6 is due *now*
++ Homework 6 is due at *midnight* tonight!
 
 + Lab/Office Hours for next week are *modified:*
 
   + Office Hours: Monday (11/14) 8:30-10:30am; Thursday (11/17) 10am-12pm
-  + Lab (11/15): Cancelled
+  + Lab (11/15): Replaced with additional office hours (above!)
   
 + Homework 7 will be due on on 11/17 at *midnight*
 
@@ -89,6 +89,8 @@ Before you can write effective code, you need to know *exactly* what you want:
 --
 
 **As we become more advanced coders, this concept is key!!**
+
+**Remember:** *When you're stuck, try searching your problem on Google!!*
 
 
 ---
@@ -164,18 +166,19 @@ NAME &lt;- function(ARGUMENT1, ARGUMENT2=DEFAULT){
 
 
 * **Name**: What you call the function so you can use it later
+
 --
 
 * **Arguments** (aka inputs, parameters): things the user passes to the function that affect how it works
-    + e.g. `x` or `na.rm` in `my_new_func &lt;- function(x, na.rm = FALSE) {...}`
-    + `na.rm = FALSE` is example of setting a default value
-    + In this example, `x`, `na.rm` values won't exist outside of the function
+    + e.g. `ARGUMENT1`, `ARGUMENT2`
+    + `ARGUMENT2=DEFAULT` is example of setting a default value
+    + In this example, `ARGUMENT1`, `ARGUMENT2` values won't exist outside of the function
 --
 
 * **Body**: The actual operations inside the function.
 --
 
-* **Return**: The output inside `return()`. Could be anything (or nothing!)
+* **Output**: The object inside `return()`. Could be anything (or nothing!)
     + If unspecified, will be the last thing calculated
     
 
@@ -342,7 +345,7 @@ smarter_first_and_last
 ##       return(c("first" = first, "last" = last))    
 ##     }
 ## }
-## &lt;bytecode: 0x7f7ce78f66a8&gt;
+## &lt;bytecode: 0x7f8dd4d33f48&gt;
 ```
 
 ---
