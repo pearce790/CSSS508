@@ -30,6 +30,25 @@ set.seed(7)
 
 ---
 class:inverse
+# Mid-Quarter Feedback
+
+*Thank you very much* for your feedback! Here are some findings:
+
++ Students generally preferred the current course structure.
+
++ There were generally positive feelings towards the lectures, balance between material/activities, and usefulness of homework/peer review.
+
++ Many students provided helpful suggestions for change:
+
+  + Workload: 2 credit course instead of 1? (*let's discuss!*)
+  + Homework: Many thought the homework was too challenging (*I will be sure to include more questions to build up the basic skills, as well as some challenge questions*)
+  + Lectures: Many thought the lectures cover too much material (*I agree! This course actually covers much less than previous iterations, but with more activities. I will work to make the course content more manageable, without removing the key info!*)
+  
+If you have any additional thoughts, let's chat!!
+
+
+---
+class:inverse
 # Topics
 
 Last time, we learned about,
@@ -43,86 +62,175 @@ Last time, we learned about,
 
 Today, we will cover,
 
-1. 
+1. Basics of Strings
+1. Strings in Base R
+1. Strings in `stringr` (Tidyverse)
 
 ---
-
-# Data Today
-
-We'll use data on food safety inspections in King County from [data.kingcounty.gov](https://data.kingcounty.gov/Health/Food-Establishment-Inspection-Data/f29f-zza5). 
-
-Note these data are *fairly large*. You may want to save them and load them from a *local directory*.
-
-```{r, echo=FALSE, warning=FALSE, message=FALSE}
-library(tidyverse)
-load("restaurants.Rdata")
-```
-
-.small[
-```{r download_restaurant_data, eval=FALSE}
-library(tidyverse)
-restaurants <- 
-  read_csv("https://clanfear.github.io/CSSS508/Lectures/Week8/restaurants.csv",
-                        col_types = "ccccccccnnccicccciccciD") #<<
-```
-]
-
-.footnote[I recommend specifying the column types so they read in correctly.]
+class:inverse
+# 1. Basics of Strings
 
 ---
-.smallish[
+## Basics of Strings
+
++ A general programming term for a unit of character data is a **string**
+
+  + Strings are a *sequence of characters*
+  
+  + In R, "strings" and "character data" are mostly interchangeable.
+  
+  + Some languages have more precise distinctions, but we won't worry about that here!
+  
+--
+
++ We can create strings by surrounding text, numbers, spaces, or symbols with quotes!
+
+  + Examples: `"Hello! My name is Michael"` or `"%*$#01234"`
+
+---
+## Basics of Strings 
+
+R can treat strings in funny ways!
+
 ```{r}
-glimpse(restaurants)
+"01" == "1"
+"01" == 1
+"1" == 1
 ```
-]
-
----
-# Strings
-
-A general programming term for a unit of character data is a **string**, which is defined
-as *a sequence of characters*. In R the terms "strings" and "character data" are mostly interchangeable.
 
 --
 
-In other languages, "string" often also refers to a *sequence* of numeric information, such as
-binary strings (e.g. "01110000 01101111 01101111 01110000"). We rarely use these in R.
+*Reminder:* We can check **data types** using the `class()` function!
 
---
-
-Note that these are *sequences* of numbers rather than single numbers, and thus *strings*. 
-
-One thing that separates a string from a number is that the leading zeroes are meaningful: `01 != 1`
+```{r}
+c(class("1"),class(1))
+```
 
 ---
 class: inverse
-# String Basics
+# 2. Strings in Base R
+
++ `nchar()`
++ `substr()`
++ `paste()`
 
 ---
-# `nchar()`
+## Data: King County Restaurant Inspections!
 
-We've seen the `nchar()` function to get the number of characters in a string. How many characters are in the ZIP codes?
+Today we'll study real data on **food safety inspections in King County**, collected from [data.kingcounty.gov](https://data.kingcounty.gov/Health/Food-Establishment-Inspection-Data/f29f-zza5).
 
-```{r nchar_zip}
-restaurants %>% 
-  mutate(ZIP_length = nchar(Zip_Code)) %>%
-  count(ZIP_length)
+
+Note these data are *fairly large*. The following code can be used to download the data directly from my Github page:
+
+```{r}
+load(url("https://pearce790.github.io/CSSS508/Lectures/Lecture8/restaurants.Rdata"))
 ```
 
 ---
-# `substr()`
+## Quick Examination of the Data
 
-You should be familiar with `substr()` from the homeworks. We can use it to pull out just the first 5 digits of the ZIP code.
+```{r}
+names(restaurants)
+dim(restaurants)
+```
 
-```{r substr}
+---
+## Quick Examination of the Data
+
+**Good Questions to Ask:**
+
+  + What does each row represent?
+  + Is the data in long or wide format?
+  + What are the key variables?
+  + How are the data stored? (*data type*)
+
+---
+## `nchar()`
+
+The `nchar()` function calculates the *number of characters* in a given string. 
+
++ `length()` doesn't work with strings!!
++ Why not?
+
+--
+
+```{r}
+nchar("Mike Pearce")
+```
+
+--
+
+In our `restaurants` data, let's see how many characters are in each zip code:
+
+```{r nchar_zip}
+length_zip <- nchar(restaurants$Zip_Code)
+table(length_zip)
+```
+
+
+---
+## `substr()`
+
+The `substr()` function allows us to extract characters from a string.
+
+--
+
+For example, we can extract the third through fifth elements of a string as follows:
+
+```{r}
+substr("98126",3,5)
+```
+
+
+---
+## `substr()`
+
+Let's extract the first five chararacters from each zip code in the restaurants data, and add it to our dataset.
+
+```{r warning=FALSE,message=FALSE}
+library(dplyr)
 restaurants <- restaurants %>%
     mutate(ZIP_5 = substr(Zip_Code, 1, 5))
 restaurants %>% distinct(ZIP_5) %>% head()
 ```
 
 ---
-# `paste()`
+## `paste()`
 
-We can combine parts of strings together using the `paste()` function, e.g. to make a whole mailing address:
+We combine strings together using `paste()`. By default, it puts a space between different strings.
+
+--
+
+For example, we can combine `"Michael"` and `"Pearce"` as follows:
+
+```{r}
+paste("Michael","Pearce")
+```
+
+---
+## More complex `paste()` commands
+
+There are two additional common arguments to use with `paste()`:
+
+1. `sep=` controls what separates vectors, entry-wise
+1. `collapse=` controls if/how multiple outputs are collapsed into a single string.
+
+--
+
+Examples:
+
+```{r}
+paste("CSSS","508",sep= "_")
+paste(c("CSSS","STAT"),"508",sep= "_")
+paste(c("CSSS","STAT"),"508",sep= "_",collapse=" , ")
+```
+
+*When do we get one string as output vs. two?*
+
+---
+## `paste()`
+
+Let's use `paste()` to create complete mailing addresses for each restaurant:
 
 ```{r mailing_address}
 restaurants <- restaurants %>%
@@ -131,77 +239,95 @@ restaurants <- restaurants %>%
 restaurants %>% distinct(mailing_address) %>% head()
 ```
 
+
 ---
-# `paste0()`
+class:inverse
+## Activity
 
-`paste0()` is a shortcut for `paste()` without any separator.
+The variable `Inspection_Date` is in the format "MM/DD/YYYY". In this question, we'll change the format using functions for strings.
 
-```{r paste0}
-paste(1:5, letters[1:5]) # sep is a space by default
-paste(1:5, letters[1:5], sep ="")
-paste0(1:5, letters[1:5])
+1. How long is each character string in this variable?
+1. Use `substr()` to extract the month of each entry and save it to an object called "months"
+1. Use `substr()` to extract the year of each entry and save it to an object called "years"
+1. Use `paste()` to combine each month and year, separated by an underscore (`_`). Save this as a new variable in the data called "Inspection_Date_Formatted"
+
+---
+## Activity: My Answers
+
+The variable `Inspection_Date` is in the format "MM/DD/YYYY". In this question, we'll change the format using functions for strings.
+
+1.How long is each character string in this variable?
+
+```{r}
+table(nchar(restaurants$Inspection_Date))
+```
+
+--
+
+2.Use `substr()` to extract the month of each entry and save it to an object called "months"
+
+3.Use `substr()` to extract the year of each entry and save it to an object called "years"
+
+```{r}
+months <- substr(restaurants$Inspection_Date,1,2)
+years <- substr(restaurants$Inspection_Date,7,10)
 ```
 
 ---
-# `paste()` Practice
+## Activity: My Answers
 
-`sep=` controls what happens when doing entry-wise squishing of vectors you give to `paste()`, while `collapse=` controls if/how they go from a vector to a single string.
+4.Use `paste()` to combine each month and year, separated by an underscore (`_`). Save this as a new variable in the data called "Inspection_Date_Formatted"
 
-Here are some examples; make sure you understand how each set of arguments produces its results:
-
-```{r paste_practice, eval=TRUE, results="hold"}
-paste(letters[1:5], collapse = "!")
-paste(1:5, letters[1:5], sep = "+")
-paste0(1:5, letters[1:5], collapse = "???")
-paste(1:5, "Z", sep = "*")
-paste(1:5, "Z", sep = "*", collapse = " ~ ")
+```{r}
+restaurants <- restaurants %>% 
+  mutate("Inspection_Date_Formatted"=paste(months,years,sep="_"))
+restaurants %>% 
+  select(Inspection_Date,Inspection_Date_Formatted) %>%
+  head(5)
 ```
+
 
 ---
 class: inverse
-# `stringr`
+# 3. Strings in `stringr`
 
-.img-full[![](img/stringer.jpg)]
++ `str_length()`
++ `str_sub()`
++ `str_c()`
++ `str_to_upper()`, `str_to_lower()`, and `str_to_title()`
++ `str_trim()`
++ `str_detect()`
++ `str_replace()`
+
 
 ---
-# `stringr`
+## `stringr`
 
 `stringr` is yet another R package from the Tidyverse (like `ggplot2`, `dplyr`, `tidyr`, `lubridate`, `readr`).
 
-It provides functions that:
+--
 
-* Replace some basic string functions like `paste()` and `nchar()` in a way that's a bit less touchy with missing values or factors
-* Remove whitespace or pad it out
-* Perform tasks related to **pattern matching**: Detect, locate, extract, match, replace, split.
-    + These functions use **regular expressions** to describe patterns
-    + Base R and `stringi` versions for these exist but are harder to use
+It provides TONS of functions for working with strings:
 
-Conveniently, *most* `stringr` functions begin with "`str_`" to make RStudio auto-complete more useful.
+  + Some are equivalent/better versions of Base R functions
+  + Some can do *fancier* tricks with strings
+  
+--
+
+*Most* `stringr` functions begin with "`str_`" to make RStudio auto-complete more useful.
+
+--
+
+We'll cover the basics today, but know there's much more out there!
     
 ```{r load_stringr}
 library(stringr)
 ```
 
 ---
-# `stringr` Equivalencies
+## Equivalencies: `str_length()`
 
-* `str_sub()` is like `substr()` but also lets you put in negative values to count backwards from the end (-1 is the end, -3 is third from end):
-
-```{r str_sub_example}
-str_sub("Washington", 1, -3)
-```
---
-
-* `str_c()` ("string combine") is just like `paste()` but where the default is `sep = ""` (like `paste0()`)
-
-```{r str_c_example}
-str_c(letters[1:5], 1:5)
-```
-
----
-# `stringr` Equivalencies
-
-* `str_length()` is equivalent to `nchar()`:
+`str_length()` is equivalent to `nchar()`:
 
 ```{r nchar_v_str_length}
 nchar("weasels")
@@ -209,380 +335,285 @@ str_length("weasels")
 ```
 
 ---
-# Changing Cases
+## Equivalencies: `str_sub()`
+
+`str_sub()` is like `substr()`:
+
+```{r}
+str_sub("Washington", 2,4)
+```
+
+--
+
+`str_sub()` also lets you put in negative values to count backwards from the end (-1 is the end, -3 is third from end):
+
+```{r str_sub_example}
+str_sub("Washington", 4, -3)
+```
+
+---
+## Equivalencies: `str_c()`
+
+`str_c()` ("string combine") is just like `paste()` but where the default is `sep = ""` (no space!)
+
+
+```{r str_c_example}
+str_c(c("CSSS","STAT"),508)
+str_c(c("CSSS","STAT"),508,sep=" ")
+str_c(c("CSSS","STAT"),508,sep = " ",collapse = ", ")
+```
+
+
+
+---
+## Changing Cases
 
 `str_to_upper()`, `str_to_lower()`, `str_to_title()` convert cases, which is often a good idea to do before searching for values:
 
 ```{r make_seattle_uppercase}
-head(unique(restaurants$City))
-restaurants <- restaurants %>%
-    mutate(across(c(Name, Address, City), ~str_to_upper(.)))
-head(unique(restaurants$City))
+unique_cities <- unique(restaurants$City)
+unique_cities %>% head()
+
+str_to_upper(unique_cities) %>% head()
+str_to_lower(unique_cities) %>% head()
+str_to_title(unique_cities) %>% head()
 ```
 
 ---
-# `str_trim()` Whitespace
+## Whitespace: `str_trim()`
 
 Extra leading or trailing whitespace is common in text data:
 
 ```{r show_whitespace}
-head(unique(restaurants$Name), 4)
+unique_names <- unique(restaurants$Name)
+unique_names %>% head(3)
 ```
 
 --
 
-Any character column is potentially affected. We can use the `str_trim()` function in `stringr` to clean them up all at once:
+We can remove the whitespace using `str_trim()`:
 
 ```{r clean_whitespace}
-restaurants <- restaurants %>% 
-  mutate(across(where(is.character), ~str_trim(.))) #<<
-head(unique(restaurants$Name), 4)
+str_trim(unique_names) %>% head(3)
 ```
 
-.footnote[`across(where(x), ~ y)` applies function `y` to every column for which function `x` returns `TRUE`.]
+---
+## Patterns!
+
+It's common to want to see if a string satisfies a certain *pattern*.
+
+--
+
+We did this with numeric values earlier in this course!
+
+```{r}
+cars %>% filter(speed < 5 | speed > 24)
+cars %>% filter(dist > 2 & dist <= 10)
+```
+
+---
+## Patterns: `str_detect()`
+
+We can do similar pattern-checking using `str_detect()`:
+
+```{r eval=FALSE}
+str_detect(string,pattern)
+```
+
++ `string` is the character string (or vector of strings) we want to examine
++ `pattern` is the pattern that we're checking for inside `string`
++ Output: TRUE/FALSE vector indicating if pattern was found
+
+
+--
+
+```{r}
+str_detect(string = c("Hello","my name","is Michael"),
+           pattern = "m")
+str_detect(string = c("Hello","my name","is Michael"),
+           pattern = "M")
+```
+
+Results are case-sensitive!!
+
+---
+## Patterns: `str_detect()`
+
+We can test for more complex patterns using "|" and "&":
+
+```{r}
+str_detect(string = c("Hello","my name","is Michael"),
+           pattern = "m|M")
+str_detect(string = c("Hello","my name","is Michael"),
+           pattern = "m&M")
+```
+
+--
+
+*Note:* Using "|" and "&" inside the pattern creates a **regular expression**. This is a fancy technique that we won't go into any more depth on. Still, it's helpful to know that there are more tools out there if you want to learn. Check out the links on our course website!
+
+---
+## Patterns: `str_detect()`
+
+Let's see which phone numbers are in the 206 area code:
+
+```{r}
+unique_phones <- unique(restaurants$Phone)
+unique_phones %>% tail(4)
+str_detect(unique_phones,"206") %>% tail(4)
+```
+
+---
+## Replacement: `str_replace()`
+
+What about if you want to replace a string with something else? Use `str_replace()`!
+
+--
+
+This function works very similarly to `str_detect()`, but with one extra argument:
+
+```{r eval=FALSE}
+str_replace(string, pattern, replacement)
+```
+
++ `replacement` is what `pattern` is substituted for.
+
+--
+
+```{r}
+str_replace(string="Hi, I'm Michael",
+            pattern="Hi",replacement="Hello")
+```
+
+---
+## Replacement: `str_replace()`
+
+In the `Date` variable, let's replace each dash ("-") with an underscore ("_")
+
+```{r}
+dates <- restaurants$Date
+dates %>% tail(3)
+str_replace(dates,"-","_") %>% tail(3)
+```
+
+Wait, what?
+
+---
+## Replacement: `str_replace_all()`
+
+`str_replace()` only changes the **first** instance of a pattern in each string! 
+
+--
+
+If we want to replace **all** patterns, use `str_replace_all()`
+
+```{r}
+dates <- restaurants$Date
+dates %>% tail(3)
+str_replace_all(dates,"-","_") %>% tail(3)
+```
+
+---
+class:inverse
+## Quick Summary
+
+We've seen lots of functions today! 
+
+*Don't try to memorize them!* Instead, use this page as a reference.
+
++ Character Length: `nchar` and `str_length`
+
++ Subsetting: `substr` and `str_sub`
+
++ Combining: `paste` and `str_c`
+
++ Case Changes: `str_to_upper()`, `str_to_lower()`, and `str_to_title()`
+
++ Removing Whitespace: `str_trim`
+
++ Pattern Detection/Replacement: `str_detect()` and `str_replace()`
+
+---
+class:inverse
+# Activity: Exploratory Analyses
+
+Let's examine the coffee shops of King County!
+
+
+1. Filter your data to only include rows in which the `Name` includes the word "coffee" (in any case!)
+
+1. Create a new variable in your data which includes the length of the business name, after removing beginning/trailing whitespace.
+
+1. Create a new variable in your data for the inspection year, *using a `stringr` function!*
+
+1. Create side-by-side boxplots for the length of business name vs. year.
+
+1. Calculate the maximum `Inspection_Score` by business and year.
+
+1. Create a plot (you chose precisely what plot) using the variables Year, Maximum Score, and Business. Get creative!
+
+---
+# Activity: My Solutions
+
+1. Filter your data to only include rows in which the `Name` includes the word "coffee" (in any case!)
+
+```{r}
+coffee <- restaurants
+coffee$Name <- str_to_lower(coffee$Name)
+coffee <- coffee %>% filter(str_detect(Name,"coffee"))
+```
+
+---
+# Activity: My Solutions
+
+2.Create a new variable in your data which includes the length of the business name, after removing beginning/trailing whitespace.
+
+```{r}
+coffee$NameLength <- str_length(str_trim(coffee$Name))
+coffee$Year <- str_sub(coffee$Inspection_Date,-4,-1)
+```
+
+---
+# Activity: My Solutions
+
+3.Create a new variable in your data for the inspection year.
+
+```{r warning=FALSE,message=FALSE,fig.height=5}
+library(ggplot2)
+ggplot(coffee,aes(Year,NameLength))+geom_boxplot()
+```
+
+---
+# Activity: My Solutions
+
+4.Calculate the maximum `Inspection_Score` by business and year.
+
+```{r}
+coffee_summary <- coffee %>% group_by(Name,Year) %>% 
+  summarize(MaxScore=max(Inspection_Score))
+```
+
+
+---
+# Activity: My Solutions
+
+
+5.Create a plot (you chose precisely what plot) using the variables Year, Maximum Score, and Business.
+```{r warning=FALSE,fig.height=4.5}
+ggplot(coffee_summary,aes(Year,MaxScore,group=Name))+
+  geom_line(alpha=.2)
+```
+
+
 
 ---
 class: inverse
-# Regular Expressions and Pattern Matching
+# Coming Up 
 
----
-# What are Regular Expressions?
+* Remember: No homework due next week, and no lecture on Thanksgiving!
 
-**Regular expressions** or **regex**es are how we describe patterns we are looking for
-in text in a way that a computer can understand. We write an **expression**, apply it
-to a string input, and then can do things with **matches** we find.
+* Homework 7 is due tonight!
 
---
+* Lab on Tuesday will be a review of past homework!
 
-* **Literal characters** are defined snippets to search for like `SEA` or `206`
-
---
-
-* **Metacharacters** let us be flexible in describing patterns:
-    + backslash `\`, caret `^`, dollar sign `$`, period `.`, pipe `|`, question mark `?`, asterisk `*`, plus sign `+`, parentheses `(` and `)`, square brackets `[` and `]`, curly braces `{` and `}`
-    + To treat a metacharacter as a literal character, you must **escape** it with two preceding backslashs `\\`, e.g. to match `(206)` including the parentheses, you'd use `\\(206\\)` in your regex
-
----
-# `str_detect()`
-
-I want to get inspections for coffee shops. I'll say a coffee shop is anything that has "COFFEE", "ESPRESSO", or "ROASTER" in the name. The `regex` for this is `COFFEE|ESPRESSO|ROASTER` because `|` is a metacharacter that means "OR". Use the `str_detect()` function, which returns `TRUE` if it finds what you're looking for and `FALSE` if it doesn't (similar to `grepl()`):
-
-```{r coffee_check}
-coffee <- restaurants %>% 
-  filter(str_detect(Name, "COFFEE|ESPRESSO|ROASTER"))
-coffee %>% distinct(Name) %>% head()
-```
-
----
-# Will My Coffee Kill Me?
-
-Let's take each unique business identifier, keep the most recent inspection score, and look at a histogram of scores:
-
-.small[
-```{r coffee_histogram, fig.height = 3, dev = "svg" }
-coffee %>% select(Business_ID, Name, Inspection_Score, Date) %>%
-       group_by(Business_ID) %>% filter(Date == max(Date)) %>% 
-       distinct(.keep_all=TRUE) %>% ggplot(aes(Inspection_Score)) + 
-    geom_histogram(bins=8) + xlab("Most recent inspection score") + ylab("") +
-    ggtitle("Histogram of inspection scores for Seattle coffee shops")
-```
-]
-
----
-# `str_detect()`: Patterns
-
-Let's look for phone numbers whose first three digits are "206" using `str_detect()`.
-
-We will want it to work whether they have parentheses around the beginning or not, but NOT to match "206" occurring elsewhere:
-
-```{r look_for_206}
-area_code_206_pattern <- "^\\(?206"
-phone_test_examples <- c("2061234567", "(206)1234567",
-                         "(206) 123-4567", "555-206-1234")
-str_detect(phone_test_examples, area_code_206_pattern)
-```
-
-* `^` is a metacharacter meaning "look only at the *beginning* of the string"
-* `\\(?` means look for a left parenthesis (`\\(`), but it's optional (`?`)
-* `206` is the literal string to look for after the optional parenthesis
-
-
----
-# `str_view()`
-
-`stringr` also has a function called `str_view()` that allows you to see in the viewer pane *exactly*
-what text is being selected with a regular expression.
-
-```{r str_view, eval=FALSE}
-str_view(phone_test_examples, area_code_206_pattern)
-```
-
-This will generate a small web page in the viewer pane (but not in Markdown docs).
-
-Just be careful to not load an entire long vector / variable or it may crash RStudio
-as it tries to render a massive page!
-
----
-# `str_detect()`
-
-Perhaps we want to know how many phone numbers aren't in the 206 area code?
-
-```{r look_for_206_rest}
-restaurants %>% 
-  mutate(has_206_number = 
-           str_detect(Phone, area_code_206_pattern)) %>% 
-  count(has_206_number) 
-```
-
-`str_detect()` returns `NA` for rows with missing (`NA`) phone numbers--you can't search for text in a missing value.
-
----
-# `str_extract()`
-
-`str_extract()` extracts substrings that match a regex.
-
-Let's extract the [directional part of Seattle](https://en.wikipedia.org/wiki/Street_layout_of_Seattle#Directionals) of addresses: N, NW, SE, none, etc.
-
---
-
-```{r test_direction}
-direction_pattern <- " (N|NW|NE|S|SW|SE|W|E)( |$)"
-direction_examples <- c("2812 THORNDYKE AVE W", "512 NW 65TH ST",
-                        "407 CEDAR ST", "15 NICKERSON ST")
-str_extract(direction_examples, direction_pattern)
-```
-
-* The first space will match a space character, then
-* `(N|NW|NE|S|SW|SE|W|E)` matches one of the directions in the group
-* `( |$)` is a group saying either there is a space after, or it's the end of the address string (`$` means the end of the string)
-
----
-# Where are the Addresses?
-
-```{r extract_directions}
-restaurants %>% 
-  distinct(Address) %>% 
-  mutate(city_region = 
-          str_trim(str_extract(Address, direction_pattern))) %>% #<<
-  count(city_region) %>% arrange(desc(n))
-```
-.pull-right[
-.footnote[
-A common operation is to `str_extract()` something with extra spaces and then `str_trim()` them out.
-]
-]
-
----
-# `str_replace()`: Replacing
-
-Maybe we want to do a street-level analysis of inspections (e.g. compare The Ave to Pike Street). How can we remove building numbers?
-
-```{r test_address_numbers}
-number_pattern <- "^[0-9]*-?[A-Z]? (1/2 )?"
-number_examples <- 
-  c("2812 THORNDYKE AVE W", "1ST AVE", "10A 1ST AVE", 
-    "10-A 1ST AVE", "5201-B UNIVERSITY WAY NE",
-    "7040 1/2 15TH AVE NW")
-str_replace(number_examples, number_pattern, replacement = "")
-```
---
-
-We can also use the shortcut `str_remove()`:
-
-```{r}
-str_remove(number_examples, number_pattern)
-```
-
-
----
-# How Does the Building Number regex Work?
-
-Let's break down `"^[0-9]*-?[A-Z]? (1/2 )?"`:
-
-* `^[0-9]` means look for a digit between 0 and 9 (`[0-9]`) at the beginning (`^`)
-
---
-
-* `*` means potentially match more digits after that
-
---
-
-* `-?` means optionally (`?`) match a hyphen (`-`)
-
---
-
-* `[A-Z]?` means optionally match (`?`) a letter (`[A-Z]`)
-
---
-
-* Then we match a space (` `)
-
---
-
-* `(1/2 )?` optionally matches a 1/2 followed by a space since this is apparently a thing with some address numbers
-
----
-# Removing Street Numbers
-
-```{r replace_numbers}
-restaurants <- restaurants %>% 
-  mutate(street_only = str_remove(Address, number_pattern))
-restaurants %>% distinct(street_only) %>% head(10)
-```
-
----
-# How About Units/Suites Too?
-
-Getting rid of unit/suite references is tricky, but a decent attempt would be to drop anything including and after "#", "STE", "SUITE", "SHOP", "UNIT":
-
-```{r test_unit_numbers}
-unit_pattern <- " (#|STE|SUITE|SHOP|UNIT).*$"
-unit_examples <-
-  c("1ST AVE", "RAINIER AVE S #A", "FAUNTLEROY WAY SW STE 108", 
-    "4TH AVE #100C", "NW 54TH ST")
-str_remove(unit_examples, unit_pattern)
-```
-
----
-# How'd the Unit regex Work?
-
-Breaking down `" (#|STE|SUITE|SHOP|UNIT).*$"`:
-
-* First we match a space
-
---
-
-* `(#|STE|SUITE|SHOP|UNIT)` matches one of those words
-
---
-
-* `.*$` matches *any* character (`.`) after those words, zero or more times (`*`), until the end of the string (`$`)
-
-
----
-# Removing Units/Suites
-
-```{r replace_units}
-restaurants <- restaurants %>% 
-  mutate(street_only = 
-           str_trim(str_remove(street_only, unit_pattern)))
-restaurants %>% distinct(street_only) %>% head(11)
-```
-
-.pull-right[.footnote[For serious work, we would want to also look into special cases like "C-08" here.]]
-
----
-# Where Does Danger Lurk?
-
-Let's get the number of 45+ point inspections occurring on every street.
-
-```{r failed_inspections}
-restaurants %>% 
-  filter(Inspection_Score > 45) %>% 
-  distinct(Business_ID, Date, Inspection_Score, street_only) %>% 
-  count(street_only) %>%
-  arrange(desc(n)) %>% 
-  head(n=5)
-```
-
----
-# Splitting up Strings
-
-You can split up strings using `tidyr::separate()`, seen in Week 5. Another option is `str_split()`, which will split strings based on a pattern separating parts and put these components in a list. `str_split_fixed()` will do that but with a matrix instead (thus can't have varying numbers of separators):
-
-.small[
-```{r str_split_violation}
-head(str_split_fixed(restaurants$Violation_Description, " - ", n = 2))
-```
-]
-
----
-# Making Sentences
-
-Maybe we have a report or website where we need text dynamically generated from data.
-
-Lets prep some recent scores first.
-
-```{r, message=FALSE, warning=FALSE}
-library(lubridate)
-recent_scores <- restaurants %>%
-  select(Name, Address, City, 
-         Inspection_Score, Inspection_Date) %>% 
-  filter(!is.na(Inspection_Score)) %>% 
-  group_by(Name) %>% 
-  arrange(desc(Inspection_Score)) %>% 
-  slice(1) %>% 
-  ungroup() %>%
-  mutate_at(vars(Name, Address, City), ~ str_to_title(.)) %>%
-  mutate(Inspection_Date = mdy(Inspection_Date)) %>%
-  sample_n(3)
-```
-
----
-## With `paste()`
-
-We can give *many* arguments to string a sentence together.
-
-```{r, message=FALSE, warning=FALSE}
-library(scales) # for ordinal day text
-recent_scores %>%
-  mutate(text_desc = 
-           paste(Name, 
-                 "is located at", Address, "in", City,
-                 "and received a score of", Inspection_Score, "on",
-                 month(Inspection_Date, label=TRUE, abbr=FALSE),
-                 paste0(ordinal(day(Inspection_Date)),","), 
-                 paste0(year(Inspection_Date), "."))) %>% 
-  select(text_desc)
-```
-
----
-## With `glue`
-
-Or we can use `str_glue`, `paste()`'s more sophisticated sibling which uses [the `glue` package](https://glue.tidyverse.org/). Variables and functions just go inside `{ }` and you can create temporary variables for convenience.
-
-```{r}
-(score_text <- recent_scores %>%
-  mutate(text_desc = 
-           str_glue("{Name} is located at {Address} in {City} ",
-                    "and received a score of {Inspection_Score} ",
-                    "on {month(when, label=TRUE, abbr=FALSE)} ",
-                    "{ordinal(day(when))}, {year(when)}.",
-                    when = Inspection_Date)) %>% 
-  select(text_desc))
-```
-
----
-# `str_wrap()` and `\n`
-
-The previous output will work fine for in-line Markdown, but it runs off the edge of the console. It also won't wrap in many tables and images.
-
-We can add regular linebreaks using `str_wrap()` or manually with `"\n"`.
-
-```{r}
-score_text %>% 
-  pull(text_desc) %>% 
-  str_wrap(width = 70) %>% #<<
-  paste0("\n\n") %>% # add two linebreaks as a paragraph break #<<
-  cat() # cat combines text and prints it
-```
-
-
----
-# Other Useful `stringr` Functions
-
-`str_pad(string, width, side, pad)`: Adds "padding" to any string to make it a given minimum width.
-
-`str_subset(string, pattern)`: Returns all elements that contain matches of the pattern.
-
-`str_which(string, pattern)`: Returns numeric indices of elements that match the pattern.
-
-`str_replace_all(string, pattern, replacement)`: Performs multiple replacements simultaneously
-
-`str_squish(string)`: Trims spaces around a string but also removes duplicate spaces inside it.
-
----
-class: inverse
-# Coming Up
-
-Homework 6, Part 2 is due next week, and peer reviews due the week after.
+* Have a wonderful and restful Thanksgiving!!
