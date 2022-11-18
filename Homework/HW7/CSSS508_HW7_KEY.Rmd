@@ -1,0 +1,140 @@
+---
+title: "Homework 7: Loops and Functions"
+author: "KEY"
+date: "Due: 11/17"
+output: 
+  html_document:
+    preserve_yaml: true
+    toc: true
+    toc_float: true
+published: false
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(tidyr)
+library(readr)
+library(ggplot2)
+```
+
+# 1. For and While Loops
+
+### Question 1.1: Write in words the difference between a `for` loop and a `while` loop.
+
+> ANSWER: Both for and while loops allow for applying code iteratively. A for loop runs through a pre-specified set of indices, but a while loop runs until some condition is met.
+
+### Question 1.2: Create a matrix with 3 rows and 8 columns, called `double_matrix`. Make the first column equal to the values 1, 2, and 3. Using a loop, fill in the matrix, row by row, such that each value is double that to its left.
+
+For example, the first row of the matrix should be: `r c(1,2,4,8,16,32,64,128)`
+
+```{r}
+double_matrix <- matrix(NA,nrow=3,ncol=8)
+double_matrix[,1] <- 1:3
+for(row in 1:3){
+  for(col in 2:8){
+    double_matrix[row,col] <- 2 * double_matrix[row,col-1]
+  }
+}
+print(double_matrix)
+```
+
+### Question 1.3: Write a while loop that keeps "flipping 5 coins" until all are heads. Have the function count how many sets of 5 coin flips it took until getting 5 heads, and return that number.
+
+*Hint:* You can flip 5 coins using the code `rbinom(n=5,size=1,prob=.5)`. A heads is when you return a `1`.
+
+```{r}
+num_heads <- 0
+counter <- 0
+while(num_heads < 5){
+  coins <- rbinom(n=5,size=1,prob=.5)
+  num_heads <- sum(coins)
+  counter <- counter + 1
+}
+print(counter)
+```
+
+**Note:** Due to the randomness of the `rbinom` function, each person may have a different output number!
+
+# 2. Functions
+
+### Question 2.1: Pick a built-in R function and describe its input(s) and output(s).
+
+> ANSWER: The function `summary` takes an object as an input, such as a number, vector, matrix, or data.frame. It then outputs a summary of the object as best its able. Oftentimes, it will summarize matrices or data.frames by column. Output often includes the min, first quartile, median, mean, third quartile, and max.
+
+### Question 2.2: Write a function, called `doubler`, that takes a single number as its input and returns a vector of length 8. The vector should contain the initial value, doubled consecutive times. Be sure to check if a single number was given!
+
+*Hint:* If input is 1, output should be `c(1,2,4,8,16,32,64,128)`.
+
+```{r}
+doubler <- function(x){
+  ## Solution 1:
+  vals <- c(x)
+  for(i in 1:7){
+    x <- x*2
+    vals <- c(vals,x)
+  }
+  return(vals)
+  
+  ## Solution 2:
+  # vals <- c(x,x*2,x*4,x*8,x*16,x*32,x*64,x*128)
+  # return(vals)
+  
+  ## Solution 3:
+  # vals <- x*2^(0:7)
+  # return(vals)
+}
+```
+
+### Question 2.3: Use `doubler` on the inputs 1, 2, and 3. Do you get the same values as in question 1.2? (You should!)
+
+```{r}
+doubler(1)
+doubler(2)
+doubler(3)
+```
+
+# 3. Apply
+
+### Question 3.1 What's similar/different between a `for` loop and `apply`?
+
+> ANSWER: `for` loops and `apply` can usually accomplish the same tasks: Each uses code iteratively.`for` loops are more flexible, in that you can provide different data using indices to the loop; they are harder to write. `apply` loops are simpler and don't require preallocation; they require your data be a matrix or dataframe.
+
+### Question 3.2 Write an `apply()` function to take the median value of each column in the `cars` dataset
+
+```{r}
+median_cars <- apply(cars,2,median)
+median_cars
+```
+
+### Question 3.3 Using `ggplot`, make a scatterplot of the `speed` and `dist` variables in `cars`. Then, add an appropriate horizontal and vertical line symbolizing the median value of each variable.
+
+*Hint:* Using the layers `geom_vline(xintercept = )` and `geom_hline(yintercept = )`
+
+```{r}
+library(ggplot2)
+ggplot(cars,aes(speed,dist))+geom_point()+
+  geom_vline(xintercept = median_cars[1])+
+  geom_hline(yintercept = median_cars[2])
+```
+
+### Question 3.4: Repeat steps 3.2 and 3.3, but this time using a function you create called `half_max`. This function should return the maximum value of a vector divided by 2.
+
+*Hint:* Given the vector `1:6`, `half_max` should return 3 (since 6/2 = 3).
+
+```{r}
+half_max <- function(vector){
+  half_max <- max(vector)/2
+  return(half_max)
+}
+halfmax_cars <- apply(cars,2,half_max)
+halfmax_cars
+
+ggplot(cars,aes(speed,dist))+geom_point()+
+  geom_vline(xintercept = halfmax_cars[1])+
+  geom_hline(yintercept = halfmax_cars[2])
+```
+
+
+
