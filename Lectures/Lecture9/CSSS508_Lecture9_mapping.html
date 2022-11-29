@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>CSSS508, Lecture 9</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Michael Pearce (based on slides from Chuck Lanfear)" />
+    <meta name="date" content="2022-12-01" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, top, title-slide
+
+.title[
+# CSSS508, Lecture 9
+]
+.subtitle[
+## Mapping
+]
+.author[
+### Michael Pearce<br>(based on slides from Chuck Lanfear)
+]
+.date[
+### December 1, 2022
+]
+
+---
+
+class:inverse
+
+
+# Topics
+
+Last time, we learned about,
+
+1. Basics of Strings
+1. Strings in Base R
+1. Strings in `stringr` (Tidyverse)
+
+--
+
+Today, we will cover,
+
+1. `ggmap` for mapping in `ggplot2`
+2. Density plots
+3. Labeling points
+
+
+---
+# Mapping in R: A quick plug
+
+.pull-left[
+.image-75[
+![](img/bivand.jpg)
+]
+]
+
+.pull-right[
+
+Mapping can be **complex!** If you are interested in digging deeper, here are some resources:
+
+* If you are interested in mapping, GIS, and geospatial analysis in R, *acquire this book*.
+
+* [RSpatial.org](http://rspatial.org/) is a great resource for working with spatial data.
+
+* For more information on *spatial statistics*, consider taking Jon Wakefield's **CSSS 554: Statistical Methods for Spatial Data** this winter.
+
+]
+
+---
+class: inverse
+# 1. `ggmap`
+
+---
+## One Day of SPD Incidents
+
+Today, we'll study data from the Seattle Police Department regarding incidents on just one day: March 25, 2016. 
+
+--
+
+The data can be downloaded from my predecessor's Github using the code below (code in the R companion file).
+
+
+
+```r
+library(ggplot2)
+library(readr)
+library(dplyr)
+```
+
+```r
+spd_raw &lt;- read_csv("https://clanfear.github.io/CSSS508/Seattle_Police_Department_911_Incident_Response.csv")
+```
+
+---
+## Taking a `glimpse()`
+
+.small[
+
+```r
+glimpse(spd_raw)
+```
+
+```
+## Rows: 706
+## Columns: 19
+## $ `CAD CDW ID`                  &lt;dbl&gt; 1701856, 1701857, 1701853, 170…
+## $ `CAD Event Number`            &lt;dbl&gt; 16000104006, 16000103970, 1600…
+## $ `General Offense Number`      &lt;dbl&gt; 2016104006, 2016103970, 201610…
+## $ `Event Clearance Code`        &lt;chr&gt; "063", "064", "161", "245", "2…
+## $ `Event Clearance Description` &lt;chr&gt; "THEFT - CAR PROWL", "SHOPLIFT…
+## $ `Event Clearance SubGroup`    &lt;chr&gt; "CAR PROWL", "THEFT", "TRESPAS…
+## $ `Event Clearance Group`       &lt;chr&gt; "CAR PROWL", "SHOPLIFTING", "T…
+## $ `Event Clearance Date`        &lt;chr&gt; "03/25/2016 11:58:30 PM", "03/…
+## $ `Hundred Block Location`      &lt;chr&gt; "S KING ST / 8 AV S", "92XX BL…
+## $ `District/Sector`             &lt;chr&gt; "K", "S", "D", "M", "M", "B", …
+## $ `Zone/Beat`                   &lt;chr&gt; "K3", "S3", "D2", "M1", "M3", …
+## $ `Census Tract`                &lt;dbl&gt; 9100.102, 11800.602, 7200.106,…
+## $ Longitude                     &lt;dbl&gt; -122.3225, -122.2680, -122.342…
+## $ Latitude                      &lt;dbl&gt; 47.59835, 47.51985, 47.61422, …
+## $ `Incident Location`           &lt;chr&gt; "(47.598347, -122.32245)", "(4…
+## $ `Initial Type Description`    &lt;chr&gt; "THEFT (DOES NOT INCLUDE SHOPL…
+## $ `Initial Type Subgroup`       &lt;chr&gt; "OTHER PROPERTY", "SHOPLIFTING…
+## $ `Initial Type Group`          &lt;chr&gt; "THEFT", "THEFT", "TRESPASS", …
+## $ `At Scene Time`               &lt;chr&gt; "03/25/2016 10:25:51 PM", "03/…
+```
+]
+
+What does each **row represent?** What are the **variables and values?**
+
+---
+## Simple Plotting: Regular `ggplots`
+
+
+.pull-left[
+Coordinates, such as longitude and latitude, can be provided in `aes()` as `x` and `y` values.
+
+This is ideal when you don't need to place points over some map for reference.
+
+.small[
+
+```r
+ggplot(spd_raw, 
+       aes(Longitude, Latitude)) + 
+  geom_point() + 
+  coord_fixed() + # evenly spaces x and y
+  ggtitle("Seattle Police Incidents",
+          subtitle="March 25, 2016") +
+  theme_classic()
+```
+]
+
+Sometimes, however, we want to plot these points over existing maps.
+
+]
+
+.pull-right[
+![](CSSS508_Lecture9_mapping_files/figure-html/unnamed-chunk-4-1.svg)&lt;!-- --&gt;
+]
+
+---
+## Better plots with `ggmap`
+
+`ggmap` is a package that works with `ggplot2` to plot spatial data directly on map images.
+
+--
+
+What this package does for you:
+
+1. Queries servers for a map at the location and scale you want
+
+2. Plots the image as a `ggplot` object
+
+3. Lets you add more `ggplot` layers like points, 2D density plots, text annotations
+
+4. Additional functions for interacting with Google Maps (beyond this course)
+
+
+---
+## Installation
+
+We can install `ggmap` like other packages:
+
+
+```r
+install.packages("ggmap")
+```
+
+**Note: If prompted to "install from sources the package which needs compilation", I find that typing "no" works best!**
+
+Because the map APIs it uses change frequently, sometimes you may need to get a newer development version of `ggmap` from the author's GitHub. This can be done using the `remotes` package.
+
+
+```r
+if(!requireNamespace("remotes")){install.packages("remotes")}
+remotes::install_github("dkahle/ggmap", ref = "tidyup")
+```
+
+Note, this may require compilation on your computer.
+
+
+```r
+library(ggmap)
+```
+
+---
+## Quick Maps with `qmplot()`
+
+.pull-left[
+`qmplot` will automatically set the map region based on your data:
+
+
+```r
+qmplot(data = spd_raw,
+       x = Longitude, 
+       y = Latitude)
+```
+
+All I provided was numeric latitude and longitude, and it placed the data points correctly on a raster map of Seattle.
+
+]
+
+.pull-right[
+![](CSSS508_Lecture9_mapping_files/figure-html/qmplot-1.svg)&lt;!-- --&gt;
+]
+
+---
+## `get_map()`
+
+`qmplot()` internally uses the function `get_map()`, which retrieves a base map layer. Some options:
+
+* `location=` search query or numeric vector of longitude and latitude
+* `zoom=` a zoom level (3 = continent, 10 = city, 21 = building)
+* `maptype=`: `"watercolor"`, `"toner"`, `"toner-background"`, `"toner-lite"`
+* `color=`: `"color"` or `"bw"`
+
+--
+
+
+There are fancier options available, but many require a Google Maps API. 
+
+See the **help page** for `gmplot()` or `get_map` for more information!
+
+---
+## Nicer Example
+
+
+.pull-left[
+
+Let's add *color* to our plot from before
+
+```r
+qmplot(data = spd_raw,
+       x = Longitude, 
+       y = Latitude,
+       color=I("navy")
+)
+```
+`I()` is used here to specify *set* (constant) rather than *mapped* values.
+]
+
+.pull-right[
+![](CSSS508_Lecture9_mapping_files/figure-html/unnamed-chunk-10-1.svg)&lt;!-- --&gt;
+]
+
+---
+## Nicer Example
+
+
+
+.pull-left[
+
+Add *transparency*
+
+
+```r
+qmplot(data = spd_raw,
+       x = Longitude, 
+       y = Latitude,
+       color=I("navy"),
+       alpha=I(0.5)
+)
+```
+]
+.pull-right[
+![](CSSS508_Lecture9_mapping_files/figure-html/unnamed-chunk-12-1.svg)&lt;!-- --&gt;
+]
+
+
+---
+class:inverse
+# 2. Density plots
+
+---
+## Density Layers
+
+.pull-left[
+
+We can create a **spatial density plot** using the layer function `stat_density_2d()`:
+
+* What to use when creating a "density" plot (where the observations occur)
+
+* Aesthetics of the density plot
+
+* Additional layer functions for customization
+
+
+]
+
+.pull-right[
+![](CSSS508_Lecture9_mapping_files/figure-html/unnamed-chunk-14-1.svg)&lt;!-- --&gt;
+]
+
+---
+## Basic Map
+
+.pull-left[
+
+Start with basic plot, remove points:
+
+
+```r
+qmplot(data = spd_raw,
+*      geom = "blank",
+       x = Longitude, 
+       y = Latitude)
+```
+]
+
+.pull-right[
+![](CSSS508_Lecture9_mapping_files/figure-html/unnamed-chunk-16-1.svg)&lt;!-- --&gt;
+]
+
+---
+## Add Density Layer
+
+.pull-left[
+
+Add `stat_density_2d` layer:
+
+
+```r
+qmplot(data = spd_raw,
+       geom = "blank",
+       x = Longitude, 
+       y = Latitude)+
+* stat_density_2d(
+*   aes(fill = stat(level)),
+*   geom = "polygon")
+```
+
+`stat(level)` indicates we want `fill=` to be based on `level` values calculated by the layer (i.e., number of observations).
+]
+
+.pull-right[
+![](CSSS508_Lecture9_mapping_files/figure-html/unnamed-chunk-18-1.svg)&lt;!-- --&gt;
+]
+
+
+---
+## Color Scale
+
+.pull-left[
+
+Specify color gradient
+
+
+```r
+qmplot(data = spd_raw,
+       geom = "blank",
+       x = Longitude, 
+       y = Latitude)+
+  stat_density_2d(
+    aes(fill = stat(level)),
+    geom = "polygon", 
+  )+
+* scale_fill_gradient2(
+*   low = "white",
+*   mid = "yellow",
+*   high = "red")
+```
+]
+
+.pull-right[
+![](CSSS508_Lecture9_mapping_files/figure-html/unnamed-chunk-20-1.svg)&lt;!-- --&gt;
+]
+
+
+---
+## Customize transparency and legend
+
+.pull-left[
+
+.small[
+
+```r
+qmplot(data = spd_raw,
+       geom = "blank",
+       x = Longitude, 
+       y = Latitude,
+*      darken = 0.5)+
+  stat_density_2d(
+    aes(fill = stat(level)), 
+    geom = "polygon", 
+*   alpha = .2,
+  )+
+  scale_fill_gradient2(
+*   "Incident\nConcentration",
+    low = "white", 
+    mid = "yellow", 
+    high = "red")+
+* theme(legend.position = "bottom")
+```
+]
+
+Done!
+
+]
+
+.pull-right[
+![](CSSS508_Lecture9_mapping_files/figure-html/unnamed-chunk-22-1.svg)&lt;!-- --&gt;
+]
+---
+class:inverse
+# 3. Labeling points
+
+---
+## Focus in on Downtown Seattle
+
+First, let's filter our data to downtown based on values "eyeballed" from our earlier map:
+
+
+```r
+downtown &lt;- spd_raw %&gt;%
+  filter(Latitude &gt; 47.58, Latitude &lt; 47.64,
+         Longitude &gt; -122.36, Longitude &lt; -122.31)
+```
+
+We'll plot just these values from now on!
+
+--
+
+Let's also make a dataframe that includes just assaults and robberies downtown:
+
+
+```r
+assaults &lt;- downtown %&gt;% 
+  filter(`Event Clearance Group` %in%
+                  c("ASSAULTS", "ROBBERY")) %&gt;%
+  mutate(assault_label = `Event Clearance Description`)
+```
+
+We'll **label** these observations!
+
+---
+.pull-left[
+## Labels
+
+Now let's plot the events and label them with `geom_label()`:
+
+.smallish[
+
+```r
+qmplot(data = downtown,
+       x = Longitude,
+       y = Latitude,
+       maptype = "toner-lite",
+       color = I("firebrick"),
+       alpha = I(0.5)) +  
+* geom_label(data = assaults,
+*      aes(label = assault_label),
+*      size=2)
+```
+]
+
+Note that one dataframe is used for points (`downtown`) and another for labels (`assaults`)!!
+
+]
+
+.pull-right[
+![](CSSS508_Lecture9_mapping_files/figure-html/labels_2-1.svg)&lt;!-- --&gt;
+]
+
+---
+## Fixing Overlapping Labels
+
+.pull-left[
+
+The `ggrepel` package lets use fix or reduce overlapping labels using the function `geom_label_repel()`.
+
+.small[
+
+```r
+library(ggrepel)
+qmplot(data = 
+    downtown,
+    x = Longitude,
+    y = Latitude,
+    maptype = "toner-lite", 
+    color = I("firebrick"), 
+    alpha = I(0.5)) + 
+* geom_label_repel(
+    data = assaults,
+    aes(label = assault_label), 
+    size=2)
+```
+]
+]
+
+.pull-right[
+![](CSSS508_Lecture9_mapping_files/figure-html/ggrepel_2-1.svg)&lt;!-- --&gt;
+]
+
+
+---
+class: inverse
+# Lab/Homework
+
+For the remainder of class, we'll use breakout rooms on Zoom to work on homework. Please *assign yourself* to a breakout room, then start working on Homework 8!
+
++ The first part is based on Lecture 8 (strings)
+  + This includes lab questions from last lecture!
++ The second part is based on Lecture 9 (mapping)
+  + This includes an analysis of the restaurant data from last week!
+
+You can call me to your breakout room in Zoom! Otherwise, I will be moving between rooms.
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "tomorrow-night-bright",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+// add `data-at-shortcutkeys` attribute to <body> to resolve conflicts with JAWS
+// screen reader (see PR #262)
+(function(d) {
+  let res = {};
+  d.querySelectorAll('.remark-help-content table tr').forEach(tr => {
+    const t = tr.querySelector('td:nth-child(2)').innerText;
+    tr.querySelectorAll('td:first-child .key').forEach(key => {
+      const k = key.innerText;
+      if (/^[a-z]$/.test(k)) res[k] = t;  // must be a single letter (key)
+    });
+  });
+  d.body.setAttribute('data-at-shortcutkeys', JSON.stringify(res));
+})(document);
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

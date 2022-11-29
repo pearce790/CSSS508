@@ -31,3 +31,7 @@ Smooth after removing lots of the material from Chuck's version. Remove the "gue
 Lecture 6:
 
 Remove seq_along, as it was confusing and did not add anything! Slighty too much material still it seems, so perhaps key examples simpler!!
+
+Lecture 8:
+
+Fix problem with & conditions!
