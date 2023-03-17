@@ -2,7 +2,7 @@
 title: "CSSS 508, Lecture 1"
 subtitle: "Syllabus and Introduction to R, RStudio, and RMarkdown"
 author: "Michael Pearce<br>(based on slides from Chuck Lanfear)"
-date: "September 29, 2022"
+date: "March 29, 2022"
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -42,7 +42,7 @@ We'll go around the room and each share our:
 
 * Experience with programming (in R or generally)
 
-* Something fun you did over the summer
+* Something fun you did over Spring Break
 
 ---
 
@@ -88,9 +88,9 @@ We will cover almost no statistics here, but I hope you'll leave being able to f
 
 **Sessions: **
 
-* **Lecture:** Thursdays, 3:30-5:20 (Savery 117) -- Interactive sessions in which we'll learn key skills, concepts, and principles
-* **Lab:** Tuesdays, 3:30-5:20 (Savery 117) -- Optional and mostly unstructured sessions to work on homework and review
-* **Office Hours:** Wednesdays 10:30-11:30am and 3:30-4:30pm (on Zoom; link on Canvas)
+* **Lecture:** Wednesdays, 3:30-5:20 (Savery 117) -- Interactive sessions in which we'll learn key skills, concepts, and principles
+* **Lab:** Mondays, 3:30-5:20 (Savery 117) -- Optional and mostly unstructured sessions to work on homework and review
+* **Office Hours:** Tuesdays, 9-10am and 3-4pm (on Zoom; link on Canvas)
 
 
 **Course Website:** https://pearce790.github.io/CSSS508
@@ -102,17 +102,16 @@ We will cover almost no statistics here, but I hope you'll leave being able to f
 
 # Schedule
 
-* Week 0 (Th 9/29): Introduction to R, RStudio, and RMarkdown
-* Week 1 (Th 10/6): Visualizing Data
-* Week 2 (Th 10/13): Manipulating and Summarizing Data
-* Week 3 (Th 10/20): Understanding R Data Structures
-* Week 4 (Th 10/27): Importing, Exporting, and Cleaning Data
-* Week 5 (Th 11/3): Using Loops
-* Week 6 (Th 11/10): Writing Functions
-* Week 7 (Th 11/17): Working with Text Data
-* Week 8 (Th 11/24): Thanksgiving Holiday (No class; following lab will review past homeworks)
-* Week 9 (Th 12/1): Working with Geographical Data
-* Week 10 (Th 12/8): Reproducibility and Model Results
+* Week 1: Introduction to R, RStudio, and RMarkdown
+* Week 2: Visualizing Data
+* Week 3: Manipulating and Summarizing Data
+* Week 4: Understanding R Data Structures
+* Week 5: Importing, Exporting, and Cleaning Data
+* Week 6: Using Loops
+* Week 7: Writing Functions
+* Week 8: Working with Text Data
+* Week 9: Working with Geographical Data
+* Week 10: Reproducibility and Model Results
 
 
 This course will have no meeting during final exam week.
@@ -142,8 +141,8 @@ This course will have no meeting during final exam week.
 
 **Final grade:** C/NC, 60% to get Credit.
 
-* **Homework** (75%; assessed by peers): 9 total homeworks; assessed on a 0-3 point rubric. Assigned after Thursday lectures and due the following Thursday before lecture.
-* **Peer Grading** (25%; assessed by the instructor): One per homework, assessed on a binary "good"/"not good" scale. Due the following Tuesday before lab.
+* **Homework** (75%; assessed by peers): 8 total homeworks; assessed on a 0-3 point rubric. Assigned after lectures and due before the following lecture.
+* **Peer Grading** (25%; assessed by the instructor): One per homework, assessed on a binary "good"/"not good" scale. Due before the following lab.
 
 
 Assignment/peer grading instructions and deadlines can be found on the [Homework](https://pearce790.github.io/CSSS508/homework.html) page of the course website. All homework will be turned in on Canvas.
@@ -167,9 +166,9 @@ Yes, because:
 
 How to peer review:
 
-* Leave **constructive comments** -- more than just saying "good job!"
-    + I expect at least 3-4 sentences saying what was good, interesting, could use improvement, etc.
-    + Earlier assignments will need more feedback, later assignments less.
+* Leave **constructive comments**: You'll only get the point if you write at least 1 full paragraph that includes
+    + Any key issues from the assignment and,
+    + Points out something positive in your peer's work.
 * **Email me** if you would like your assignment to be regraded or provide feedback if no peer review was given.
 
 
@@ -216,7 +215,7 @@ Anything found in violation of this policy will be automatically given a score o
 
 --
 
-* Getting Help: If you ever find yourself struggling, know I'm here to help! Try Canvas discussion boards, chatting after class, email, or office hours.
+* Getting Help: If you ever find yourself struggling, know I'm here to help! Try chatting after class, email, or office hours.
 
 
 ---
@@ -266,11 +265,11 @@ class: inverse
 
 # A Note on Slide Formatting
 
-**Bold** and *Italics* usually indicate emphasis or important terms! 
+**Bold** and *Italics* indicate important terms! 
 
 --
 
-`Code` represents R code you type into the editor or console or keystrokes used to perform actions, for example: "Press `Ctrl-P` to open the print dialogue."
+`Code` represents R code you could use to perform actions. For example: "Press `Ctrl-P` to open the print dialogue."
 
 --
 
@@ -506,7 +505,7 @@ Help files provide documentation on how to use functions and what functions prod
 
 ---
 
-# Creating Objects
+# Objects
 
 R stores everything as an **object**, including data, functions, models, and output.
 
@@ -565,7 +564,7 @@ sqrt(new.object)
 
 ---
 
-# Creating Vectors
+# Vectors
 
 A **vector** is a series of **elements**, such as numbers.
 
@@ -646,7 +645,7 @@ The header of an .Rmd file is a [YAML](http://yaml.org/) (YAML Ain't Markup Lang
 ---
 title: "Untitled"
 author: "Michael Pearce"
-date: "September 29, 2022"
+date: "March 29, 2023"
 output: html_document
 ---
 ```
@@ -801,26 +800,6 @@ R Markdown docs can be modified in many ways. Visit these links for more informa
 * [Ways to format parts of your document](http://rmarkdown.rstudio.com/authoring_basics.html)
 * [R Markdown: The Definitive Guide](https://bookdown.org/yihui/rmarkdown/)
 
----
-
-# Formatting Caveats
-
-To keep R Markdown dead-simple, it lacks some features you might occasionally want to use. Your options for fancier documents are:
-
-* Templates
-* Use HTML with CSS for custom formatting<sup>1</sup>
-* Use LaTeX files instead of .Rmd<sup>2</sup>
-
-For day-to-day use, plain vanilla R Markdown does the job.
-
-For handouts, memos, and homeworks, default R Markdown PDFs look surprisingly good!
-
-
-.footnote[
-[1] These slides were created using [Xaringan](https://github.com/yihui/xaringan), a blend of RMarkdown and CSS.
-
-[2] LaTeX is powerful but exacts a terrible price.
-]
 
 ---
 
@@ -857,25 +836,15 @@ Chunks have options that control what happens with their code, such as:
 * `fig.height=5, fig.width=5`: modify the dimensions of any plots that are generated in the chunk (units are in inches)
 
 
-Some of these can be modified using the gear-shaped *Modify Chunk Options* button in each chunk. [There are a *lot* of other options, however](https://yihui.name/knitr/options/).
-
 ---
 
 # Playing with Chunk Options
 
 Try adding or changing the chunk options (separated by commas) for the two chunks in `my_first_Rmd.Rmd` and re-knitting to check what happens.
 
-
-You can also name your chunks by putting something after the `r` before the chunk options.
-
-    ```{r summarize_cars, echo=FALSE}`r ''`
+    ```{r echo=FALSE}`r ''`
     summary(cars)
     ```
-After you name your chunks, look what happens in the dropdown on the bottom left of your editor pane.
-
-Naming chunks allows you to browse through an RMarkdown document by named chunks. 
-
-You can also browse by sections named using headers and subheaders.
 
 ---
 
@@ -930,15 +899,11 @@ Having R dump values directly into your document protects you from silly mistake
 
 In your YAML header, make the date come from R's `Sys.time()` function by changing:
 
-    date: "March 30, 2016"
+    date: "March 29, 2023"
 to:
 
     date: "`r inline_expr("Sys.time()", "md")`"
-Fancier option: Use this instead to take today's date and make it read nicely:<sup>1</sup>
 
-    date: "`r inline_expr("format(Sys.Date(), format='%B %d, %Y')", "md")`"
-
-.footnote[[1] `format(Sys.Date(), format='%B %d, %Y')` says "format system date as month name (`%B`), day-of-month (`%d`), and four-digit year (`%Y`): `r format(Sys.Date(), format='%B %d, %Y')`. See `?strptime` for these format codes.]
 ---
 class: inverse
 
@@ -1082,56 +1047,6 @@ pairs(swiss, pch = 8, col = "violet", #<<
 ]
 
 ---
-
-# Installing Packages
-
-Let's make a table that looks a little less code-y in the output. To do this, we'll 
-want to install a **package** called `pander`. Packages contain premade functions 
-and/or data we can use. R's strength is its wide variety of packages!
-
-In the console: `install.packages("pander")`.
-
---
-
-* Note that unlike the `library()` command, *the name of a package to be installed must be in quotes*. This is because the name here is a search term (text, not an object!) while for `library()` it is an actual R object.
-
---
-
-* Once you install a package, you don't need to re-install it until you update R. *Consequently, you should not include* `install.packages()` *in any markdown document or R script!*
-
----
-
-# Making Tables
-
-```{r, eval=FALSE}
-library(pander) # loads pander, do once in your session
-pander(summary(swiss), style = "rmarkdown", split.tables = 120) #<<
-```
-
-.small[
-```{r, echo=FALSE}
-library(pander) # loads pander, do once in your session
-pander(summary(swiss), style = "rmarkdown", split.tables = 120)
-```
-]
-
-
----
-
-## Data Look a Little Nicer This Way
-
-```{r, eval=FALSE}
-pander(head(swiss, 5), style = "rmarkdown", split.tables = 120)
-```
-.small[
-```{r, echo=FALSE}
-pander(head(swiss, 5), style = "rmarkdown", split.tables = 120)
-```
-]
-
-.footnote[`split.tables = 120` tells `pander` to break a table into multiple tables if it will be over 120 characters wide. Adjust this to get widths *just right*.]
-
----
 class: inverse
 
 # Homework
@@ -1143,7 +1058,7 @@ Advice: Start with the provided template, then modify!
 
 ---
 
-# See you on Tuesday for lab!
+# See you on Monday for lab!
 
 (I'll stay for a bit after class to chat!)
 
