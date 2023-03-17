@@ -635,10 +635,8 @@ tinytex::install_tinytex()
 
 # R Markdown Headers
 
-The header of an .Rmd file is a [YAML](http://yaml.org/) (YAML Ain't Markup Language<sup>1</sup>) code block, and everything else is part of the main document.
+The header of an .Rmd file is a code block, and everything else is part of the main document.
 
-.footnote[[1] Nerds love recursive acronyms.
- ]
 --
 
 ```{}
@@ -653,7 +651,6 @@ output: html_document
 
 To mess with global formatting, [you can modify the header](http://rmarkdown.rstudio.com/html_document_format.html)<sup>2</sup>.
 
-.footnote[[2] Be careful though, YAML is space-sensitive; indents matter!]
 
 ```{}
 output:
@@ -718,9 +715,6 @@ output:
 * Are also real easy
   + Also even with sublists
 
-[URLs are trivial](http://www.uw.edu)
-
-![pictures too](http://depts.washington.edu/uwcreate/img/UW_W-Logo_smallRGB.gif)
 ]
 
 .pull-right[
@@ -737,10 +731,7 @@ output:
 * Unordered lists
 * Are also real easy
   + Also even with sublists
-
-[URLs are trivial](http://www.uw.edu)
-
-![pictures too](http://depts.washington.edu/uwcreate/img/UW_W-Logo_smallRGB.gif)
+  
 </pre>
 ]
 
@@ -751,11 +742,11 @@ output:
 .pull-left[
 ## Output 
 
-You can put some math $y= \left( \frac{2}{3} \right)^2$ right up in there.
+Include math $y= \left( \frac{2}{3} \right)^2$.
 
 $$\frac{1}{n} \sum_{i=1}^{n} x_i = \bar{x}_n$$
 
-Or a sentence with `code-looking font`.
+Or write `code-looking font`.
 
 
 Or a block of code:
@@ -771,14 +762,13 @@ z <- y^2
 ## Syntax
 
 <pre>
-You can put some math $y= \left(
-\frac{2}{3} \right)^2$ right up in 
-there
+Include math $y= \left(
+\frac{2}{3} \right)^2$.
 
 $$\frac{1}{n} \sum_{i=1}^{n}
 x_i = \bar{x}_n$$
 
-Or a sentence with 
+Or write
 `code-looking font`.
 
 Or a block of code:
@@ -918,9 +908,7 @@ In the sample R Markdown document you are working on, we can load the built-in d
 
 --
 
-`data(cars)` loads this dataframe into the **Global Environment** (as a *promise*<sup>1</sup>).
-
-.pull-right[.footnote[[1] Promises are *unevaluated arguments*. Read more about R's [lazy evaluation here](http://adv-r.had.co.nz/Functions.html).]]
+`data(cars)` loads this dataframe into the **Global Environment**.
 
 --
 
@@ -948,8 +936,6 @@ str(cars) # str[ucture]
 ```{r}
 summary(cars)
 ```
-
-.pull-right[.footnote[[1] [Note R is **object-oriented**](https://adv-r.hadley.nz/oo.html): `summary()` provides different information for different types of objects!]]
 
 ---
 
@@ -985,12 +971,12 @@ hist(cars$dist,
 
 # Math with `cars`
 
-If you put an assignment such as `x <- y` in parentheses `()`, R will print the output of the assignment out for you in your document. Otherwise, it won't show the value.
---
 
 ```{r}
-( dist_mean  <- mean(cars$dist) )
-( speed_mean <- mean(cars$speed) )
+dist_mean  <- mean(cars$dist) 
+print(dist_mean)
+speed_mean <- mean(cars$speed)
+print(speed_mean)
 ```
 
 ---
@@ -999,18 +985,12 @@ If you put an assignment such as `x <- y` in parentheses `()`, R will print the 
 
 .small[
 ```{r, out.height="330px"}
-plot(dist ~ speed, data = cars, #<<
-     xlab = "Speed (mph)",
+plot(dist ~ speed, data = cars,
+xlab = "Speed (mph)",
      ylab = "Stopping distance (ft)",
      main = "Speeds and stopping distances of cars",
      pch = 16) # Point size
-abline(h = dist_mean, col = "firebrick")
-abline(v = speed_mean, col = "cornflowerblue")
 ```
-]
-
-.pull-right[
-.footnote[Note that `dist ~ speed` is a **formula** of the type `y ~ x`. The first element (`dist`) gets plotted on the y-axis and the second (`speed`) goes on the x-axis. Regression formulae follow this convention as well!]
 ]
 
 ---
