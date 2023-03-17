@@ -1,15 +1,14 @@
 ---
 title: "Homework 1"
 author: "Michael Pearce"
-date: "Due: October 6, 2022"
+date: "`r Sys.time()`"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-##Loading libraries and data
-library(pander)
+##Loading data
 data(swiss)
 
 ##Counting variables and observations
@@ -29,14 +28,8 @@ Let's see, maybe R can randomly pick something for us...
 random_num <- floor(runif(1, min=1, max=6))
 ```
 
-A random number generator gives us: `r random_num`. That corresponds to `r var_names[random_num]`, cool! Now while it would be fun to do the rest of this assignment with a random variable, we can't really make comments on plots and such without knowing it in advance. So it looks like we're stuck with a regular ol' summary table of all our variables here:
+A random number generator gives us: `r random_num`. That corresponds to `r var_names[random_num]`, cool! Now while it would be fun to do the rest of this assignment with a random variable, we can't really make comments on plots and such without knowing it in advance. Let's plot this variable!
 
-### Summary of *swiss* variables
-```{r summary table, echo=FALSE}
-pander(summary(swiss), style = "rmarkdown", split.tables = 120)
-```
-
-Perhaps a closer look at Education would be interesting? Here's a visual impression of its distribution:
 ```{r plots, echo=FALSE}
 hist(swiss$Education, xlab="Education Index Value", ylab="Number of Municipalities", main="Histogram of Education Indices", col="cornflowerblue")
 ```
