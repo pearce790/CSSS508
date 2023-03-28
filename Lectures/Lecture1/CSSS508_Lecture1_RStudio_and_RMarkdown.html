@@ -141,7 +141,7 @@ This course will have no meeting during final exam week.
 * Homework instructions and/or templates
 * Useful links to other resources.
 
-**Laptops:** It's help to bring a laptop to class. If you don't have one, you can use the lab computers or borrow one for free from the UW Student Technology Loan Program.
+**Laptops:** It's helpful to bring a laptop to class. If you don't have one, you can use the lab computers or borrow one for free from the UW Student Technology Loan Program.
 
 **Textbooks:** This course has no textbook. However, the website has links to a few texts which I have found useful!
 
@@ -581,6 +581,8 @@ than vague ones*!
 
 *Good names save confusion later!*
 
+Object names are **CaSe SeNsItIvE!!**
+
 
 ---
 
@@ -623,7 +625,7 @@ A **vector** is a series of **elements**, such as numbers.
 
 --
 
-You can create a vector and store it as an object in the same way. To do this, use the
+You can create a vector using the
 function `c()` which stands for "combine" or "concatenate".
 --
 
@@ -659,11 +661,9 @@ sqrt(new.object)
 
 # More Complex Objects
 
-The same principles can be used to create more complex objects like **matrices**, **arrays**, **lists**, and **dataframes** (lists which look like matrices but can hold multiple data types at once).
+There are other, more complex data types in R which we will discuss later in the quarter! These include **matrices**, **arrays**, **lists**, and **dataframes**.
 
 Most data sets you will work with will be read into R and stored as a **dataframe**, so this course will mainly focus on manipulating and visualizing these objects.
-
-Before we get into these, let's revisit R Markdown.
 
 ---
 class: inverse
@@ -681,8 +681,6 @@ Let's try making an R Markdown file:
 3. Save the file somewhere, call it `my_first_rmd.Rmd`
 4. Click the *Knit HTML* button
 5. Watch the progress in the R Markdown pane, then gaze upon your result!
-
-You may also open up the file in your computer's browser if you so desire, using the *Open in Browser* button at the top of the preview window.
 
 --
 
@@ -900,6 +898,8 @@ Chunks have options that control what happens with their code, such as:
 
 * `fig.height=5, fig.width=5`: modify the dimensions of any plots that are generated in the chunk (units are in inches)
 
+* `fig.cap="Text"`: add a caption to your figure in the chunk
+
 
 ---
 
@@ -1110,7 +1110,7 @@ print(speed_mean)
 
 ```r
 plot(dist ~ speed, data = cars,
-xlab = "Speed (mph)",
+     xlab = "Speed (mph)",
      ylab = "Stopping distance (ft)",
      main = "Speeds and stopping distances of cars",
      pch = 16) # Point size
