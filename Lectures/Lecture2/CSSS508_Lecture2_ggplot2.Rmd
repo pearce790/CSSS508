@@ -131,7 +131,7 @@ class: inverse
 
 # Gapminder Data
 
-In today's lecture and Homework 2, we'll use data from Hans Rosling's [Gapminder](http://www.gapminder.org) project. The data can be accessed through the `gaminder` R package.
+In today's lecture and Homework 2, we'll use data from Hans Rosling's [Gapminder](http://www.gapminder.org) project. The data can be accessed through the `gapminder` R package.
 
 --
 
@@ -253,7 +253,7 @@ detach("package:ggplot2")
 ---
 # `ggplot2`
 
-The ``ggplot2` package provides an alternative toolbox for plotting.
+The `ggplot2` package provides an alternative toolbox for plotting.
 
 
 ```{r}
@@ -275,13 +275,13 @@ The core idea underlying this package is the [**layered grammar of graphics**](h
 ---
 # Structure of a ggplot
 
-`ggplot2` graphics objects consist of two primary components:
+`ggplot` graphics objects consist of two primary components:
 
 --
 
 1. **Layers**, the components of a graph.
 
-   * We *add* layers to a `ggplot2` object using `+`.
+   * We *add* layers to a `ggplot` object using `+`.
    * This includes adding lines, shapes, and text to a plot.
 
 --
@@ -937,7 +937,7 @@ We can modify the axes in a variety of ways, such as:
 ```{r, fig.height=3.5, dev='svg'}
 ggplot(data = China, aes(x = year, y = gdpPercap)) +
     geom_line() +
-    scale_y_log10(breaks = c(1000, 2000, 3000, 4000, 5000)) #<<
+    scale_y_log10(breaks = c(1000, 2000, 3000, 4000, 5000)) + #<<
     xlim(1940, 2010) + ggtitle("Chinese GDP per capita")
 ```
 

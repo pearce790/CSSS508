@@ -69,7 +69,9 @@ install.packages("gapminder")
 ```
 We always install packages in the **console**, because we only want to do it **once**
 
---
+---
+
+# Loading Packages
 
 Installing a packages *does not* mean it's loaded in our R session. To do so, we call the package:
 
@@ -80,12 +82,13 @@ library(gapminder)
 
 **NOTE:** Use quotes when installing packages, but not when loading packages!
 
+--
+
 We need to run this code every time we open a new R session: **Where should we put this code?**
 
 --
 
 **Answer:** In R/Rmd files, and not the console!
-
 
 ---
 
@@ -147,7 +150,7 @@ class: inverse
 
 # Gapminder Data
 
-In today's lecture and Homework 2, we'll use data from Hans Rosling's [Gapminder](http://www.gapminder.org) project. The data can be accessed through the `gaminder` R package.
+In today's lecture and Homework 2, we'll use data from Hans Rosling's [Gapminder](http://www.gapminder.org) project. The data can be accessed through the `gapminder` R package.
 
 --
 
@@ -214,7 +217,7 @@ class: inverse
 
 ---
 
-## "Ugly" Plots
+## Basic Plots
 
 .pull-left[
  .small[
@@ -239,8 +242,11 @@ plot(lifeExp ~ year,
 ![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
 ]
 
+Note: Don't worry about the code used to create the object `China`. We'll explore data manipulation next week!
+
+
 ---
-## Starter Example in `ggplot`
+## Fancier: `ggplot`
 
 
 .pull-left[
@@ -266,11 +272,12 @@ ggplot(data = China,
 ---
 # `ggplot2`
 
-An alternative way of plotting uses the `ggplot2` package in R, which is part of the `tidyverse`.
+The `ggplot2` package provides an alternative toolbox for plotting.
 
 
 
 ```r
+# install.packages("ggplot2")
 library(ggplot2)
 ```
 
@@ -288,13 +295,13 @@ The core idea underlying this package is the [**layered grammar of graphics**](h
 ---
 # Structure of a ggplot
 
-`ggplot2` graphics objects consist of two primary components:
+`ggplot` graphics objects consist of two primary components:
 
 --
 
 1. **Layers**, the components of a graph.
 
-   * We *add* layers to a `ggplot2` object using `+`.
+   * We *add* layers to a `ggplot` object using `+`.
    * This includes adding lines, shapes, and text to a plot.
 
 --
@@ -798,7 +805,7 @@ lifeExp_by_year &lt;-
   theme(legend.position = "none")
 ```
 
-The graph won't be displayed when you do this. You can show the graph using a single line of code with just the object name, *or take the object and add more layers*.
+Afterwards, you can display or modify `ggplot`s...
 
 ---
 
@@ -813,7 +820,7 @@ lifeExp_by_year
 
 ---
 
-# Adding a Layer
+# Adding More Layers
 
 
 ```r
@@ -838,10 +845,6 @@ ggsave("I_saved_a_file.pdf", plot = lifeExp_by_year,
 
 If you didn't manually set font sizes, these will usually come out at a reasonable size given the dimensions of your output file.
 
-**Bad/non-reproducible way**&lt;sup&gt;1&lt;/sup&gt;: choose *Export* on the plot preview or take a screenshot / snip.
-
-.footnote[[1] I still do this for quick emails of simple plots. Bad me!]
-
 ---
 
 # Changing the Axes
@@ -862,8 +865,7 @@ We can modify the axes in a variety of ways, such as:
 ```r
 ggplot(data = China, aes(x = year, y = gdpPercap)) +
     geom_line() +
-*   scale_y_log10(breaks = c(1000, 2000, 3000, 4000, 5000),
-*                 labels = scales::dollar) +
+*   scale_y_log10(breaks = c(1000, 2000, 3000, 4000, 5000)) +
     xlim(1940, 2010) + ggtitle("Chinese GDP per capita")
 ```
 
@@ -883,27 +885,6 @@ ggplot(data = China, aes(x = year, y = lifeExp)) +
 
 ![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-49-1.svg)&lt;!-- --&gt;
 
----
-
-# Text and Tick Adjustments
-
-Text size, labels, tick marks, etc. can be messed with more precisely using arguments to the `theme()` layer. 
-
---
-
-Examples:
-
-* `plot.title = element_text(size = rel(2), hjust = 0)` makes the title twice as big as usual and left-aligns it
-* `axis.text.x = element_text(angle = 45)` rotates `\(x\)` axis labels
-* `axis.text = element_text(colour = "blue")` makes the `\(x\)` and `\(y\)` axis labels blue
-* `axis.ticks.length = unit(.5, "cm")` makes the axis ticks longer
-
---
-
-Note: `theme()` is a different layer than `theme_gray()` or `theme_bw()`, which you might also be using in a previous layer. See the [`ggplot2` documentation](http://docs.ggplot2.org/current/theme.html) for details. 
-
-I recommend using `theme()` *after* `theme_bw()` or other *global themes*.
-
 
 ---
 
@@ -919,7 +900,6 @@ lifeExp_by_year +
 ]
 
 Instead of coordinates, you could also use "top", "bottom", "left", or "right".
-  + Example: `theme(legend.position = "bottom")`
 
 
 ---
@@ -931,7 +911,11 @@ Instead of coordinates, you could also use "top", "bottom", "left", or "right".
 
 You can modify these with a `scale_[aesthetic]_[option]()` layer:
 
+--
+
 * `[aesthetic]` is `color`, `shape`, `linetype`, `alpha`, `size`, `fill`, etc.
+
+--
 
 * `[option]` is something like `manual`, `continuous` or `discrete` (depending on nature of the variable).
 
@@ -940,7 +924,6 @@ You can modify these with a `scale_[aesthetic]_[option]()` layer:
 **Examples:**
 
 * `scale_linetype_manual()`: manually specify the linetype for each different value
-* `scale_alpha_continuous()`: varies transparency over a continuous range
 * `scale_color_manual()`: manually specify colors
 
 ---
@@ -1330,15 +1313,14 @@ class: inverse
 
 # Homework 2
 
-Pick some relationship to look at in the Gapminder data and write up a .Rmd file investigating that question graphically. You might work with a subset of the data (e.g. just Africa). Upload both the `.Rmd` file and the `.html` file to Canvas. 
+In this homework, you'll pose a question regarding the Gapminder dataset and investigate it graphically. 
 
-* Include 4 to 8 plots.
-* All titles, axes, and legends should be labelled clearly (no raw variable names).
-* You must have at least one graph with `facet_wrap()` or `facet_grid()`.
-* You must include at least one manually specified legend.
-* You can use other `geoms` like histograms, bar charts, add vertical or horizontal lines, etc.
+* At the beginning of your document, write down a research question that is based on the Gapminder dataset (e.g., "How does population change over time in different countries?")
+* Create 3-6 plots to answer/investigate your research question. Consider histograms (`geom_histogram()`), scatterplots (`geom_point()`), or lineplots (`geom_line()`).
+* Be sure all titles, axes, and legends are clearly labelled.
+* Include at least one plot with `facet_wrap()` or `facet_grid()`.
 
-Your document should be pleasant for a peer to look at, with some organization. You must write up your observations in words as well as showing the graphs. Use chunk options like `echo=FALSE` to limit the code/output you show in the `.html`.
+Your document should be pleasant for a peer to look at, with some organization. You must write up your observations in words as well as showing the graphs. Upload both the `.Rmd` file and the `.html` file to Canvas. 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

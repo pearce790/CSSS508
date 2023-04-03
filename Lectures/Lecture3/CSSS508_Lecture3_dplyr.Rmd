@@ -49,6 +49,7 @@ Last time, we learned about,
 
 Today, we will cover,
 
+1. Advanced data manipulation tools
 1. Subsetting data
 1. Modifying data 
 1. Summarizing data
@@ -68,6 +69,259 @@ You may be familiar with tools like Excel or Google Sheets, which let you manipu
 Today we'll talk more about `dplyr`: an R package that does just about anything Excel can, but more *transparently*, *reproducibly*, and *safely*. 
 
 Don't be the next sad research assistant who makes headlines with an Excel error ([Reinhart & Rogoff, 2010](http://www.bloomberg.com/news/articles/2013-04-18/faq-reinhart-rogoff-and-the-excel-error-that-changed-history))
+
+---
+
+# Into the **Tidyverse**
+
+The **Tidyverse** is a modern collection of data science tools introduced by famed statistician Hadley Wickham. All the *cool* stats people use it!
+
+The [tidyverse](http://tidyverse.org/) is a package of packages, including:
+
+* dplyr (data manipulation)
+* ggplot2 (plotting)
+* stringr (working with text data)
+* and many, many more!
+
+If you have not already installed the tidyverse, type, in the console: `install.packages("tidyverse")`
+
+(This may take a few seconds, because there are a *lot* of packages to install!)
+
+---
+
+# Loading dplyr
+
+We'll first use the `dplyr` package in the tidyverse, which will help us filter/slice data!
+
+```{r, message=TRUE}
+library(dplyr)
+```
+
+---
+
+# Wait, was that an error?
+
+When you load packages in R that have functions sharing the same name as functions you already have, the more recently loaded functions overwrite the previous ones ("masks them").
+
+--
+
+This **message** is just letting you know that. To avoid showing this in your R Markdown file, add `message=FALSE` or `include=FALSE` to your chunk options when loading packages.
+
+--
+
+Sometimes you may get a **warning message** when loading packages---usually because you aren't running the latest version of R:
+
+```
+Warning message:
+package `gapminder' was built under R version 3.5.3 
+```
+Chunk options `message=FALSE` or `include=FALSE` will hide this. *Update R* to deal with it completely!
+
+---
+
+# Pipes
+
+`dplyr` allows us to use the "pipe" data between functions using the (`%>%`) operator. So instead of nesting functions like this:
+
+
+```{r}
+log(mean(gapminder$pop))
+```
+
+--
+
+We can pipe them like this:
+
+```{r}
+gapminder$pop %>% mean() %>% log()
+```
+
+--
+
+Read this as, "send `gapminder$pop` to `mean()`, then send the output of that to `log()`."
+In essence, pipes read "left to right" while nested functions read "inside to out."
+This may be confusing... we'll cover it more later!
+
+---
+
+# `filter` Data Frames
+
+```{r}
+gapminder %>% filter(country == "Algeria")
+```
+
+What is this doing?
+
+---
+
+# How Expressions Work
+
+What does `country == "Algeria"` actually do? 
+
+--
+
+```{r}
+head(gapminder$country == "Algeria", 50) # display first 50 elements
+```
+
+
+It returns a vector of `TRUE` or `FALSE` values.
+
+--
+
+**Check your understanding:** How are `==`, `=` and `<-` the same or different?
+
+---
+
+# Logical Operators
+
+We used `==` for testing "equals": `country == "Algeria"`.
+
+--
+
+There are many other [logical operators](http://www.statmethods.net/management/operators.html):
+
+--
+
+* `!=`: not equal to
+--
+
+* `>`, `>=`, `<`, `<=`: less than, less than or equal to, etc.
+--
+
+* `%in%`: used with checking equal to one of several values
+
+--
+
+Or we can combine multiple logical conditions:
+
+* `&`: both conditions need to hold (AND)
+--
+
+* `|`: at least one condition needs to hold (OR)
+--
+
+* `!`: inverts a logical condition (`TRUE` becomes `FALSE`, `FALSE` becomes `TRUE`)
+
+--
+
+We'll practice these a lot, so don't worry right now if it's unclear!
+
+---
+
+# Multiple Conditions Example
+
+
+```{r}
+gapminder %>%
+    filter(country == "Oman" & year > 1980)
+```
+
+---
+# Multiple Conditions
+
+.pull-left[
+
+### And: `&`
+
+```{r, eval=FALSE}
+gapminder %>% 
+  filter(country == "Oman" &
+         year > 1980)
+```
+
+.image-100[
+![](img/country_and_year.svg)
+]
+
+*Give me rows where the country is Oman **and** the year is after 1980.*
+
+]
+
+--
+
+.pull-right[
+
+### Or: `|`
+
+```{r, eval=FALSE}
+gapminder %>%
+  filter(country == "Oman" |
+         year > 1980)
+```
+
+.image-100[
+![](img/country_or_year.svg)
+]
+
+*Give me rows where the country is Oman **or** the year is after 1980... or **both**.*
+
+]
+
+---
+
+# Saving a Subset
+
+If we think a particular subset will be used repeatedly, we can save it and give it a name like any other object:
+
+```{r}
+China <- gapminder %>% filter(country == "China")
+head(China, 4)
+```
+
+---
+
+# Summary
+
+We've discussed a lot so far:
+
+* Saving/Loading files (`save()`, `load()`)
+
+* Working Directories (`setwd()`, `getwd()`)
+
+* Pipes (`gapminder %>% filter(country == "Algeria")`)
+
+* Logical Operators (`!=`, `==`, `>`, `<=` )
+
+* Combining Logical Operators (AND using `&`, OR using `|`)
+
+
+With time and practice, these tools will become second nature!
+
+---
+
+# Test Your Knowledge
+
+**Question 1: How could I filter the gapminder data to observations from Mexico after 1980?**
+
+**Question 2: What's the mean life expectancy in Mexico after 1980, based on this dataset?**<sup>1</sup>
+
+
+
+*Take 1 minute to work on this problem by yourself, then talk through your ideas with your neighbor.*
+
+.footnote[Hint: Save the result from the first question in one line of code, then write a second line of code to answer the second question.]
+
+
+---
+
+# My Solution
+
+**Question 1: How could I filter the gapminder data to observations from Mexico after 1980?**
+
+```{r}
+Mexico1980 <- gapminder %>% filter(country == "Mexico" & 
+                                     year >= 1980)
+head(Mexico1980,2)
+```
+
+--
+
+**Question 2: What's the mean life expectancy in Mexico after 1980, based on this dataset?**
+
+```{r}
+Mexico1980$lifeExp %>% mean()
+```
 
 ---
 class: inverse
