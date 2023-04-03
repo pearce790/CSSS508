@@ -1,0 +1,93 @@
+---
+title: "Homework 2 Example"
+author: "Michael Pearce"
+date: "Due: 4/12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+This is an example and template for homework 2. Feel free to modify this file to get started on this assignment! Still, I'd encourage you to look through each line of code carefully, because next week there will **not** be a template!
+
+I first write down a research question: **How has population changed in the gapminder countries over time?**
+
+## Data and Packages
+
+Before I can investigate my research question, I first load the `ggplot2` and `gapminder` packages.
+
+```{r}
+library(ggplot2)
+library(gapminder)
+```
+
+## Plots
+
+I start by creating a histogram of population in the gapminder dataset.
+
+```{r message=FALSE}
+ggplot(data = gapminder, aes(pop))+
+  geom_histogram()+
+  theme_bw(base_size=12)+
+  xlab("Population")+
+  ylab("Count")+
+  ggtitle("Histogram of Country Population (across years 1952-2007)")
+```
+
+(Notice how I set the chunk option `message = FALSE` to avoid a pesky error message showing up!)
+
+Here is an example of in-line R code: The mean population in the gapminder dataset is `r mean(gapminder$pop)` and the median is `r median(gapminder$pop)`. Since the mean is much greater than the median, this suggests right-skew.
+
+The plot has some serious right skew! It is also a bit misleading, because countries appear multiple times (once per every five years!) To address this, lets make a plot with facets by year.
+
+```{r message=FALSE}
+ggplot(data = gapminder, aes(pop))+
+  geom_histogram()+
+  facet_wrap(~year)+
+  theme_bw(base_size=12)+
+  xlab("Population")+
+  ylab("Count")+
+  ggtitle("Histograms of Country Population",
+          "by year") #Note: second argument in ggtitle makes a subtitle
+```
+
+This is more "honest", but it's tough to get a sense of how populations change over time! Let's create a line plot.
+
+```{r}
+ggplot(data = gapminder, aes(x=year,y=pop,group=country))+
+  geom_line()+
+  theme_bw(base_size=12)+
+  xlab("Year")+ylab("Population")+
+  ggtitle("Population vs. Year","by country")
+```
+
+It seems like population is increasing over time for most (?) countries. We could make the relationship more apparent though by transforming the y-axis to the log scale. Let's also add colors for each continent!
+
+```{r}
+ggplot(data = gapminder, aes(x=year,y=pop,group=country,color=continent))+
+  geom_line()+
+  theme_bw(base_size=12)+
+  xlab("Year")+ylab("Population")+
+  ggtitle("Population vs. Year","by country; y-axis on log scale; color = continent")+
+  labs(color="Continent")+ #changes legend title name associated with the color variable
+  scale_y_log10()+
+  theme(legend.position = "bottom")
+```
+
+Something fancier: Boxplots of population by continent!
+
+```{r}
+ggplot(data=gapminder,aes(x=continent,y=pop))+
+  geom_boxplot()+
+  theme_bw(base_size=12)+
+  xlab("Continent")+ylab("Population")+
+  ggtitle("Boxplots of Population by Continent")+
+  scale_y_log10()
+```
+
+## Conclusion
+
+From the above plots, we notice that population has generally increased in each country in the gapminder dataset during the period 1952 -- 2007. Although there are some minor dips in population, the general trend is upward. Overall, the distribution of country population is highly right-skewed.
