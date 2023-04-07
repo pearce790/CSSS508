@@ -47,7 +47,7 @@ class: inverse
 
 # Packages 
 
-Packages are **collections of functions and tools** that make your life easier! The best part of R is the huge number of user-created packages. The `Packages` tab in the bottom-left pane of RStudio lists your installed packages.
+Packages are **collections of functions and tools** that make your life easier! The best part of R is the huge number of user-created packages. The `Packages` tab in the bottom-right pane of RStudio lists your installed packages.
 
 --
 
@@ -856,6 +856,8 @@ class: inverse
 
 # 4. Advanced ggplot tools
 
+*(10 minute break!)*
+
 Next, we'll discuss:
 
 * Storing, modifying, and saving ggplots
@@ -941,16 +943,6 @@ ggplot(data = China, aes(x = year, y = gdpPercap)) +
     xlim(1940, 2010) + ggtitle("Chinese GDP per capita")
 ```
 
----
-
-# Fonts Too Small?
-
-```{r, fig.height=3.5, dev='svg'}
-ggplot(data = China, aes(x = year, y = lifeExp)) +
-    geom_line() +
-    ggtitle("Chinese life expectancy") +
-    theme_gray(base_size = 20) #<<
-```
 
 
 ---

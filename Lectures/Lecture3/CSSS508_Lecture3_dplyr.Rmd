@@ -2,7 +2,7 @@
 title: "CSSS 508, Lecture 3"
 subtitle: "Manipulating and Summarizing Data"
 author: "Michael Pearce<br>(based on slides from Chuck Lanfear)"
-date: "October 13, 2022"
+date: "April 12, 2022"
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -13,6 +13,7 @@ output:
       countIncrementalSlides: false
       titleSlideClass: ["center","top"]
 ---
+class: inverse
 
 ```{r setup, include=FALSE,purl=FALSE}
 options(htmltools.dir.version = FALSE)
@@ -21,27 +22,11 @@ knitr::opts_chunk$set(comment = "##")
 # knitr::purl("CSSS508_Lecture3_dplyr.Rmd")
 ```
 
-# A Quick Note
-
-The last two lectures have been jam-packed with content! This makes it hard to answer individual-level questions as we get started with R and RStudio.
-
---
-
-Luckily, today's lecture has **less content** and **more time for questions!** To keep things moving along,
-
-+ Please try to **limit very-individual questions while I'm running through slides** (e.g., "I'm getting this error message, why is that?"). I'm happy to answer these while we're working on exercises, during a break/lab/office hour, or before/after class.
-
-+ Please **interrupt me with questions about content during lecture!** If something isn't clear on the slides, it's best to discuss it right away!
-
----
-class: inverse
-
 # Topics
 
 Last time, we learned about,
 
 1. Useful coding tips: packages, directories, and saving data
-1. Advanced data manipulation tools
 1. Basics of ggplot: layers and aesthetics
 1. Advanced ggplot tools
 
@@ -49,11 +34,11 @@ Last time, we learned about,
 
 Today, we will cover,
 
-1. Advanced data manipulation tools
+1. Building blocks
 1. Subsetting data
 1. Modifying data 
 1. Summarizing data
-1. Joining (merging) data
+1. Merging together data
 
 ---
 class: inverse
@@ -64,65 +49,128 @@ class: inverse
 options(width = 90)
 ```
 
-You may be familiar with tools like Excel or Google Sheets, which let you manipulate data in a spreadsheet using functions. Spreadsheets are *not reproducible*: It's hard to know how someone changed the raw data!
+Tools like *Excel* or *Google Sheets* lets you manipulate spreadsheets using functions.
 
-Today we'll talk more about `dplyr`: an R package that does just about anything Excel can, but more *transparently*, *reproducibly*, and *safely*. 
+* Spreads are *not reproducible*: It's hard to know how someone changed the raw data!
+* It's hard to catch mistakes when you use spreadsheets. Don't be the next sad Research Assistant who makes headlines with an Excel error! ([Reinhart & Rogoff, 2010](http://www.bloomberg.com/news/articles/2013-04-18/faq-reinhart-rogoff-and-the-excel-error-that-changed-history))
 
-Don't be the next sad research assistant who makes headlines with an Excel error ([Reinhart & Rogoff, 2010](http://www.bloomberg.com/news/articles/2013-04-18/faq-reinhart-rogoff-and-the-excel-error-that-changed-history))
+Today, we'll use R to manipulate data more *transparently* and *reproducibly*.
+
+---
+class:inverse
+
+# 1. Building Blocks
+
+1. Logical Operators (`!=`, `==`, `>`, `<=`, etc. )
+1. Combining Logical Operators (`&`, `|`)
+
 
 ---
 
-# Into the **Tidyverse**
+## Logical Operators
 
-The **Tidyverse** is a modern collection of data science tools introduced by famed statistician Hadley Wickham. All the *cool* stats people use it!
+Logical operators refer to base functions which allow us to **test a connection** between two objects.
 
-The [tidyverse](http://tidyverse.org/) is a package of packages, including:
+--
 
-* dplyr (data manipulation)
-* ggplot2 (plotting)
-* stringr (working with text data)
-* and many, many more!
+For example, we may test
 
-If you have not already installed the tidyverse, type, in the console: `install.packages("tidyverse")`
++ Is A equal to B?
++ Is A greater than B?
++ Is A within B?
 
-(This may take a few seconds, because there are a *lot* of packages to install!)
+and many others!
 
 ---
+## Logical Operators in Code
 
-# Loading dplyr
+* `==`: is equal to (note: there are TWO equal signs here!)
 
-We'll first use the `dplyr` package in the tidyverse, which will help us filter/slice data!
+--
 
-```{r, message=TRUE}
+* `!=`: not equal to
+
+--
+
+* `>`, `>=`, `<`, `<=`: less than, less than or equal to, etc.
+
+--
+
+* `%in%`: used with checking equal to one of several values
+
+---
+## Examples of Logical Operators
+
+Let's create two objects, `A` and `B`
+
+```{r}
+A <- c(5,10,15)
+B <- c(5,15,25)
+```
+
+--
+
+```{r}
+A == B
+A >  B
+A %in% B
+```
+
+---
+## Combining Logical Operators
+
+We have three main ways to combine logical operators:
+
+* `&`: **both** conditions need to hold (AND)
+--
+
+* `|`: **at least one** condition needs to hold (OR)
+--
+
+* `!`: **inverts** a logical condition (`TRUE` becomes `FALSE`, `FALSE` becomes `TRUE`)
+
+---
+## Examples
+
+```{r}
+A <- c(5,10,15); B <- c(5,15,25)
+```
+
+--
+
+```{r}
+A > 5 & A <= B
+B < 10 | B > 20
+!(A == 10)
+```
+
+---
+class: inverse
+
+# Aside: `dplyr`
+
+Today, we'll use tools from the `dplyr` package to manipulate data! 
+
++ Like `ggplot2`, `dplyr` is part of the **Tidyverse**, a modern collection of data science tools introduced by Hadley Wickham.
+
++ You can read more about the tidyverse on its [website](http://tidyverse.org/).
+
+--
+
+To get started, let's install (in the console) and load (in an R/Rmd file) dplyr. (We also load `gapminder`!)
+
+```{r warning=FALSE,message=FALSE}
+# install.packages("dplyr")
 library(dplyr)
+
+library(gapminder)
 ```
 
 ---
 
-# Wait, was that an error?
-
-When you load packages in R that have functions sharing the same name as functions you already have, the more recently loaded functions overwrite the previous ones ("masks them").
-
---
-
-This **message** is just letting you know that. To avoid showing this in your R Markdown file, add `message=FALSE` or `include=FALSE` to your chunk options when loading packages.
-
---
-
-Sometimes you may get a **warning message** when loading packages---usually because you aren't running the latest version of R:
-
-```
-Warning message:
-package `gapminder' was built under R version 3.5.3 
-```
-Chunk options `message=FALSE` or `include=FALSE` will hide this. *Update R* to deal with it completely!
-
----
-
-# Pipes
+## Building Block of `dplyr`: Pipes
 
 `dplyr` allows us to use the "pipe" data between functions using the (`%>%`) operator. So instead of nesting functions like this:
-
 
 ```{r}
 log(mean(gapminder$pop))
@@ -130,7 +178,7 @@ log(mean(gapminder$pop))
 
 --
 
-We can pipe them like this:
+We can **pipe** them like this:
 
 ```{r}
 gapminder$pop %>% mean() %>% log()
@@ -138,570 +186,187 @@ gapminder$pop %>% mean() %>% log()
 
 --
 
-Read this as, "send `gapminder$pop` to `mean()`, then send the output of that to `log()`."
-In essence, pipes read "left to right" while nested functions read "inside to out."
-This may be confusing... we'll cover it more later!
++ Pipes read "left to right" (intuitive)
++ Nested functions read "inside to out." (kinda weird)
 
----
 
-# `filter` Data Frames
-
-```{r}
-gapminder %>% filter(country == "Algeria")
-```
-
-What is this doing?
-
----
-
-# How Expressions Work
-
-What does `country == "Algeria"` actually do? 
-
---
-
-```{r}
-head(gapminder$country == "Algeria", 50) # display first 50 elements
-```
-
-
-It returns a vector of `TRUE` or `FALSE` values.
-
---
-
-**Check your understanding:** How are `==`, `=` and `<-` the same or different?
-
----
-
-# Logical Operators
-
-We used `==` for testing "equals": `country == "Algeria"`.
-
---
-
-There are many other [logical operators](http://www.statmethods.net/management/operators.html):
-
---
-
-* `!=`: not equal to
---
-
-* `>`, `>=`, `<`, `<=`: less than, less than or equal to, etc.
---
-
-* `%in%`: used with checking equal to one of several values
-
---
-
-Or we can combine multiple logical conditions:
-
-* `&`: both conditions need to hold (AND)
---
-
-* `|`: at least one condition needs to hold (OR)
---
-
-* `!`: inverts a logical condition (`TRUE` becomes `FALSE`, `FALSE` becomes `TRUE`)
-
---
-
-We'll practice these a lot, so don't worry right now if it's unclear!
-
----
-
-# Multiple Conditions Example
-
-
-```{r}
-gapminder %>%
-    filter(country == "Oman" & year > 1980)
-```
-
----
-# Multiple Conditions
-
-.pull-left[
-
-### And: `&`
-
-```{r, eval=FALSE}
-gapminder %>% 
-  filter(country == "Oman" &
-         year > 1980)
-```
-
-.image-100[
-![](img/country_and_year.svg)
-]
-
-*Give me rows where the country is Oman **and** the year is after 1980.*
-
-]
-
---
-
-.pull-right[
-
-### Or: `|`
-
-```{r, eval=FALSE}
-gapminder %>%
-  filter(country == "Oman" |
-         year > 1980)
-```
-
-.image-100[
-![](img/country_or_year.svg)
-]
-
-*Give me rows where the country is Oman **or** the year is after 1980... or **both**.*
-
-]
-
----
-
-# Saving a Subset
-
-If we think a particular subset will be used repeatedly, we can save it and give it a name like any other object:
-
-```{r}
-China <- gapminder %>% filter(country == "China")
-head(China, 4)
-```
-
----
-
-# Summary
-
-We've discussed a lot so far:
-
-* Saving/Loading files (`save()`, `load()`)
-
-* Working Directories (`setwd()`, `getwd()`)
-
-* Pipes (`gapminder %>% filter(country == "Algeria")`)
-
-* Logical Operators (`!=`, `==`, `>`, `<=` )
-
-* Combining Logical Operators (AND using `&`, OR using `|`)
-
-
-With time and practice, these tools will become second nature!
-
----
-
-# Test Your Knowledge
-
-**Question 1: How could I filter the gapminder data to observations from Mexico after 1980?**
-
-**Question 2: What's the mean life expectancy in Mexico after 1980, based on this dataset?**<sup>1</sup>
-
-
-
-*Take 1 minute to work on this problem by yourself, then talk through your ideas with your neighbor.*
-
-.footnote[Hint: Save the result from the first question in one line of code, then write a second line of code to answer the second question.]
-
-
----
-
-# My Solution
-
-**Question 1: How could I filter the gapminder data to observations from Mexico after 1980?**
-
-```{r}
-Mexico1980 <- gapminder %>% filter(country == "Mexico" & 
-                                     year >= 1980)
-head(Mexico1980,2)
-```
-
---
-
-**Question 2: What's the mean life expectancy in Mexico after 1980, based on this dataset?**
-
-```{r}
-Mexico1980$lifeExp %>% mean()
-```
 
 ---
 class: inverse
 
-# Subsetting data
+# 2. Subsetting data
 
 + `filter()`
-+ `distinct()`
 + `select()`
-+ `pull()`
++ `distinct()`
 
 
 ---
-# Reminder: Pipes (%>%)
+## Subset Rows: `filter`
 
-In `dplyr`, we use the **pipe** operator (`%>%`) to make code readable. A keyboard shortcut to create pipes is `Ctrl+Shift+M` (Windows) or `Command+Shift+M` (OS).
-
---
-
-Pipes take the object on the *left* and apply to it the function on the *right*:
-
-```{r, message=FALSE, warning=FALSE}
-library(dplyr)
-library(gapminder)
-gapminder %>% filter(country == "Canada") %>% head(2)
-```
-
-In words, we (1) take the gapminder data, (2) filter to observations where the country is "Canada", and (3) display the first two observations.
-
-
----
-# Subsetting rows
-
-We often get *big* datasets, but only want to use a portion of them. We can subset portions of our data using the `filter()` function.
+We often get *big* datasets, and we only want some of the entries. We can subset rows using `filter`.
 
 --
-
-Last week we used the `filter()` command to subset data:
-```{r}
-Canada <- gapminder %>% filter(country == "Canada")
-```
-
-We now have the object `Canada` saved in our environment, which contains all observations of the gapminder data from the country Canada.
-
-.footnote[[1] Reminder: `==` is an operator that tests for equality.]
-
----
-## Another Operator: `%in%`
-
-What if I want to subset data from multiple countries at once?! Use the `%in%` operator!
-
---
-
-We can use `%in%` like `==` but for matching *any element* in the vector on its right<sup>1</sup>. 
 
 ```{r}
-former_yugoslavia <- c("Bosnia and Herzegovina", "Croatia", 
-                       "Montenegro", "Serbia", "Slovenia")
-Yugoslavia <- gapminder %>% filter(country %in% former_yugoslavia)
-head(Yugoslavia, 4)
+gapminder %>% filter(country == "China") %>% 
+  head(4) # display first four rows
+China <- gapminder %>% filter(country == "China")
 ```
 
-
-.footnote[[1] Reminder: The `c()` function is how we make **vectors** in R.]
+(Now, `China` is an object in our environment which contains rows corresponding to China.)
 
 ---
-## Finding unique values
+## Subset Columns: `select`
 
-You may want to find the unique combinations of variables in a dataset.  This can be performed using the function `distinct()`.
+What if we want to keep each entry, but only use certain variables? Use `select`!
 
 --
 
-For example, if we want to see what unique combinations of "continent" and "year" are in gapminder, run:
+```{r}
+gapminder %>% select(country,continent,year,lifeExp) %>% head(4)
+```
+
+---
+## Dropping columns with `select`
+
+Alternatively, we can use `select()` to drop variables using a `-` sign: 
+
+```{r}
+gapminder %>% select(-continent, -pop, -lifeExp) %>% head(4)
+```
+
+---
+## Finding Unique Rows: `distinct`
+
+You may want to find the unique combinations of variables in a dataset.  Use `distinct`
+
+--
 
 ```{r}
 gapminder %>% distinct(continent, year) %>% head(6)
 ```
 
 ---
-## `distinct()` drops variables!
+## `distinct` drops variables!
 
 
-By default, `distinct()` drops all unused variables. If you don't want to drop the others, use `distinct(.keep_all=TRUE)`:
+By default, `distinct()` drops unused variables. If you don't want to drop them, add the argument `.keep_all=TRUE`:
 
 ```{r}
 gapminder %>% distinct(continent, year, .keep_all=TRUE) %>% head(6)
 ```
 
----
-## Keeping or dropping variables
 
-What if we want to subset *variables* (as opposed to observations)? Use the `select()` function!
-
---
-
-If we want to view the variables "country", "year", and "pop" (in that order), we can do so using the following code: 
-```{r}
-Yugoslavia %>% select(country, year, pop) %>% head(4)
-```
-
----
-## Dropping columns
-
-Alternatively, we can use `select()` to drop variables using a `-` sign: 
-
-```{r}
-Yugoslavia %>% select(-continent, -pop, -lifeExp) %>% head(4)
-```
-
-Now, we're showing all variables *except* "continent", "pop", and "lifeExp".
-
----
-
-## Extracting a single column?
-
-Sometimes you want to extract a single column from a data frame as a *vector* (or single value). `pull()` *pulls* a column of a data frame out as a vector.
-
---
-
-```{r}
-gapminder %>% pull(lifeExp) %>% head(4)
-```
-
---
-
-```{r}
-gapminder %>% select(lifeExp) %>% head(4)
-```
-
-.pull-right[.footnote[Note the difference between these two operations: The second yields only one column but is still a data frame.]]
----
-
-## In-Line `pull()`
-
-`pull()` is particularly useful when you want to use a vector-only command in a `dplyr` chain of functions (say, in an in-line expression).
-
---
-
-This in-line code...
-
-<p><code>The average life expectancy in Afghanistan from 1952 to 2007 was </code><code  class="r">`</code><code class="r">r gapminder %>% filter(country=="Afghanistan") %>% pull(lifeExp) %>% mean() %>% round(1)`</code><code> years.</code></p>
-
---
-
-... will produce this output:
-
-The average life expectancy in Afghanistan from 1952 to 2007 was `r gapminder %>% filter(country=="Afghanistan") %>% pull(lifeExp) %>% mean() %>% round(1)` years.
-
-
-NOTE: `mean()` can only take a *vector* input, not a data frame. So this won't work with `select(lifeExp)` instead of `pull(lifeExp)`.
-
----
-class:inverse
-
-# Check Your Understanding:
-
-With a neighbor or two, write one line of code to answer each of the following questions:
-
-1. Create an object that includes all rows in gapminder from the continents Asia and Oceania
-
-2. Remove the variables "lifeExp" and "gdpPercap" from your subsetted data.
-
-3. Display the distinct combinations of "country" and "continent" from your subsetted data, but do not drop the remaining variables!
-
----
-
-# My Solution
-
-### 1: Filter Asia and Oceania:
-```{r}
-Asia_and_Oceania <- gapminder %>% 
-  filter(continent %in% c("Asia", "Oceania"))
-head(Asia_and_Oceania,4)
-```
-
-
----
-
-# My Solution
-
-### 2: Drop "lifeExp" and "gdpPercap":
-
-```{r}
-Asia_and_Oceania <- Asia_and_Oceania %>% select(-lifeExp,-gdpPercap)
-head(Asia_and_Oceania,4)
-```
-
-
----
-
-# My Solution
-
-### 3: Display distinct "country" and "continent" without dropping:
-
-```{r}
-Asia_and_Oceania %>% 
-  distinct(country,continent,.keep_all=TRUE) %>%
-  head(4)
-```
 
 ---
 class: inverse
 
-# Modifying data
+# 3. Modifying data
 
 + `arrange()`
 + `rename()`
 + `mutate()`
-+ `recode()`
-
 
 ---
-## Sorting data by rows
+## Sorting data by rows: `arrange`
 
-Sometimes we want to sort data by row, in either ascending (low to high) or descending (high to low) order. We can do that with `arrange()`.
-
-`arrange` uses ascending order by default. Arrange by descending order using the function `desc`.
+Sometimes it's useful to sort rows in your data, in ascending (low to high) or descending (high to low) order. We do that with `arrange`.
 
 --
 
-For example, we can sort Yugoslavia first by year and then by population:
+```{r}
+US_and_Canada <- gapminder %>% 
+  filter(country %in% c("United States","Canada"))
+US_and_Canada %>% arrange(year,lifeExp) %>% head(4)
+```
+
+---
+## Sorting data by rows: `arrange`
+
+To sort in descending order, using `desc()` within `arrange`
 
 ```{r}
-Yugoslavia %>% arrange(year, desc(pop)) %>% head(6)
+US_and_Canada %>% arrange(desc(pop)) %>% head(4)
 ```
 
 
+
 ---
-## Rename variables
+## Rename variables: `rename`
 
 You may receive data with unintuitive variable names. You can change them using `rename()`.
 
+--
+
 
 ```{r}
-Yugoslavia %>% select(country,year,lifeExp) %>%
-  rename(Life_Expectancy = lifeExp) %>%
-    head(4)
+US_and_Canada %>% rename(life_expectancy = lifeExp) %>%
+  head(4)
 ```
 
-(NOTE: I did *not* re-save the object Yugoslavia, so the name change is *not* permanent!)
-
----
-## Column Naming Practices
-
-* *Good* column names are self-describing. Don't use inscrutable abbreviations to save typing, since RStudio can autocomplete.
-
 --
 
-* *Valid* column names can contain upper or lowercase letters, numbers, periods, and underscores. They must start with a letter or period and not be a special reserved word (e.g. `TRUE`, `if`).
+(NOTE 1: I did *not* re-save the object `US_and_Canada`, so the name change is *not* permanent!)
 
---
-
-* Names are case-sensitive: `Year` and `year` are not the same thing!
-
---
-
-* You can include spaces if you put backticks around the name.
+(NOTE 2: I recommend **against** using spaces in a name! It makes things *really hard* sometimes!!)
 
 ---
-## Column Name with Space Example
-
-```{r}
-library(pander)
-Yugoslavia %>% filter(country == "Serbia") %>%
-    select(year, lifeExp) %>%
-    rename(Year = year, `Life Expectancy` = lifeExp) %>% #<<
-    head(5) %>%
-    pander(style = "rmarkdown", caption = "Serbian life expectancy")
-```
-
----
-## Create new columns
+## Create new columns: `mutate`
 
 You can add new columns to a data frame using `mutate()`. 
 
 --
 
-For example, we could add a new variable that provides the population in millions: 
+For example, perhaps we wish to state the population in millions:
+
 
 ```{r}
-Yugoslavia %>% select(country, year, pop) %>%
-    mutate(pop_million = pop / 1000000) %>% #<<
+US_and_Canada %>% select(country, year, pop) %>%
+    mutate(pop_millions = pop / 1000000) %>% #<<
     head(5)
 ```
 
 
 ---
-## Recoding variables
-
-We've renamed *variables*, but what about variable *values*?
-
---
-
-We can use the function `recode()` inside `mutate()`, which allows us to change specific values to others. This is best for categorical data.
-
-```{r}
-Yugoslavia %>% 
-  mutate(country = recode(country, 
-                        `Bosnia and Herzegovina`="B and H", #<<
-                        Montenegro="M")) %>%
-  distinct(country, .keep_all=TRUE)
-```
-
----
-class:inverse
-
-# Check Your Understanding:
-
-Try to answer the following questions on your own, then share your solutions with a neighbor
-
-1. Sort the gapminder data by population in ascending order and print the first 5 rows. What's the country/year with the smallest population?
-
-2. Filter the gapminder data to the countries "United States and "United Kingdom". Then, recode the country values to "US" and "UK", respectively. Print the unique combinations of country and continent.
-
----
-
-# My Solution
-
-### 1: Sort by population
-```{r}
-gapminder %>% arrange (pop) %>%  head(5)
-```
-
----
-
-# My Solution
-
-### 2: Display US and UK
-```{r}
-gapminder %>% 
-  filter(country %in% c("United States","United Kingdom")) %>%
-  mutate(country = recode(country,
-                          "United States" = "US",
-                          "United Kingdom"="UK")) %>%
-  distinct(country,continent)
-```
-
----
 class: inverse
 
-# Summarizing data
+# 4. Summarizing data
 
-1. `summarize()`
-3. `group_by()`
++ `summarize()`
++ `group_by()`
 
 ---
-## Summarizing data
+## Summarizing data: `summarize`
 
-**`summarize()`** takes your column(s) of data and computes something using every row: 
+**`summarize()`** calculates summaries of variables in your data:
 
-* Count how many rows there are
+* Count the number of rows
 * Calculate the mean
-* Compute the sum
-* Obtain a minimum or maximum value
+* Calculate the sum
+* Find the minimum or maximum value
 
 You can use any function inside `summarize()` that aggregates *multiple values* into a *single value* (like `sd()`, `mean()`, or `max()`).
 
 ---
 ## `summarize()` Example
 
-For the year 1982, let's get the number of observations, total population, mean life expectancy, and range of life expectancy for former Yugoslavian countries.
+For the year 1982, let's summarize some values in `gapminder`
 
 ```{r}
-Yugoslavia %>% filter(year == 1982) %>%
-    summarize(n_obs          = n(),
-              total_pop      = sum(pop),
-              mean_life_exp  = mean(lifeExp),
-              range_life_exp = max(lifeExp) - min(lifeExp))
+gapminder %>% filter(year == 1982) %>%
+  summarize(number_observations = n(),
+            max_lifeexp = max(lifeExp),
+            mean_pop = mean(pop),
+            sd_pop = sd(pop))
 ```
 
-These new variables are calculated using *all of the rows* in `Yugoslavia`
-
 ---
-## Summarizing data by groups
+## Summarizing data by groups: `group_by`
 
-What if we want to summarize data by category? For example, what's the population of countries in former Yugoslavia by year?
+What if we want to summarize data by category? Use `group_by` **and** `summarize`
 
 --
-
-We can do this by applying the function `group_by()` and then `summarize()`.
 
 Functions after `group_by()` are computed *within each group* as defined by variables given, rather than over all rows at once.
 
@@ -711,68 +376,26 @@ Functions after `group_by()` are computed *within each group* as defined by vari
 
 
 ```{r}
-Yugoslavia %>%
-  group_by(year) %>% #<<
-  summarize(num_countries     = n_distinct(country),
-            total_pop         = sum(pop)) %>%
-  head(5)
+US_and_Canada %>% group_by(year) %>%  #<<
+  summarize(total_pop = sum(pop)) %>% #<<
+  head(4)
 ```
 
 Because we did `group_by()` with `year` then used `summarize()`, we get *one row per value of `year`*!
 
-Each value of year is its own **group**!
 
 ---
 class:inverse
 
-# Check Your Understanding:
+# 5. Merging together data
 
-Try to answer the following questions on your own, then share your solutions with a neighbor.
-
-1. Calculate the mean GDP for Canada, United States, and Mexico between 2000 and 2010. *HINT: Filter the data based on countries and years, then group the data by country, and then summarize.*
-
-2. Plot the mean GDP for each country during the decade 2000-2010 using `ggplot`. Try to make sure the axis labels and limits look nice, and add a title. 
++ `left_join()`
++ `full_join()`
 
 ---
+## Why merge?!
 
-# My Solution
-
-### 1: Mean GDP by Country in North America, 2000-2010.
-```{r}
-meanGDP_2000s <- gapminder %>% 
-  filter(country %in% c("Canada","United States","Mexico"), 
-         year > 2000 & year <= 2010) %>% 
-  group_by(country) %>%
-  summarize(meanGDP = mean(gdpPercap))
-meanGDP_2000s
-```
-
----
-
-# My Solution
-
-### 2: Plot the data
-
-.smallish[
-```{r fig.height=5}
-library(ggplot2)
-ggplot(meanGDP_2000s,aes(country,meanGDP)) +geom_col() + 
-  xlab("Country") + ylab("Mean GDP") + ylim(c(0,45000)) + 
-  ggtitle("Average GDP by Country (2000-2010)",subtitle = "North America")
-```
-]
-
----
-class: inverse
-##Joining (Merging) Data
-
-1. `left_join()`
-3. `full_join()`
-
----
-## When Do We Need to Join Tables?
-
-In practice, you may need to collect data from different sources. Merging those datasets can be tricky!
+In practice, we often collect data from different sources. To analyze the data, we usually must first combine (merge) them.
 
 --
 
@@ -781,75 +404,63 @@ For example, imagine you would like to study county-level patterns with respect 
 * County level age data from the US Census, and 
 * County level grocery spending data from the US Department of Agriculture
 
-Solution: Join the datasets!
+--
+
+Merge the data!!
 
 
 ---
-## Joining in Concept
+## Merging in Concept
 
-When merging dataframes `A` and `B`, we think about:
-
-* Which **rows** to keep from each data frame?
-
-  + *Example: One row for each county*
-
---
-
-* Which **columns** to keep from each data frame?
-
-  + *Example: County name, mean age, mean grocery spending*
+When merging datasets `A` and `B`, ask yourself the following two questions:
   
 --
 
-* Which variables determine whether rows **match**?
+* Which **rows** do I want to keep?
 
-  + *Example: County name*
+  + All rows in `A`?
+  + All rows in both `A` and `B`?
+  
+--
+
+* How do my datasets **connect**?
+
+  + Is there a specific variable they have in common?
+  + Multiple variables they have in common?
+  
 
 ---
-## Join Types: Rows and columns kept
+## Which Rows to Keep:
+
 
 We'll focus on two types of joins:<sup>1</sup>...
 
-* `A %>% left_join(B)`: keep all rows from `A`, matched with `B` wherever possible (`NA` when not), keep columns from both `A` and `B`
+* `A %>% left_join(B)`: keeps `A` and adds variables from `B` after matching.
 
-* `A %>% full_join(B)`: keep all rows from both `A` and `B`, matched wherever possible (`NA` when not), keep columns from both `A` and `B`
+* `A %>% full_join(B)`: keeps all of `A` and `B`, but combines rows when possible.
 
+.footnote[[1] Other types include `right_join`, `inner_join`, `semi_join`, and `anti_join`, but we won't study those here.]
 
-.pull-right[.footnote[[1] Other types include `right_join`, `inner_join`, `semi_join`, and `anti_join`, but we won't study those here.]]
 
 ---
 ## Matching Criteria
 
-We say rows *match* when they have some columns containing the same value. We list these in a `by = ` argument to the join.
+We have to tell R **which variables** to use when merging datasets! Rows are matched when the values in matching variables are equivalent.
+
 
 --
 
-Matching Behavior:
-
-* `by = c("var1", "var2")`: Match on identical values of `var1` and `var2` in both `A` and `B`.
+* `by = c("County")`: Both datasets have a `County` variable, match on this!
 
 --
 
-* `by = c("A_var1" = "B_var1", "A_var2" = "B_var2")`: Match identical values of `A_var1` variable in `A` to `B_var1` variable in `B`, and `A_var2` variable in `A` to `B_var2` variable in `B`.
+* `by = c("CountyName" = "County_Name")`: Match `CountyName` in `A` with `County_Name` in `B`
 
---
-
-* If you don't include `by`: Match using all variables in `A` and `B` that have identical names.
-
-Note: If there are multiple matches, you'll get *one row for each possible combination*.
 
 ---
-## `nycflights13` Data
+## Example: `nycflights13` Data
 
-We'll use data in the [`nycflights13` package](https://cran.r-project.org/web/packages/nycflights13/nycflights13.pdf). Install and load it:
-.smallish[
-```{r}
-# install.packages("nycflights13") # Uncomment to run
-library(nycflights13)
-```
-]
-
-It includes five data frames, some of which contain missing data (`NA`):
+The `nycflights13` package includes five data frames, some of which contain missing data (`NA`):
 
 * `flights`: flights leaving JFK, LGA, or EWR in 2013
 * `airlines`: airline abbreviations
@@ -857,117 +468,188 @@ It includes five data frames, some of which contain missing data (`NA`):
 * `planes`: airplane metadata
 * `weather`: hourly weather data for JFK, LGA, and EWR
 
-Note these are *separate data frames*, each needing to be *loaded separately*:
 .smallish[
-```{r, eval=FALSE}
-data(flights)
-data(airlines)
-data(airports)
-data(planes)
-data(weather)
+```{r}
+# install.packages("nycflights13")
+library(nycflights13)
 ```
 ]
----
-## Join Example #1
 
-The "flights" data has carrier abbreviations, but not full names. That information is in the "airlines" data. Let's join them together!
+---
+## Join Example 1
+
+`flights` has one row per flight, with abbreviated airline names.
+
+```{r}
+flights %>% select(flight,origin,dest,carrier) %>% head(2)
+```
 
 --
 
+`airlines` has one row per airline, with airline abbreviations *and* full names
+
 ```{r}
-flights %>% left_join(airlines, by = "carrier") %>%
-  select(flight,origin,dest,carrier,name) %>%
+airlines %>% head(2)
+```
+
+---
+## Join Example 1 (continued)
+
+Let's left join `flights` with `airlines` to add full airline name to each flight record!
+
+```{r}
+flights %>% select(flight,origin,dest,carrier) %>%
+  left_join(airlines, by = "carrier")  %>% #<< 
   head(5)
 ```
-
 We now have one row per flight, with both carrier abbreviations and full names!
-
----
-## Join Example #1 (cont.)
-
-Which airlines had the most flights to Seattle?
-
---
-
-```{r}
-flights %>% left_join(airlines, by = "carrier") %>%
-  filter(dest == "SEA") %>%
-  group_by(name) %>% 
-  summarize(num_flights = n())
-```
-
 
 ---
 ## Join Example #2
 
-The "flights" data doesn't has plane manufacturer information, but "planes" does. Both have the variable "tailnum". Let's join them together!
+`flights` also includes a `tailnum` variable for each plane's tail number.
+
+```{r}
+flights %>% select(flight,origin,dest,tailnum) %>% head(2)
+```
 
 --
 
+`planes` includes a row for each plane type, including the manufacturer.
 
 ```{r}
-flights %>% left_join(planes, by = "tailnum") %>%
-  select(flight,origin,dest,tailnum,manufacturer) %>%
+planes %>% select(tailnum,year,manufacturer,model) %>% head(2)
+```
+
+---
+## Join Example 2 (continued)
+
+Let's left join `flights` with `planes` to add manufacture to each flight record!
+
+```{r}
+flights %>% select(flight,origin,dest,tailnum) %>%
+  left_join(planes, by = "tailnum")  %>% #<< 
   head(5)
 ```
-
-We now have one row per flight, with plane manufacturer names!
+A bunch of columns from `planes` are now in the dataset!
 
 ---
-## Join Example #2 (cont.)
+## Join Example 2 (continued)
 
-How many flights from JFK to Seattle were made by each manufacturer?
-
---
+Let's remove some of the "spare" columns
 
 ```{r}
-flights %>% left_join(planes, by = "tailnum") %>%
-  filter(origin == "JFK",dest == "SEA") %>% 
-  group_by(manufacturer) %>% 
-  summarize(count_flights = n())
+flights %>% select(flight,origin,dest,tailnum) %>%
+  left_join(planes, by = "tailnum")  %>% 
+  select(flight,origin,dest,manufacturer,model) %>% #<< 
+  head(5)
 ```
----
-## Join Example #2 (cont.)
-
-Let's plot who manufactures the planes that flew from JFK to Seattle:
-
---
-
-.smallish[
-```{r fig.height=4,fig.width=9}
-JFK_Seattle_manufacturers <- flights %>% left_join(planes, by = "tailnum") %>%
-  filter(origin == "JFK",dest == "SEA") %>% 
-  group_by(manufacturer) %>% summarize(count_manufacturer = n())
-ggplot(JFK_Seattle_manufacturers,aes(manufacturer,count_manufacturer))+
-  geom_col()+xlab("Manufacturer")+ylab("Count")
-```
-]
-
----
-## Tinkering Suggestions
-
-Some possible questions to investigate:
-
-* What are the names of the most common destination airports?
-* Which airlines fly from NYC to your home city?
-*  What is the distribution of departure times for flights leaving NYC over a 24 hour period?
-    + Are especially late or early arrivals departures to some regions or for some airlines?
-
-**Warning:** `flights` has `r nrow(flights)` rows, so if you do a sloppy join, you can end up with **many** matches per observation and have the data *explode* in size.
 
 ---
 class: inverse
 
+# Summary
+
+1. Logical Operators (`&, |, ==, <, %in%,` etc.)
+1. Subsetting (`filter, select, distinct`)
+1. Modifying (`arrange, rename, mutate`)
+1. Summarizing (`summarize, group_by`)
+1. Merging (`left_join, full_join`)
+
+Let's take a 10-minute break, then come back together to practice!
+
+---
+class:inverse
+
+# Activity
+
+1. Create a new object that contains `gapminder` (1) observations from China, India, and United States after 1980, and (2) variables corresponding to country, year, population, and life expectancy. 
+1. How many rows and columns does the object contain?
+1. Save over your object after sorting the rows by year (ascending order) and population (descending order). Print the first 6 rows.
+1. Add a new variable that contains population in billions.
+1. By year, calculate the total population (in billions) across these three countries
+1. In ggplot, create a line plot showing life expectancy over time by country. Make the plot visually appealing!
+
+---
+
+# My Answers
+
+Question 1:
+
+```{r}
+subset_gapminder <- gapminder %>% 
+  filter(country %in% c("China","India","United States"), 
+         year >1980 ) %>%
+  select(country, year, pop, lifeExp)
+```
+
+--
+
+Question 2: 
+```{r}
+c(nrow(subset_gapminder),ncol(subset_gapminder))
+```
+
+
+---
+
+# My Answers
+
+Question 3:
+```{r}
+subset_gapminder <- subset_gapminder %>% arrange(year,desc(pop))
+subset_gapminder %>% head(6)
+```
+
+--
+
+Question 4:
+```{r}
+subset_gapminder <- subset_gapminder %>% 
+  mutate(pop_billions = pop/1000000000)
+```
+
+---
+
+# My Answers
+
+Question 5:
+```{r}
+subset_gapminder %>% group_by(year) %>% 
+  summarize(TotalPop_Billions = sum(pop_billions))
+```
+
+---
+
+# My Answers
+
+.small[
+Question 6
+```{r fig.height=4,fig.width=8}
+library(ggplot2)
+ggplot(subset_gapminder,aes(year,lifeExp,color=country,group=country))+
+  theme_bw(base_size=20)+geom_point()+geom_line()+
+  xlab("Year")+ylab("Life Expectancy (years)")+
+  ggtitle("Life Expectancy (1982-2007)","China, India, and United States")+
+  scale_x_continuous(breaks=c(1982,1987,1992,1997,2002,2007),minor_breaks = c())+
+  ylim(c(50,80))+scale_color_discrete(name="Country")+theme(legend.position = "bottom")
+```
+]
+
+---
+
 # Homework 3
 
-Pick something to look at in the `nycflights13` data and write up a .Rmd file showing your investigation. Upload both the .Rmd file and the .html file to Canvas. 
+.small[
+Create an RMarkdown file (from scratch this time!) in which you answer each of the following questions. Be sure to display **all your code in the knitted** version (use throughout `echo=TRUE`). 
 
-You must:
+Remember, the package `nycflights13` contains data on flights originating in NYC during the year 2013. There are three airports servicing NYC: JFK, LGA ("LaGuardia"), and EWR ("Newark").
 
-1. Use each of the following functions at least once: `mutate()`, `summarize()`, `group_by()`, and `left_join()`. 
-2. Include at least one nicely formatted plot (`ggplot2`) and at least one nicely formatted table (`pander`). In plots and tables, use "nice" variable names (try out spaces!) and rounded values (<= 3 digits).
-3. Briefly write down your question, observations from your analyses, and a summary of your work in words.
+1. Choose an airport outside New York, and count how many flights went to that airport from NYC in 2013. How many of those flights started at JFK, LGA, and EWR? (Hint: Use `filter`, `group_by`, and `summarize`)
+1. The variable `arr_delay` contains arrival delays in minutes (negative values represent early arrivals). Make a `ggplot` histogram displaying arrival delays for 2013 flights from NYC to the airport you chose.
+1. Use `left_join` to add weather data at departure to the subsetted data (Hint 1: Match on `origin`, `year`, `month`, `day`, **and** `hour`!!). Calculate the mean temperature by month at departure (`temp`) across all flights (Hint 2: Use `mean(temp,na.rm=T)` to have R calculate an average after ignoring missing data values).
+1. Investigate if there is a relationship between departure delay (`dep_delay`) and wind speed (`wind_speed`). Is the relationship different between JFK, LGA, and EWR? I suggest answering this question by making a plot and writing down a one-sentence interpretation.
 
-
-This time, *include all your code in your output document* (`echo=TRUE`), using comments and line breaks separating commands so that it is clear to a peer what you are doing (or trying to do!).
+As always, submit both the .Rmd and knitted .html to Canvas.
+]
 

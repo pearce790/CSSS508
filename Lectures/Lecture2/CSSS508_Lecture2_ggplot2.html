@@ -58,7 +58,7 @@ class: inverse
 
 # Packages 
 
-Packages are **collections of functions and tools** that make your life easier! The best part of R is the huge number of user-created packages. The `Packages` tab in the bottom-left pane of RStudio lists your installed packages.
+Packages are **collections of functions and tools** that make your life easier! The best part of R is the huge number of user-created packages. The `Packages` tab in the bottom-right pane of RStudio lists your installed packages.
 
 --
 
@@ -775,6 +775,8 @@ class: inverse
 
 # 4. Advanced ggplot tools
 
+*(10 minute break!)*
+
 Next, we'll discuss:
 
 * Storing, modifying, and saving ggplots
@@ -871,19 +873,6 @@ ggplot(data = China, aes(x = year, y = gdpPercap)) +
 
 ![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-48-1.svg)&lt;!-- --&gt;
 
----
-
-# Fonts Too Small?
-
-
-```r
-ggplot(data = China, aes(x = year, y = lifeExp)) +
-    geom_line() +
-    ggtitle("Chinese life expectancy") +
-*   theme_gray(base_size = 20)
-```
-
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-49-1.svg)&lt;!-- --&gt;
 
 
 ---
@@ -896,7 +885,7 @@ lifeExp_by_year +
   theme(legend.position = c(0.8, 0.2)) 
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-50-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-49-1.svg)&lt;!-- --&gt;
 ]
 
 Instead of coordinates, you could also use "top", "bottom", "left", or "right".
@@ -940,7 +929,7 @@ lifeExp_by_year +
                "Asia" = "royalblue", "Europe" = "violetred1", "Oceania" = "yellow"))
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-51-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-50-1.svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -955,7 +944,7 @@ class: inverse
 
 We're going to *slowly* build up a *really detailed plot* now!
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-52-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-51-1.svg)&lt;!-- --&gt;
 
 
 ---
@@ -975,7 +964,7 @@ We're going to *slowly* build up a *really detailed plot* now!
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-53-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-52-1.svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -998,7 +987,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-54-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-53-1.svg)&lt;!-- --&gt;
 ]
 ---
 
@@ -1020,7 +1009,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-55-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-54-1.svg)&lt;!-- --&gt;
 ]
 
 .footnote[Note: A [*loess* curve](https://en.wikipedia.org/wiki/Local_regression) is something like a moving average.]
@@ -1044,7 +1033,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-56-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-55-1.svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -1067,7 +1056,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-57-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-56-1.svg)&lt;!-- --&gt;
 ]
 ---
 
@@ -1088,7 +1077,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-58-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-57-1.svg)&lt;!-- --&gt;
 ]
 ---
 
@@ -1110,7 +1099,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-59-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-58-1.svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -1133,7 +1122,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-60-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-59-1.svg)&lt;!-- --&gt;
 ]
 ---
 
@@ -1155,7 +1144,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
   #
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-61-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-60-1.svg)&lt;!-- --&gt;
 ]
 ---
 
@@ -1177,7 +1166,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
 * theme(axis.text.x = element_text(angle = 45))
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-62-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-61-1.svg)&lt;!-- --&gt;
 ]
 
 .footnote[Note: Fewer values might be better than angled labels!]
@@ -1201,7 +1190,7 @@ ggplot(data = gapminder, aes(x = year, y = lifeExp, group = country)) +
 * theme(legend.position=c(0.82, 0.15), axis.text.x = element_text(angle = 45))
 ```
 
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-63-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-62-1.svg)&lt;!-- --&gt;
 ]
 
 ---
@@ -1262,7 +1251,7 @@ ggplot(gapminder,aes(x=lifeExp))
 ]
 ]
 .pull-right[
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-65-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-64-1.svg)&lt;!-- --&gt;
 ]
 
 
@@ -1281,7 +1270,7 @@ ggplot(gapminder,aes(x=lifeExp))+
 ]
 ]
 .pull-right[
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-67-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-66-1.svg)&lt;!-- --&gt;
 ]
 
 .footnote[Setting the `bins` aesthetic removes a pesky message!]
@@ -1305,7 +1294,7 @@ ggplot(gapminder,aes(x=lifeExp))+
 ]
 ]
 .pull-right[
-![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-69-1.svg)&lt;!-- --&gt;
+![](CSSS508_Lecture2_ggplot2_files/figure-html/unnamed-chunk-68-1.svg)&lt;!-- --&gt;
 ]
 
 ---

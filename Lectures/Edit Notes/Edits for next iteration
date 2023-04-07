@@ -1,29 +1,3 @@
-Lecture 1:
-
-Perhaps move some of this material to the following week, and give time for installation help/questions after describing packages/files. Not all students were able to install packages easily.
-
-Describe how R is case-sensitive, as this seemed to create issues for some students.
-
-Remove "pander" library and table functions.
-
-Add more organization surrounding the topics covered during lecture.
-
-
-
-Lecture 2: 
-
-Went pretty smoothly! Activities were very good here!
-
-In general though, there was too much content! I would push all the data manipulation things
-to next week, if possible, to give more time to working with plots. Potentially, switch the order
-of lectures 2 and 3?
-
-Lecture 3:
-
-Pretty smooth, but perhaps there is too much info here still! The exercises were great but took up a lot of time.
-
-I would also re-edit the join section, maybe adding an example of full join and showing datasets before/after.
-
 Lecture 5: 
 
 Smooth after removing lots of the material from Chuck's version. Remove the "guess_max" argument stuff, however, as it was very unintuitive and perhaps not even correct! Instead, provide an example of point-and-click importing with copy/paste.

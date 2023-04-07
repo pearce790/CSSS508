@@ -1,173 +1,79 @@
+A <- c(5,10,15)
+B <- c(5,15,25)
+
+A == B
+A >  B
+A %in% B
+
+A <- c(5,10,15)
+B <- c(5,15,25)
+
+A > 5 & A <= B
+B < 10 | B > 20
+!(A == 10)
+
+# install.packages("dplyr")
 library(dplyr)
 library(gapminder)
-gapminder %>% filter(country == "Canada") %>% head(2)
 
+log(mean(gapminder$pop))
+gapminder$pop %>% mean() %>% log()
 
+gapminder %>% filter(country == "China") %>% 
+  head(4) # display first four rows
+China <- gapminder %>% filter(country == "China")
 
-Canada <- gapminder %>% filter(country == "Canada")
+gapminder %>% select(country,continent,year,lifeExp) %>% head(4)
 
-
-
-former_yugoslavia <- c("Bosnia and Herzegovina", "Croatia", 
-                       "Montenegro", "Serbia", "Slovenia")
-Yugoslavia <- gapminder %>% filter(country %in% former_yugoslavia)
-head(Yugoslavia, 4)
-
-
+gapminder %>% select(-continent, -pop, -lifeExp) %>% head(4)
 
 gapminder %>% distinct(continent, year) %>% head(6)
 
-
-
 gapminder %>% distinct(continent, year, .keep_all=TRUE) %>% head(6)
 
+US_and_Canada <- gapminder %>% 
+  filter(country %in% c("United States","Canada"))
+US_and_Canada %>% arrange(year,lifeExp) %>% head(4)
 
+US_and_Canada %>% arrange(desc(pop)) %>% head(4)
 
-Yugoslavia %>% select(country, year, pop) %>% head(4)
-
-
-
-Yugoslavia %>% select(-continent, -pop, -lifeExp) %>% head(4)
-
-
-
-gapminder %>% pull(lifeExp) %>% head(4)
-
-
-
-gapminder %>% select(lifeExp) %>% head(4)
-
-
-
-Asia_and_Oceania <- gapminder %>% 
-  filter(continent %in% c("Asia", "Oceania"))
-head(Asia_and_Oceania,4)
-
-
-
-Asia_and_Oceania <- Asia_and_Oceania %>% select(-lifeExp,-gdpPercap)
-head(Asia_and_Oceania,4)
-
-
-
-Asia_and_Oceania %>% 
-  distinct(country,continent,.keep_all=TRUE) %>%
+US_and_Canada %>% rename(life_expectancy = lifeExp) %>%
   head(4)
 
-
-
-Yugoslavia %>% arrange(year, desc(pop)) %>% head(6)
-
-
-
-Yugoslavia %>% select(country,year,lifeExp) %>%
-  rename(Life_Expectancy = lifeExp) %>%
-    head(4)
-
-
-
-library(pander)
-Yugoslavia %>% filter(country == "Serbia") %>%
-    select(year, lifeExp) %>%
-    rename(Year = year, `Life Expectancy` = lifeExp) %>% #<<
-    head(5) %>%
-    pander(style = "rmarkdown", caption = "Serbian life expectancy")
-
-
-
-Yugoslavia %>% select(country, year, pop) %>%
-    mutate(pop_million = pop / 1000000) %>% #<<
-    head(5)
-
-
-
-Yugoslavia %>% 
-  mutate(country = recode(country, 
-                        `Bosnia and Herzegovina`="B and H", #<<
-                        Montenegro="M")) %>%
-  distinct(country, .keep_all=TRUE)
-
-gapminder %>% arrange (pop) %>%  head(5)
-
-gapminder %>% 
-  filter(country %in% c("United States","United Kingdom")) %>%
-  mutate(country = recode(country,
-                          "United States" = "US",
-                          "United Kingdom"="UK")) %>%
-  distinct(country,continent)
-
-
-
-Yugoslavia %>% filter(year == 1982) %>%
-    summarize(n_obs          = n(),
-              total_pop      = sum(pop),
-              mean_life_exp  = mean(lifeExp),
-              range_life_exp = max(lifeExp) - min(lifeExp))
-
-
-
-Yugoslavia %>%
-  group_by(year) %>% #<<
-  summarize(num_countries     = n_distinct(country),
-            total_pop         = sum(pop),
-            total_gdp_per_cap = sum(pop*gdpPercap)/total_pop) %>%
+US_and_Canada %>% select(country, year, pop) %>%
+  mutate(pop_millions = pop / 1000000) %>% #<<
   head(5)
 
+gapminder %>% filter(year == 1982) %>%
+  summarize(number_observations = n(),
+            max_lifeexp = max(lifeExp),
+            mean_pop = mean(pop),
+            sd_pop = sd(pop))
 
+US_and_Canada %>% group_by(year) %>%  #<<
+  summarize(total_pop = sum(pop)) %>% #<<
+  head(4)
 
-meanGDP_2000s <- gapminder %>% 
-  filter(country %in% c("Canada","United States","Mexico"), 
-         year > 2000 & year <= 2010) %>% 
-  group_by(country) %>%
-  summarize(meanGDP = mean(gdpPercap))
-meanGDP_2000s
-
-
-library(ggplot2)
-ggplot(meanGDP_2000s,aes(country,meanGDP)) +geom_col() + 
-  xlab("Country") + ylab("Mean GDP") + ylim(c(0,45000)) + 
-  ggtitle("Average GDP by Country (2000-2010)",subtitle = "North America")
-
-
-
-# install.packages("nycflights13") # Uncomment to run
+# install.packages("nycflights13")
 library(nycflights13)
 
-data(flights)
-data(airlines)
-data(airports)
-data(planes)
-data(weather)
+flights %>% select(flight,origin,dest,carrier) %>% head(2)
 
+airlines %>% head(2)
 
-
-flights %>% left_join(airlines, by = "carrier") %>%
-  select(flight,origin,dest,carrier,name) %>%
+flights %>% select(flight,origin,dest,carrier) %>%
+  left_join(airlines, by = "carrier")  %>% #<< 
   head(5)
 
+flights %>% select(flight,origin,dest,tailnum) %>% head(2)
 
+planes %>% select(tailnum,year,manufacturer,model) %>% head(2)
 
-flights %>% left_join(airlines, by = "carrier") %>%
-  filter(dest == "SEA") %>%
-  group_by(name) %>% 
-  summarize(num_flights = n())
-
-
-
-flights %>% left_join(planes, by = "tailnum") %>%
-  select(flight,origin,dest,tailnum,manufacturer) %>%
+flights %>% select(flight,origin,dest,tailnum) %>%
+  left_join(planes, by = "tailnum")  %>% #<< 
   head(5)
 
-
-
-flights %>% left_join(planes, by = "tailnum") %>%
-  filter(origin == "JFK",dest == "SEA") %>% 
-  group_by(manufacturer) %>% 
-  summarize(count_flights = n())
-
-JFK_Seattle_manufacturers <- flights %>% left_join(planes, by = "tailnum") %>%
-  filter(origin == "JFK",dest == "SEA") %>% 
-  group_by(manufacturer) %>% summarize(count_manufacturer = n())
-ggplot(JFK_Seattle_manufacturers,aes(manufacturer,count_manufacturer))+
-  geom_col()+xlab("Manufacturer")+ylab("Count")
-
+flights %>% select(flight,origin,dest,tailnum) %>%
+  left_join(planes, by = "tailnum")  %>% 
+  select(flight,origin,dest,manufacturer,model) %>% #<< 
+  head(5)

@@ -121,16 +121,17 @@
 		<h3>Homework 3:</h3>
 	  	<p class="text">
 		<ul>
- 			<li><b>Homework Instructions:</b> Pick something to look at in the <code>nycflights13</code> data and write up a .Rmd file showing your investigation. Upload both the .Rmd file and the .html file to Canvas. 
- 			
- 			You must:
+ 			<li><b>Homework Instructions:</b> Create an RMarkdown file (from scratch this time!) in which you answer each of the following questions. Be sure to display <b>all your code in the knitted**</b> version (use throughout <code>echo=TRUE`</code>). 
+ 			Remember, the package <code>nycflights13</code> contains data on flights originating in NYC during the year 2013. There are three airports servicing NYC: JFK, LGA ("LaGuardia"), and EWR ("Newark").
  			<ul>
-					<li>Use each of the following functions at least once: <code>mutate()</code>, <code>summarize()</code>, <code>group_by()</code>, and <code>left_join()</code>. </li>
-					<li>Include at least one nicely formatted plot (<code>ggplot2</code>) and at least one nicely formatted table (<code>pander</code>). In plots and tables, use "nice" variable names (try out spaces!) and rounded values (<= 3 digits).</li>
-					<li>Briefly write down your question, observations from your analyses, and a summary of your work in words.</li>
-			</ul>
-      This time, <i>include all your code in your output document</i> (<code>echo=TRUE</code>), using comments and line breaks separating commands so that it is clear to a peer what you are doing (or trying to do!).</li>
-  			<li><b>Homework Due Date:</b> 4/19</li>
+ 			  <li>Choose an airport outside New York, and count how many flights went to that airport from NYC in 2013. How many of those flights started at JFK, LGA, and EWR? (Hint: Use <code>filter</code>, <code>group_by</code>, and <code>summarize</code>)</li>
+ 			  <li>The variable <code>arr_delay</code> contains arrival delays in minutes (negative values represent early arrivals). Make a ggplot histogram displaying arrival delays for 2013 flights from NYC to the airport you chose.</li>
+ 			  <li>Use <code>left_join</code> to add weather data at departure to the subsetted data (Hint 1: Match on <code>origin</code>, <code>year</code>, <code>month</code>, <code>day</code>, and <code>hour</code>!!). Calculate the mean temperature by month at departure (<code>temp</code>) across all flights (Hint 2: Use <code>mean(temp,na.rm=T)</code> to have R calculate an average after ignoring missing data values).</li>
+ 			  <li>Investigate if there is a relationship between departure delay (<code>dep_delay</code>) and wind speed (<code>wind_speed</code>). Is the relationship different between JFK, LGA, and EWR? I suggest answering this question by making a plot and writing down a one-sentence interpretation.</li>
+ 			</ul>
+ 			As always, submit both the .Rmd and knitted .html to Canvas.
+ 			</li>
+  		<li><b>Homework Due Date:</b> 4/19</li>
 			<li><b>Peer Review Due Date:</b> 4/24</li>
 		</ul>  
 

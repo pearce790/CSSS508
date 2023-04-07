@@ -4,7 +4,7 @@
     <title>CSSS 508, Lecture 3</title>
     <meta charset="utf-8" />
     <meta name="author" content="Michael Pearce (based on slides from Chuck Lanfear)" />
-    <meta name="date" content="2022-10-13" />
+    <meta name="date" content="2022-04-12" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -22,35 +22,20 @@ class: center, top, title-slide
 ### Michael Pearce<br>(based on slides from Chuck Lanfear)
 ]
 .date[
-### October 13, 2022
+### April 12, 2022
 ]
 
 ---
 
-
-
-
-# A Quick Note
-
-The last two lectures have been jam-packed with content! This makes it hard to answer individual-level questions as we get started with R and RStudio.
-
---
-
-Luckily, today's lecture has **less content** and **more time for questions!** To keep things moving along,
-
-+ Please try to **limit very-individual questions while I'm running through slides** (e.g., "I'm getting this error message, why is that?"). I'm happy to answer these while we're working on exercises, during a break/lab/office hour, or before/after class.
-
-+ Please **interrupt me with questions about content during lecture!** If something isn't clear on the slides, it's best to discuss it right away!
-
----
 class: inverse
+
+
 
 # Topics
 
 Last time, we learned about,
 
 1. Useful coding tips: packages, directories, and saving data
-1. Advanced data manipulation tools
 1. Basics of ggplot: layers and aesthetics
 1. Advanced ggplot tools
 
@@ -58,10 +43,11 @@ Last time, we learned about,
 
 Today, we will cover,
 
+1. Building blocks
 1. Subsetting data
 1. Modifying data 
 1. Summarizing data
-1. Joining (merging) data
+1. Merging together data
 
 ---
 class: inverse
@@ -70,105 +56,286 @@ class: inverse
 
 
 
-You may be familiar with tools like Excel or Google Sheets, which let you manipulate data in a spreadsheet using functions. Spreadsheets are *not reproducible*: It's hard to know how someone changed the raw data!
+Tools like *Excel* or *Google Sheets* lets you manipulate spreadsheets using functions.
 
-Today we'll talk more about `dplyr`: an R package that does just about anything Excel can, but more *transparently*, *reproducibly*, and *safely*. 
+* Spreads are *not reproducible*: It's hard to know how someone changed the raw data!
+* It's hard to catch mistakes when you use spreadsheets. Don't be the next sad Research Assistant who makes headlines with an Excel error! ([Reinhart &amp; Rogoff, 2010](http://www.bloomberg.com/news/articles/2013-04-18/faq-reinhart-rogoff-and-the-excel-error-that-changed-history))
 
-Don't be the next sad research assistant who makes headlines with an Excel error ([Reinhart &amp; Rogoff, 2010](http://www.bloomberg.com/news/articles/2013-04-18/faq-reinhart-rogoff-and-the-excel-error-that-changed-history))
+Today, we'll use R to manipulate data more *transparently* and *reproducibly*.
+
+---
+class:inverse
+
+# 1. Building Blocks
+
+1. Logical Operators (`!=`, `==`, `&gt;`, `&lt;=`, etc. )
+1. Combining Logical Operators (`&amp;`, `|`)
+
+
+---
+
+## Logical Operators
+
+Logical operators refer to base functions which allow us to **test a connection** between two objects.
+
+--
+
+For example, we may test
+
++ Is A equal to B?
++ Is A greater than B?
++ Is A within B?
+
+and many others!
+
+---
+## Logical Operators in Code
+
+* `==`: is equal to (note: there are TWO equal signs here!)
+
+--
+
+* `!=`: not equal to
+
+--
+
+* `&gt;`, `&gt;=`, `&lt;`, `&lt;=`: less than, less than or equal to, etc.
+
+--
+
+* `%in%`: used with checking equal to one of several values
+
+---
+## Examples of Logical Operators
+
+Let's create two objects, `A` and `B`
+
+
+```r
+A &lt;- c(5,10,15)
+B &lt;- c(5,15,25)
+```
+
+--
+
+
+```r
+A == B
+```
+
+```
+## [1]  TRUE FALSE FALSE
+```
+
+```r
+A &gt;  B
+```
+
+```
+## [1] FALSE FALSE FALSE
+```
+
+```r
+A %in% B
+```
+
+```
+## [1]  TRUE FALSE  TRUE
+```
+
+---
+## Combining Logical Operators
+
+We have three main ways to combine logical operators:
+
+* `&amp;`: **both** conditions need to hold (AND)
+--
+
+* `|`: **at least one** condition needs to hold (OR)
+--
+
+* `!`: **inverts** a logical condition (`TRUE` becomes `FALSE`, `FALSE` becomes `TRUE`)
+
+---
+## Examples
+
+
+```r
+A &lt;- c(5,10,15); B &lt;- c(5,15,25)
+```
+
+--
+
+
+```r
+A &gt; 5 &amp; A &lt;= B
+```
+
+```
+## [1] FALSE  TRUE  TRUE
+```
+
+```r
+B &lt; 10 | B &gt; 20
+```
+
+```
+## [1]  TRUE FALSE  TRUE
+```
+
+```r
+!(A == 10)
+```
+
+```
+## [1]  TRUE FALSE  TRUE
+```
 
 ---
 class: inverse
 
-# Subsetting data
+# Aside: `dplyr`
+
+Today, we'll use tools from the `dplyr` package to manipulate data! 
+
++ Like `ggplot2`, `dplyr` is part of the **Tidyverse**, a modern collection of data science tools introduced by Hadley Wickham.
+
++ You can read more about the tidyverse on its [website](http://tidyverse.org/).
+
+--
+
+To get started, let's install (in the console) and load (in an R/Rmd file) dplyr. (We also load `gapminder`!)
+
+
+```r
+# install.packages("dplyr")
+library(dplyr)
+
+library(gapminder)
+```
+
+---
+
+## Building Block of `dplyr`: Pipes
+
+`dplyr` allows us to use the "pipe" data between functions using the (`%&gt;%`) operator. So instead of nesting functions like this:
+
+
+```r
+log(mean(gapminder$pop))
+```
+
+```
+## [1] 17.20333
+```
+
+--
+
+We can **pipe** them like this:
+
+
+```r
+gapminder$pop %&gt;% mean() %&gt;% log()
+```
+
+```
+## [1] 17.20333
+```
+
+--
+
++ Pipes read "left to right" (intuitive)
++ Nested functions read "inside to out." (kinda weird)
+
+
+
+---
+class: inverse
+
+# 2. Subsetting data
 
 + `filter()`
-+ `distinct()`
 + `select()`
-+ `pull()`
++ `distinct()`
 
 
 ---
-# Reminder: Pipes (%&gt;%)
+## Subset Rows: `filter`
 
-In `dplyr`, we use the **pipe** operator (`%&gt;%`) to make code readable. A keyboard shortcut to create pipes is `Ctrl+Shift+M` (Windows) or `Command+Shift+M` (OS).
-
---
-
-Pipes take the object on the *left* and apply to it the function on the *right*:
-
-
-```r
-library(dplyr)
-library(gapminder)
-gapminder %&gt;% filter(country == "Canada") %&gt;% head(2)
-```
-
-```
-## # A tibble: 2 × 6
-##   country continent  year lifeExp      pop gdpPercap
-##   &lt;fct&gt;   &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
-## 1 Canada  Americas   1952    68.8 14785584    11367.
-## 2 Canada  Americas   1957    70.0 17010154    12490.
-```
-
-In words, we (1) take the gapminder data, (2) filter to observations where the country is "Canada", and (3) display the first two observations.
-
-
----
-# Subsetting rows
-
-We often get *big* datasets, but only want to use a portion of them. We can subset portions of our data using the `filter()` function.
+We often get *big* datasets, and we only want some of the entries. We can subset rows using `filter`.
 
 --
 
-Last week we used the `filter()` command to subset data:
 
 ```r
-Canada &lt;- gapminder %&gt;% filter(country == "Canada")
-```
-
-We now have the object `Canada` saved in our environment, which contains all observations of the gapminder data from the country Canada.
-
-.footnote[[1] Reminder: `==` is an operator that tests for equality.]
-
----
-## Another Operator: `%in%`
-
-What if I want to subset data from multiple countries at once?! Use the `%in%` operator!
-
---
-
-We can use `%in%` like `==` but for matching *any element* in the vector on its right&lt;sup&gt;1&lt;/sup&gt;. 
-
-
-```r
-former_yugoslavia &lt;- c("Bosnia and Herzegovina", "Croatia", 
-                       "Montenegro", "Serbia", "Slovenia")
-Yugoslavia &lt;- gapminder %&gt;% filter(country %in% former_yugoslavia)
-head(Yugoslavia, 4)
+gapminder %&gt;% filter(country == "China") %&gt;% 
+  head(4) # display first four rows
 ```
 
 ```
 ## # A tibble: 4 × 6
-##   country                continent  year lifeExp     pop gdpPercap
-##   &lt;fct&gt;                  &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;
-## 1 Bosnia and Herzegovina Europe     1952    53.8 2791000      974.
-## 2 Bosnia and Herzegovina Europe     1957    58.4 3076000     1354.
-## 3 Bosnia and Herzegovina Europe     1962    61.9 3349000     1710.
-## 4 Bosnia and Herzegovina Europe     1967    64.8 3585000     2172.
+##   country continent  year lifeExp       pop gdpPercap
+##   &lt;fct&gt;   &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;
+## 1 China   Asia       1952    44   556263527      400.
+## 2 China   Asia       1957    50.5 637408000      576.
+## 3 China   Asia       1962    44.5 665770000      488.
+## 4 China   Asia       1967    58.4 754550000      613.
 ```
 
+```r
+China &lt;- gapminder %&gt;% filter(country == "China")
+```
 
-.footnote[[1] Reminder: The `c()` function is how we make **vectors** in R.]
+(Now, `China` is an object in our environment which contains rows corresponding to China.)
 
 ---
-## Finding unique values
+## Subset Columns: `select`
 
-You may want to find the unique combinations of variables in a dataset.  This can be performed using the function `distinct()`.
+What if we want to keep each entry, but only use certain variables? Use `select`!
 
 --
 
-For example, if we want to see what unique combinations of "continent" and "year" are in gapminder, run:
+
+```r
+gapminder %&gt;% select(country,continent,year,lifeExp) %&gt;% head(4)
+```
+
+```
+## # A tibble: 4 × 4
+##   country     continent  year lifeExp
+##   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;
+## 1 Afghanistan Asia       1952    28.8
+## 2 Afghanistan Asia       1957    30.3
+## 3 Afghanistan Asia       1962    32.0
+## 4 Afghanistan Asia       1967    34.0
+```
+
+---
+## Dropping columns with `select`
+
+Alternatively, we can use `select()` to drop variables using a `-` sign: 
+
+
+```r
+gapminder %&gt;% select(-continent, -pop, -lifeExp) %&gt;% head(4)
+```
+
+```
+## # A tibble: 4 × 3
+##   country      year gdpPercap
+##   &lt;fct&gt;       &lt;int&gt;     &lt;dbl&gt;
+## 1 Afghanistan  1952      779.
+## 2 Afghanistan  1957      821.
+## 3 Afghanistan  1962      853.
+## 4 Afghanistan  1967      836.
+```
+
+---
+## Finding Unique Rows: `distinct`
+
+You may want to find the unique combinations of variables in a dataset.  Use `distinct`
+
+--
 
 
 ```r
@@ -188,10 +355,10 @@ gapminder %&gt;% distinct(continent, year) %&gt;% head(6)
 ```
 
 ---
-## `distinct()` drops variables!
+## `distinct` drops variables!
 
 
-By default, `distinct()` drops all unused variables. If you don't want to drop the others, use `distinct(.keep_all=TRUE)`:
+By default, `distinct()` drops unused variables. If you don't want to drop them, add the argument `.keep_all=TRUE`:
 
 
 ```r
@@ -210,459 +377,169 @@ gapminder %&gt;% distinct(continent, year, .keep_all=TRUE) %&gt;% head(6)
 ## 6 Afghanistan Asia       1977    38.4 14880372      786.
 ```
 
----
-## Keeping or dropping variables
 
-What if we want to subset *variables* (as opposed to observations)? Use the `select()` function!
-
---
-
-If we want to view the variables "country", "year", and "pop" (in that order), we can do so using the following code: 
-
-```r
-Yugoslavia %&gt;% select(country, year, pop) %&gt;% head(4)
-```
-
-```
-## # A tibble: 4 × 3
-##   country                 year     pop
-##   &lt;fct&gt;                  &lt;int&gt;   &lt;int&gt;
-## 1 Bosnia and Herzegovina  1952 2791000
-## 2 Bosnia and Herzegovina  1957 3076000
-## 3 Bosnia and Herzegovina  1962 3349000
-## 4 Bosnia and Herzegovina  1967 3585000
-```
-
----
-## Dropping columns
-
-Alternatively, we can use `select()` to drop variables using a `-` sign: 
-
-
-```r
-Yugoslavia %&gt;% select(-continent, -pop, -lifeExp) %&gt;% head(4)
-```
-
-```
-## # A tibble: 4 × 3
-##   country                 year gdpPercap
-##   &lt;fct&gt;                  &lt;int&gt;     &lt;dbl&gt;
-## 1 Bosnia and Herzegovina  1952      974.
-## 2 Bosnia and Herzegovina  1957     1354.
-## 3 Bosnia and Herzegovina  1962     1710.
-## 4 Bosnia and Herzegovina  1967     2172.
-```
-
-Now, we're showing all variables *except* "continent", "pop", and "lifeExp".
-
----
-
-## Extracting a single column?
-
-Sometimes you want to extract a single column from a data frame as a *vector* (or single value). `pull()` *pulls* a column of a data frame out as a vector.
-
---
-
-
-```r
-gapminder %&gt;% pull(lifeExp) %&gt;% head(4)
-```
-
-```
-## [1] 28.801 30.332 31.997 34.020
-```
-
---
-
-
-```r
-gapminder %&gt;% select(lifeExp) %&gt;% head(4)
-```
-
-```
-## # A tibble: 4 × 1
-##   lifeExp
-##     &lt;dbl&gt;
-## 1    28.8
-## 2    30.3
-## 3    32.0
-## 4    34.0
-```
-
-.pull-right[.footnote[Note the difference between these two operations: The second yields only one column but is still a data frame.]]
----
-
-## In-Line `pull()`
-
-`pull()` is particularly useful when you want to use a vector-only command in a `dplyr` chain of functions (say, in an in-line expression).
-
---
-
-This in-line code...
-
-&lt;p&gt;&lt;code&gt;The average life expectancy in Afghanistan from 1952 to 2007 was &lt;/code&gt;&lt;code  class="r"&gt;`&lt;/code&gt;&lt;code class="r"&gt;r gapminder %&gt;% filter(country=="Afghanistan") %&gt;% pull(lifeExp) %&gt;% mean() %&gt;% round(1)`&lt;/code&gt;&lt;code&gt; years.&lt;/code&gt;&lt;/p&gt;
-
---
-
-... will produce this output:
-
-The average life expectancy in Afghanistan from 1952 to 2007 was 37.5 years.
-
-
-NOTE: `mean()` can only take a *vector* input, not a data frame. So this won't work with `select(lifeExp)` instead of `pull(lifeExp)`.
-
----
-class:inverse
-
-# Check Your Understanding:
-
-With a neighbor or two, write one line of code to answer each of the following questions:
-
-1. Create an object that includes all rows in gapminder from the continents Asia and Oceania
-
-2. Remove the variables "lifeExp" and "gdpPercap" from your subsetted data.
-
-3. Display the distinct combinations of "country" and "continent" from your subsetted data, but do not drop the remaining variables!
-
----
-
-# My Solution
-
-### 1: Filter Asia and Oceania:
-
-```r
-Asia_and_Oceania &lt;- gapminder %&gt;% 
-  filter(continent %in% c("Asia", "Oceania"))
-head(Asia_and_Oceania,4)
-```
-
-```
-## # A tibble: 4 × 6
-##   country     continent  year lifeExp      pop gdpPercap
-##   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
-## 1 Afghanistan Asia       1952    28.8  8425333      779.
-## 2 Afghanistan Asia       1957    30.3  9240934      821.
-## 3 Afghanistan Asia       1962    32.0 10267083      853.
-## 4 Afghanistan Asia       1967    34.0 11537966      836.
-```
-
-
----
-
-# My Solution
-
-### 2: Drop "lifeExp" and "gdpPercap":
-
-
-```r
-Asia_and_Oceania &lt;- Asia_and_Oceania %&gt;% select(-lifeExp,-gdpPercap)
-head(Asia_and_Oceania,4)
-```
-
-```
-## # A tibble: 4 × 4
-##   country     continent  year      pop
-##   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;    &lt;int&gt;
-## 1 Afghanistan Asia       1952  8425333
-## 2 Afghanistan Asia       1957  9240934
-## 3 Afghanistan Asia       1962 10267083
-## 4 Afghanistan Asia       1967 11537966
-```
-
-
----
-
-# My Solution
-
-### 3: Display distinct "country" and "continent" without dropping:
-
-
-```r
-Asia_and_Oceania %&gt;% 
-  distinct(country,continent,.keep_all=TRUE) %&gt;%
-  head(4)
-```
-
-```
-## # A tibble: 4 × 4
-##   country     continent  year      pop
-##   &lt;fct&gt;       &lt;fct&gt;     &lt;int&gt;    &lt;int&gt;
-## 1 Afghanistan Asia       1952  8425333
-## 2 Australia   Oceania    1952  8691212
-## 3 Bahrain     Asia       1952   120447
-## 4 Bangladesh  Asia       1952 46886859
-```
 
 ---
 class: inverse
 
-# Modifying data
+# 3. Modifying data
 
 + `arrange()`
 + `rename()`
 + `mutate()`
-+ `recode()`
-
 
 ---
-## Sorting data by rows
+## Sorting data by rows: `arrange`
 
-Sometimes we want to sort data by row, in either ascending (low to high) or descending (high to low) order. We can do that with `arrange()`.
-
-`arrange` uses ascending order by default. Arrange by descending order using the function `desc`.
+Sometimes it's useful to sort rows in your data, in ascending (low to high) or descending (high to low) order. We do that with `arrange`.
 
 --
 
-For example, we can sort Yugoslavia first by year and then by population:
+
+```r
+US_and_Canada &lt;- gapminder %&gt;% 
+  filter(country %in% c("United States","Canada"))
+US_and_Canada %&gt;% arrange(year,lifeExp) %&gt;% head(4)
+```
+
+```
+## # A tibble: 4 × 6
+##   country       continent  year lifeExp       pop gdpPercap
+##   &lt;fct&gt;         &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;
+## 1 United States Americas   1952    68.4 157553000    13990.
+## 2 Canada        Americas   1952    68.8  14785584    11367.
+## 3 United States Americas   1957    69.5 171984000    14847.
+## 4 Canada        Americas   1957    70.0  17010154    12490.
+```
+
+---
+## Sorting data by rows: `arrange`
+
+To sort in descending order, using `desc()` within `arrange`
 
 
 ```r
-Yugoslavia %&gt;% arrange(year, desc(pop)) %&gt;% head(6)
+US_and_Canada %&gt;% arrange(desc(pop)) %&gt;% head(4)
 ```
 
 ```
-## # A tibble: 6 × 6
-##   country                continent  year lifeExp     pop gdpPercap
-##   &lt;fct&gt;                  &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;
-## 1 Serbia                 Europe     1952    58.0 6860147     3581.
-## 2 Croatia                Europe     1952    61.2 3882229     3119.
-## 3 Bosnia and Herzegovina Europe     1952    53.8 2791000      974.
-## 4 Slovenia               Europe     1952    65.6 1489518     4215.
-## 5 Montenegro             Europe     1952    59.2  413834     2648.
-## 6 Serbia                 Europe     1957    61.7 7271135     4981.
+## # A tibble: 4 × 6
+##   country       continent  year lifeExp       pop gdpPercap
+##   &lt;fct&gt;         &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;     &lt;int&gt;     &lt;dbl&gt;
+## 1 United States Americas   2007    78.2 301139947    42952.
+## 2 United States Americas   2002    77.3 287675526    39097.
+## 3 United States Americas   1997    76.8 272911760    35767.
+## 4 United States Americas   1992    76.1 256894189    32004.
 ```
+
 
 
 ---
-## Rename variables
+## Rename variables: `rename`
 
 You may receive data with unintuitive variable names. You can change them using `rename()`.
 
+--
+
 
 
 ```r
-Yugoslavia %&gt;% select(country,year,lifeExp) %&gt;%
-  rename(Life_Expectancy = lifeExp) %&gt;%
-    head(4)
+US_and_Canada %&gt;% rename(life_expectancy = lifeExp) %&gt;%
+  head(4)
 ```
 
 ```
-## # A tibble: 4 × 3
-##   country                 year Life_Expectancy
-##   &lt;fct&gt;                  &lt;int&gt;           &lt;dbl&gt;
-## 1 Bosnia and Herzegovina  1952            53.8
-## 2 Bosnia and Herzegovina  1957            58.4
-## 3 Bosnia and Herzegovina  1962            61.9
-## 4 Bosnia and Herzegovina  1967            64.8
+## # A tibble: 4 × 6
+##   country continent  year life_expectancy      pop gdpPercap
+##   &lt;fct&gt;   &lt;fct&gt;     &lt;int&gt;           &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+## 1 Canada  Americas   1952            68.8 14785584    11367.
+## 2 Canada  Americas   1957            70.0 17010154    12490.
+## 3 Canada  Americas   1962            71.3 18985849    13462.
+## 4 Canada  Americas   1967            72.1 20819767    16077.
 ```
-
-(NOTE: I did *not* re-save the object Yugoslavia, so the name change is *not* permanent!)
-
----
-## Column Naming Practices
-
-* *Good* column names are self-describing. Don't use inscrutable abbreviations to save typing, since RStudio can autocomplete.
 
 --
 
-* *Valid* column names can contain upper or lowercase letters, numbers, periods, and underscores. They must start with a letter or period and not be a special reserved word (e.g. `TRUE`, `if`).
+(NOTE 1: I did *not* re-save the object `US_and_Canada`, so the name change is *not* permanent!)
 
---
-
-* Names are case-sensitive: `Year` and `year` are not the same thing!
-
---
-
-* You can include spaces if you put backticks around the name.
+(NOTE 2: I recommend **against** using spaces in a name! It makes things *really hard* sometimes!!)
 
 ---
-## Column Name with Space Example
-
-
-```r
-library(pander)
-Yugoslavia %&gt;% filter(country == "Serbia") %&gt;%
-    select(year, lifeExp) %&gt;%
-*   rename(Year = year, `Life Expectancy` = lifeExp) %&gt;%
-    head(5) %&gt;%
-    pander(style = "rmarkdown", caption = "Serbian life expectancy")
-```
-
-
-
-| Year | Life Expectancy |
-|:----:|:---------------:|
-| 1952 |       58        |
-| 1957 |      61.69      |
-| 1962 |      64.53      |
-| 1967 |      66.91      |
-| 1972 |      68.7       |
-
-Table: Serbian life expectancy
-
----
-## Create new columns
+## Create new columns: `mutate`
 
 You can add new columns to a data frame using `mutate()`. 
 
 --
 
-For example, we could add a new variable that provides the population in millions: 
+For example, perhaps we wish to state the population in millions:
+
 
 
 ```r
-Yugoslavia %&gt;% select(country, year, pop) %&gt;%
-*   mutate(pop_million = pop / 1000000) %&gt;%
+US_and_Canada %&gt;% select(country, year, pop) %&gt;%
+*   mutate(pop_millions = pop / 1000000) %&gt;%
     head(5)
 ```
 
 ```
 ## # A tibble: 5 × 4
-##   country                 year     pop pop_million
-##   &lt;fct&gt;                  &lt;int&gt;   &lt;int&gt;       &lt;dbl&gt;
-## 1 Bosnia and Herzegovina  1952 2791000        2.79
-## 2 Bosnia and Herzegovina  1957 3076000        3.08
-## 3 Bosnia and Herzegovina  1962 3349000        3.35
-## 4 Bosnia and Herzegovina  1967 3585000        3.58
-## 5 Bosnia and Herzegovina  1972 3819000        3.82
+##   country  year      pop pop_millions
+##   &lt;fct&gt;   &lt;int&gt;    &lt;int&gt;        &lt;dbl&gt;
+## 1 Canada   1952 14785584         14.8
+## 2 Canada   1957 17010154         17.0
+## 3 Canada   1962 18985849         19.0
+## 4 Canada   1967 20819767         20.8
+## 5 Canada   1972 22284500         22.3
 ```
 
-
----
-## Recoding variables
-
-We've renamed *variables*, but what about variable *values*?
-
---
-
-We can use the function `recode()` inside `mutate()`, which allows us to change specific values to others. This is best for categorical data.
-
-
-```r
-Yugoslavia %&gt;% 
-  mutate(country = recode(country, 
-*                       `Bosnia and Herzegovina`="B and H",
-                        Montenegro="M")) %&gt;%
-  distinct(country, .keep_all=TRUE)
-```
-
-```
-## # A tibble: 5 × 6
-##   country  continent  year lifeExp     pop gdpPercap
-##   &lt;fct&gt;    &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt;   &lt;int&gt;     &lt;dbl&gt;
-## 1 B and H  Europe     1952    53.8 2791000      974.
-## 2 Croatia  Europe     1952    61.2 3882229     3119.
-## 3 M        Europe     1952    59.2  413834     2648.
-## 4 Serbia   Europe     1952    58.0 6860147     3581.
-## 5 Slovenia Europe     1952    65.6 1489518     4215.
-```
-
----
-class:inverse
-
-# Check Your Understanding:
-
-Try to answer the following questions on your own, then share your solutions with a neighbor
-
-1. Sort the gapminder data by population in ascending order and print the first 5 rows. What's the country/year with the smallest population?
-
-2. Filter the gapminder data to the countries "United States and "United Kingdom". Then, recode the country values to "US" and "UK", respectively. Print the unique combinations of country and continent.
-
----
-
-# My Solution
-
-### 1: Sort by population
-
-```r
-gapminder %&gt;% arrange (pop) %&gt;%  head(5)
-```
-
-```
-## # A tibble: 5 × 6
-##   country               continent  year lifeExp   pop gdpPercap
-##   &lt;fct&gt;                 &lt;fct&gt;     &lt;int&gt;   &lt;dbl&gt; &lt;int&gt;     &lt;dbl&gt;
-## 1 Sao Tome and Principe Africa     1952    46.5 60011      880.
-## 2 Sao Tome and Principe Africa     1957    48.9 61325      861.
-## 3 Djibouti              Africa     1952    34.8 63149     2670.
-## 4 Sao Tome and Principe Africa     1962    51.9 65345     1072.
-## 5 Sao Tome and Principe Africa     1967    54.4 70787     1385.
-```
-
----
-
-# My Solution
-
-### 2: Display US and UK
-
-```r
-gapminder %&gt;% 
-  filter(country %in% c("United States","United Kingdom")) %&gt;%
-  mutate(country = recode(country,
-                          "United States" = "US",
-                          "United Kingdom"="UK")) %&gt;%
-  distinct(country,continent)
-```
-
-```
-## # A tibble: 2 × 2
-##   country continent
-##   &lt;fct&gt;   &lt;fct&gt;    
-## 1 UK      Europe   
-## 2 US      Americas
-```
 
 ---
 class: inverse
 
-# Summarizing data
+# 4. Summarizing data
 
-1. `summarize()`
-3. `group_by()`
++ `summarize()`
++ `group_by()`
 
 ---
-## Summarizing data
+## Summarizing data: `summarize`
 
-**`summarize()`** takes your column(s) of data and computes something using every row: 
+**`summarize()`** calculates summaries of variables in your data:
 
-* Count how many rows there are
+* Count the number of rows
 * Calculate the mean
-* Compute the sum
-* Obtain a minimum or maximum value
+* Calculate the sum
+* Find the minimum or maximum value
 
 You can use any function inside `summarize()` that aggregates *multiple values* into a *single value* (like `sd()`, `mean()`, or `max()`).
 
 ---
 ## `summarize()` Example
 
-For the year 1982, let's get the number of observations, total population, mean life expectancy, and range of life expectancy for former Yugoslavian countries.
+For the year 1982, let's summarize some values in `gapminder`
 
 
 ```r
-Yugoslavia %&gt;% filter(year == 1982) %&gt;%
-    summarize(n_obs          = n(),
-              total_pop      = sum(pop),
-              mean_life_exp  = mean(lifeExp),
-              range_life_exp = max(lifeExp) - min(lifeExp))
+gapminder %&gt;% filter(year == 1982) %&gt;%
+  summarize(number_observations = n(),
+            max_lifeexp = max(lifeExp),
+            mean_pop = mean(pop),
+            sd_pop = sd(pop))
 ```
 
 ```
 ## # A tibble: 1 × 4
-##   n_obs total_pop mean_life_exp range_life_exp
-##   &lt;int&gt;     &lt;int&gt;         &lt;dbl&gt;          &lt;dbl&gt;
-## 1     5  20042685          71.3           3.94
+##   number_observations max_lifeexp  mean_pop     sd_pop
+##                 &lt;int&gt;       &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
+## 1                 142        77.1 30207302. 105098650.
 ```
 
-These new variables are calculated using *all of the rows* in `Yugoslavia`
-
 ---
-## Summarizing data by groups
+## Summarizing data by groups: `group_by`
 
-What if we want to summarize data by category? For example, what's the population of countries in former Yugoslavia by year?
+What if we want to summarize data by category? Use `group_by` **and** `summarize`
 
 --
-
-We can do this by applying the function `group_by()` and then `summarize()`.
 
 Functions after `group_by()` are computed *within each group* as defined by variables given, rather than over all rows at once.
 
@@ -673,92 +550,36 @@ Functions after `group_by()` are computed *within each group* as defined by vari
 
 
 ```r
-Yugoslavia %&gt;%
-* group_by(year) %&gt;%
-  summarize(num_countries     = n_distinct(country),
-            total_pop         = sum(pop)) %&gt;%
-  head(5)
+*US_and_Canada %&gt;% group_by(year) %&gt;%
+* summarize(total_pop = sum(pop)) %&gt;%
+  head(4)
 ```
 
 ```
-## # A tibble: 5 × 3
-##    year num_countries total_pop
-##   &lt;int&gt;         &lt;int&gt;     &lt;int&gt;
-## 1  1952             5  15436728
-## 2  1957             5  16314276
-## 3  1962             5  17099107
-## 4  1967             5  17878535
-## 5  1972             5  18579786
+## # A tibble: 4 × 2
+##    year total_pop
+##   &lt;int&gt;     &lt;int&gt;
+## 1  1952 172338584
+## 2  1957 188994154
+## 3  1962 205523849
+## 4  1967 219531767
 ```
 
 Because we did `group_by()` with `year` then used `summarize()`, we get *one row per value of `year`*!
 
-Each value of year is its own **group**!
 
 ---
 class:inverse
 
-# Check Your Understanding:
+# 5. Merging together data
 
-Try to answer the following questions on your own, then share your solutions with a neighbor.
-
-1. Calculate the mean GDP for Canada, United States, and Mexico between 2000 and 2010. *HINT: Filter the data based on countries and years, then group the data by country, and then summarize.*
-
-2. Plot the mean GDP for each country during the decade 2000-2010 using `ggplot`. Try to make sure the axis labels and limits look nice, and add a title. 
++ `left_join()`
++ `full_join()`
 
 ---
+## Why merge?!
 
-# My Solution
-
-### 1: Mean GDP by Country in North America, 2000-2010.
-
-```r
-meanGDP_2000s &lt;- gapminder %&gt;% 
-  filter(country %in% c("Canada","United States","Mexico"), 
-         year &gt; 2000 &amp; year &lt;= 2010) %&gt;% 
-  group_by(country) %&gt;%
-  summarize(meanGDP = mean(gdpPercap))
-meanGDP_2000s
-```
-
-```
-## # A tibble: 3 × 2
-##   country       meanGDP
-##   &lt;fct&gt;           &lt;dbl&gt;
-## 1 Canada         34824.
-## 2 Mexico         11360.
-## 3 United States  41024.
-```
-
----
-
-# My Solution
-
-### 2: Plot the data
-
-.smallish[
-
-```r
-library(ggplot2)
-ggplot(meanGDP_2000s,aes(country,meanGDP)) +geom_col() + 
-  xlab("Country") + ylab("Mean GDP") + ylim(c(0,45000)) + 
-  ggtitle("Average GDP by Country (2000-2010)",subtitle = "North America")
-```
-
-![](CSSS508_Lecture3_dplyr_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
-]
-
----
-class: inverse
-##Joining (Merging) Data
-
-1. `left_join()`
-3. `full_join()`
-
----
-## When Do We Need to Join Tables?
-
-In practice, you may need to collect data from different sources. Merging those datasets can be tricky!
+In practice, we often collect data from different sources. To analyze the data, we usually must first combine (merge) them.
 
 --
 
@@ -767,76 +588,63 @@ For example, imagine you would like to study county-level patterns with respect 
 * County level age data from the US Census, and 
 * County level grocery spending data from the US Department of Agriculture
 
-Solution: Join the datasets!
+--
+
+Merge the data!!
 
 
 ---
-## Joining in Concept
+## Merging in Concept
 
-When merging dataframes `A` and `B`, we think about:
-
-* Which **rows** to keep from each data frame?
-
-  + *Example: One row for each county*
-
---
-
-* Which **columns** to keep from each data frame?
-
-  + *Example: County name, mean age, mean grocery spending*
+When merging datasets `A` and `B`, ask yourself the following two questions:
   
 --
 
-* Which variables determine whether rows **match**?
+* Which **rows** do I want to keep?
 
-  + *Example: County name*
+  + All rows in `A`?
+  + All rows in both `A` and `B`?
+  
+--
+
+* How do my datasets **connect**?
+
+  + Is there a specific variable they have in common?
+  + Multiple variables they have in common?
+  
 
 ---
-## Join Types: Rows and columns kept
+## Which Rows to Keep:
+
 
 We'll focus on two types of joins:&lt;sup&gt;1&lt;/sup&gt;...
 
-* `A %&gt;% left_join(B)`: keep all rows from `A`, matched with `B` wherever possible (`NA` when not), keep columns from both `A` and `B`
+* `A %&gt;% left_join(B)`: keeps `A` and adds variables from `B` after matching.
 
-* `A %&gt;% full_join(B)`: keep all rows from both `A` and `B`, matched wherever possible (`NA` when not), keep columns from both `A` and `B`
+* `A %&gt;% full_join(B)`: keeps all of `A` and `B`, but combines rows when possible.
 
+.footnote[[1] Other types include `right_join`, `inner_join`, `semi_join`, and `anti_join`, but we won't study those here.]
 
-.pull-right[.footnote[[1] Other types include `right_join`, `inner_join`, `semi_join`, and `anti_join`, but we won't study those here.]]
 
 ---
 ## Matching Criteria
 
-We say rows *match* when they have some columns containing the same value. We list these in a `by = ` argument to the join.
+We have to tell R **which variables** to use when merging datasets! Rows are matched when the values in matching variables are equivalent.
+
 
 --
 
-Matching Behavior:
-
-* `by = c("var1", "var2")`: Match on identical values of `var1` and `var2` in both `A` and `B`.
+* `by = c("County")`: Both datasets have a `County` variable, match on this!
 
 --
 
-* `by = c("A_var1" = "B_var1", "A_var2" = "B_var2")`: Match identical values of `A_var1` variable in `A` to `B_var1` variable in `B`, and `A_var2` variable in `A` to `B_var2` variable in `B`.
+* `by = c("CountyName" = "County_Name")`: Match `CountyName` in `A` with `County_Name` in `B`
 
---
-
-* If you don't include `by`: Match using all variables in `A` and `B` that have identical names.
-
-Note: If there are multiple matches, you'll get *one row for each possible combination*.
 
 ---
-## `nycflights13` Data
+## Example: `nycflights13` Data
 
-We'll use data in the [`nycflights13` package](https://cran.r-project.org/web/packages/nycflights13/nycflights13.pdf). Install and load it:
-.smallish[
-
-```r
-# install.packages("nycflights13") # Uncomment to run
-library(nycflights13)
-```
-]
-
-It includes five data frames, some of which contain missing data (`NA`):
+The `nycflights13` package includes five data frames, some of which contain missing data (`NA`):
 
 * `flights`: flights leaving JFK, LGA, or EWR in 2013
 * `airlines`: airline abbreviations
@@ -844,28 +652,58 @@ It includes five data frames, some of which contain missing data (`NA`):
 * `planes`: airplane metadata
 * `weather`: hourly weather data for JFK, LGA, and EWR
 
-Note these are *separate data frames*, each needing to be *loaded separately*:
 .smallish[
 
 ```r
-data(flights)
-data(airlines)
-data(airports)
-data(planes)
-data(weather)
+# install.packages("nycflights13")
+library(nycflights13)
 ```
 ]
+
 ---
-## Join Example #1
+## Join Example 1
 
-The "flights" data has carrier abbreviations, but not full names. That information is in the "airlines" data. Let's join them together!
-
---
+`flights` has one row per flight, with abbreviated airline names.
 
 
 ```r
-flights %&gt;% left_join(airlines, by = "carrier") %&gt;%
-  select(flight,origin,dest,carrier,name) %&gt;%
+flights %&gt;% select(flight,origin,dest,carrier) %&gt;% head(2)
+```
+
+```
+## # A tibble: 2 × 4
+##   flight origin dest  carrier
+##    &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;  
+## 1   1545 EWR    IAH   UA     
+## 2   1714 LGA    IAH   UA
+```
+
+--
+
+`airlines` has one row per airline, with airline abbreviations *and* full names
+
+
+```r
+airlines %&gt;% head(2)
+```
+
+```
+## # A tibble: 2 × 2
+##   carrier name                  
+##   &lt;chr&gt;   &lt;chr&gt;                 
+## 1 9E      Endeavor Air Inc.     
+## 2 AA      American Airlines Inc.
+```
+
+---
+## Join Example 1 (continued)
+
+Let's left join `flights` with `airlines` to add full airline name to each flight record!
+
+
+```r
+flights %&gt;% select(flight,origin,dest,carrier) %&gt;%
+* left_join(airlines, by = "carrier")  %&gt;%
   head(5)
 ```
 
@@ -879,137 +717,235 @@ flights %&gt;% left_join(airlines, by = "carrier") %&gt;%
 ## 4    725 JFK    BQN   B6      JetBlue Airways       
 ## 5    461 LGA    ATL   DL      Delta Air Lines Inc.
 ```
-
 We now have one row per flight, with both carrier abbreviations and full names!
-
----
-## Join Example #1 (cont.)
-
-Which airlines had the most flights to Seattle?
-
---
-
-
-```r
-flights %&gt;% left_join(airlines, by = "carrier") %&gt;%
-  filter(dest == "SEA") %&gt;%
-  group_by(name) %&gt;% 
-  summarize(num_flights = n())
-```
-
-```
-## # A tibble: 5 × 2
-##   name                   num_flights
-##   &lt;chr&gt;                        &lt;int&gt;
-## 1 Alaska Airlines Inc.           714
-## 2 American Airlines Inc.         365
-## 3 Delta Air Lines Inc.          1213
-## 4 JetBlue Airways                514
-## 5 United Air Lines Inc.         1117
-```
-
 
 ---
 ## Join Example #2
 
-The "flights" data doesn't has plane manufacturer information, but "manufacturer" does. Both have the variable "tailnum". Let's join them together!
-
---
-
+`flights` also includes a `tailnum` variable for each plane's tail number.
 
 
 ```r
-flights %&gt;% left_join(planes, by = "tailnum") %&gt;%
-  select(flight,origin,dest,tailnum,manufacturer) %&gt;%
+flights %&gt;% select(flight,origin,dest,tailnum) %&gt;% head(2)
+```
+
+```
+## # A tibble: 2 × 4
+##   flight origin dest  tailnum
+##    &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;  
+## 1   1545 EWR    IAH   N14228 
+## 2   1714 LGA    IAH   N24211
+```
+
+--
+
+`planes` includes a row for each plane type, including the manufacturer.
+
+
+```r
+planes %&gt;% select(tailnum,year,manufacturer,model) %&gt;% head(2)
+```
+
+```
+## # A tibble: 2 × 4
+##   tailnum  year manufacturer     model    
+##   &lt;chr&gt;   &lt;int&gt; &lt;chr&gt;            &lt;chr&gt;    
+## 1 N10156   2004 EMBRAER          EMB-145XR
+## 2 N102UW   1998 AIRBUS INDUSTRIE A320-214
+```
+
+---
+## Join Example 2 (continued)
+
+Let's left join `flights` with `planes` to add manufacture to each flight record!
+
+
+```r
+flights %&gt;% select(flight,origin,dest,tailnum) %&gt;%
+* left_join(planes, by = "tailnum")  %&gt;%
+  head(5)
+```
+
+```
+## # A tibble: 5 × 12
+##   flight origin dest  tailnum  year type          manuf…¹ model engines seats speed engine
+##    &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;int&gt; &lt;chr&gt;         &lt;chr&gt;   &lt;chr&gt;   &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;chr&gt; 
+## 1   1545 EWR    IAH   N14228   1999 Fixed wing m… BOEING  737-…       2   149    NA Turbo…
+## 2   1714 LGA    IAH   N24211   1998 Fixed wing m… BOEING  737-…       2   149    NA Turbo…
+## 3   1141 JFK    MIA   N619AA   1990 Fixed wing m… BOEING  757-…       2   178    NA Turbo…
+## 4    725 JFK    BQN   N804JB   2012 Fixed wing m… AIRBUS  A320…       2   200    NA Turbo…
+## 5    461 LGA    ATL   N668DN   1991 Fixed wing m… BOEING  757-…       2   178    NA Turbo…
+## # … with abbreviated variable name ¹​manufacturer
+```
+A bunch of columns from `planes` are now in the dataset!
+
+---
+## Join Example 2 (continued)
+
+Let's remove some of the "spare" columns
+
+
+```r
+flights %&gt;% select(flight,origin,dest,tailnum) %&gt;%
+  left_join(planes, by = "tailnum")  %&gt;% 
+* select(flight,origin,dest,manufacturer,model) %&gt;%
   head(5)
 ```
 
 ```
 ## # A tibble: 5 × 5
-##   flight origin dest  tailnum manufacturer
-##    &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;       
-## 1   1545 EWR    IAH   N14228  BOEING      
-## 2   1714 LGA    IAH   N24211  BOEING      
-## 3   1141 JFK    MIA   N619AA  BOEING      
-## 4    725 JFK    BQN   N804JB  AIRBUS      
-## 5    461 LGA    ATL   N668DN  BOEING
+##   flight origin dest  manufacturer model   
+##    &lt;int&gt; &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;        &lt;chr&gt;   
+## 1   1545 EWR    IAH   BOEING       737-824 
+## 2   1714 LGA    IAH   BOEING       737-824 
+## 3   1141 JFK    MIA   BOEING       757-223 
+## 4    725 JFK    BQN   AIRBUS       A320-232
+## 5    461 LGA    ATL   BOEING       757-232
 ```
-
-We now have one row per flight, with plane manufacturer names!
-
----
-## Join Example #2 (cont.)
-
-How many flights from JFK to Seattle were made by each manufacturer?
-
---
-
-
-```r
-flights %&gt;% left_join(planes, by = "tailnum") %&gt;%
-  filter(origin == "JFK",dest == "SEA") %&gt;% 
-  group_by(manufacturer) %&gt;% 
-  summarize(count_flights = n())
-```
-
-```
-## # A tibble: 6 × 2
-##   manufacturer       count_flights
-##   &lt;chr&gt;                      &lt;int&gt;
-## 1 AIRBUS                       430
-## 2 AIRBUS INDUSTRIE              75
-## 3 BARKER JACK L                  2
-## 4 BOEING                      1211
-## 5 CIRRUS DESIGN CORP             2
-## 6 &lt;NA&gt;                         372
-```
----
-## Join Example #2 (cont.)
-
-Let's plot who manufactures the planes that flew from JFK to Seattle:
-
---
-
-.smallish[
-
-```r
-JFK_Seattle_manufacturers &lt;- flights %&gt;% left_join(planes, by = "tailnum") %&gt;%
-  filter(origin == "JFK",dest == "SEA") %&gt;% 
-  group_by(manufacturer) %&gt;% summarize(count_manufacturer = n())
-ggplot(JFK_Seattle_manufacturers,aes(manufacturer,count_manufacturer))+
-  geom_col()+xlab("Manufacturer")+ylab("Count")
-```
-
-![](CSSS508_Lecture3_dplyr_files/figure-html/unnamed-chunk-30-1.png)&lt;!-- --&gt;
-]
-
----
-## Tinkering Suggestions
-
-Some possible questions to investigate:
-
-* What are the names of the most common destination airports?
-* Which airlines fly from NYC to your home city?
-*  What is the distribution of departure times for flights leaving NYC over a 24 hour period?
-    + Are especially late or early arrivals departures to some regions or for some airlines?
-
-**Warning:** `flights` has 336776 rows, so if you do a sloppy join, you can end up with **many** matches per observation and have the data *explode* in size.
 
 ---
 class: inverse
 
+# Summary
+
+1. Logical Operators (`&amp;, |, ==, &lt;, %in%,` etc.)
+1. Subsetting (`filter, select, distinct`)
+1. Modifying (`arrange, rename, mutate`)
+1. Summarizing (`summarize, group_by`)
+1. Merging (`left_join, full_join`)
+
+Let's take a 10-minute break, then come back together to practice!
+
+---
+class:inverse
+
+# Activity
+
+1. Create a new object that contains `gapminder` (1) observations from China, India, and United States after 1980, and (2) variables corresponding to country, year, population, and life expectancy. 
+1. How many rows and columns does the object contain?
+1. Save over your object after sorting the rows by year (ascending order) and population (descending order). Print the first 6 rows.
+1. Add a new variable that contains population in billions.
+1. By year, calculate the total population (in billions) across these three countries
+1. In ggplot, create a line plot showing life expectancy over time by country. Make the plot visually appealing!
+
+---
+
+# My Answers
+
+Question 1:
+
+
+```r
+subset_gapminder &lt;- gapminder %&gt;% 
+  filter(country %in% c("China","India","United States"), 
+         year &gt;1980 ) %&gt;%
+  select(country, year, pop, lifeExp)
+```
+
+--
+
+Question 2: 
+
+```r
+c(nrow(subset_gapminder),ncol(subset_gapminder))
+```
+
+```
+## [1] 18  4
+```
+
+
+---
+
+# My Answers
+
+Question 3:
+
+```r
+subset_gapminder &lt;- subset_gapminder %&gt;% arrange(year,desc(pop))
+subset_gapminder %&gt;% head(6)
+```
+
+```
+## # A tibble: 6 × 4
+##   country        year        pop lifeExp
+##   &lt;fct&gt;         &lt;int&gt;      &lt;int&gt;   &lt;dbl&gt;
+## 1 China          1982 1000281000    65.5
+## 2 India          1982  708000000    56.6
+## 3 United States  1982  232187835    74.6
+## 4 China          1987 1084035000    67.3
+## 5 India          1987  788000000    58.6
+## 6 United States  1987  242803533    75.0
+```
+
+--
+
+Question 4:
+
+```r
+subset_gapminder &lt;- subset_gapminder %&gt;% 
+  mutate(pop_billions = pop/1000000000)
+```
+
+---
+
+# My Answers
+
+Question 5:
+
+```r
+subset_gapminder %&gt;% group_by(year) %&gt;% 
+  summarize(TotalPop_Billions = sum(pop_billions))
+```
+
+```
+## # A tibble: 6 × 2
+##    year TotalPop_Billions
+##   &lt;int&gt;             &lt;dbl&gt;
+## 1  1982              1.94
+## 2  1987              2.11
+## 3  1992              2.29
+## 4  1997              2.46
+## 5  2002              2.60
+## 6  2007              2.73
+```
+
+---
+
+# My Answers
+
+.small[
+Question 6
+
+```r
+library(ggplot2)
+ggplot(subset_gapminder,aes(year,lifeExp,color=country,group=country))+
+  theme_bw(base_size=20)+geom_point()+geom_line()+
+  xlab("Year")+ylab("Life Expectancy (years)")+
+  ggtitle("Life Expectancy (1982-2007)","China, India, and United States")+
+  scale_x_continuous(breaks=c(1982,1987,1992,1997,2002,2007),minor_breaks = c())+
+  ylim(c(50,80))+scale_color_discrete(name="Country")+theme(legend.position = "bottom")
+```
+
+![](CSSS508_Lecture3_dplyr_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+]
+
+---
+
 # Homework 3
 
-Pick something to look at in the `nycflights13` data and write up a .Rmd file showing your investigation. Upload both the .Rmd file and the .html file to Canvas. 
+.small[
+Create an RMarkdown file (from scratch this time!) in which you answer each of the following questions. Be sure to display **all your code in the knitted** version (use throughout `echo=TRUE`). 
 
-You must:
+Remember, the package `nycflights13` contains data on flights originating in NYC during the year 2013. There are three airports servicing NYC: JFK, LGA ("LaGuardia"), and EWR ("Newark").
 
-1. Use each of the following functions at least once: `mutate()`, `summarize()`, `group_by()`, and `left_join()`. 
-2. Include at least one nicely formatted plot (`ggplot2`) and at least one nicely formatted table (`pander`). In plots and tables, use "nice" variable names (try out spaces!) and rounded values (&lt;= 3 digits).
-3. Briefly write down your question, observations from your analyses, and a summary of your work in words.
+1. Choose an airport outside New York, and count how many flights went to that airport from NYC in 2013. How many of those flights started at JFK, LGA, and EWR? (Hint: Use `filter`, `group_by`, and `summarize`)
+1. The variable `arr_delay` contains arrival delays in minutes (negative values represent early arrivals). Make a `ggplot` histogram displaying arrival delays for 2013 flights from NYC to the airport you chose.
+1. Use `left_join` to add weather data at departure to the subsetted data (Hint 1: Match on `origin`, `year`, `month`, `day`, **and** `hour`!!). Calculate the mean temperature by month at departure (`temp`) across all flights (Hint 2: Use `mean(temp,na.rm=T)` to have R calculate an average after ignoring missing data values).
+1. Investigate if there is a relationship between departure delay (`dep_delay`) and wind speed (`wind_speed`). Is the relationship different between JFK, LGA, and EWR? I suggest answering this question by making a plot and writing down a one-sentence interpretation.
 
-
-This time, *include all your code in your output document* (`echo=TRUE`), using comments and line breaks separating commands so that it is clear to a peer what you are doing (or trying to do!).
+As always, submit both the .Rmd and knitted .html to Canvas.
+]
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
