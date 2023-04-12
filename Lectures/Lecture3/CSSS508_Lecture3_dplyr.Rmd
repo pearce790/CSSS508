@@ -151,7 +151,7 @@ class: inverse
 
 Today, we'll use tools from the `dplyr` package to manipulate data! 
 
-+ Like `ggplot2`, `dplyr` is part of the **Tidyverse**, a modern collection of data science tools introduced by Hadley Wickham.
++ Like `ggplot2`, `dplyr` is part of the *Tidyverse*, a modern collection of data science tools introduced by Hadley Wickham.
 
 + You can read more about the tidyverse on its [website](http://tidyverse.org/).
 
