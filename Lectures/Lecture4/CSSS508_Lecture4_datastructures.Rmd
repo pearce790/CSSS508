@@ -2,7 +2,7 @@
 title: "CSSS 508, Lecture 4"
 subtitle: "Data Structures"
 author: "Michael Pearce<br>(based on slides from Chuck Lanfear)"
-date: "October 20, 2022"
+date: "April 19, 2023"
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -22,7 +22,6 @@ library(dplyr)
 ```
 
 
-
 # Preamble: R Data Structures
 
 So far, we've been manipulating, summarizing, and making visuals out of data. That's pretty great!!
@@ -38,10 +37,11 @@ class: inverse
 
 Last time, we learned about,
 
+1. Logical conditions
 1. Subsetting data
 1. Modifying data 
 1. Summarizing data
-1. Joining (merging) data
+1. Merging together data
 
 --
 
@@ -51,7 +51,6 @@ Today, we will cover,
 1. Vectors
 1. Matrices
 1. Lists
-1. Data Frames and Tibbles
 
 ---
 class: inverse
@@ -130,15 +129,20 @@ mean(my_booleans)
 ---
 ## Missing or Infinite Data Types
 
-Sometimes, your data may be missing or infinite (basically, not one of the types I just showed):
+Your data may otherwise be missing or infinite:
+
 
 1. **Not Applicable** `NA` 
 
     + Used when data simply is missing or "not available"
+    
+--
 
 2. **Not a Number** `NaN`
 
     + Used when you try to perform a bad math operation, e.g., `0 / 0 `
+    
+--
 
 3. **Infinite** `Inf`, `-Inf`
 
@@ -174,42 +178,6 @@ c(is.infinite(-Inf),  is.na(NA),  is.nan(NaN))
 
 Warning: `NA` is not `NaN`!!!
 
----
-class:inverse
-
-## Mini-Check
-
-In each case, what will R return?
-
-+ `is.numeric(3.14)`
-
---
-
-    + `TRUE`
-
---
-
-+ `is.numeric(pi)`
-
---
-
-    + `TRUE`
-
---
-
-+ `is.logical(FALSE)`
-
---
-
-    + `TRUE`
-
---
-
-+ `is.nan(NA)`
-
---
-
-    + `FALSE`
 
 ---
 class: inverse
@@ -247,9 +215,19 @@ If you mix character and numeric data, it will convert everything to *characters
 There are shortcuts for generating numeric vectors:
 ```{r}
 1:10
+```
+
+--
+
+```{r}
 seq(-3, 6, by = 1.75) # Sequence from -3 to 6, increments of 1.75
-rep(c(-1, 0, 1), times = 3) # Repeat c(-1,0,1) 3 times
-rep(c(-1, 0, 1), each = 3) # Repeat each element 3 times
+```
+
+--
+
+```{r}
+rep(c(0, 1), times = 3) # Repeat c(0,1) 3 times
+rep(c(0, 1), each = 3) # Repeat each element 3 times
 ```
 
 ---
@@ -286,7 +264,7 @@ A special case of recycling involves arithmetic with **scalars** (a single numbe
 Recycling doesn't work so well with vectors of incommensurate lengths:
 
 ```{r, warning=TRUE}
-c(1, 2, 3, 4) + c(0.5, 1.5, 2.5)
+c(1,2) + c(100,200,300)
 ```
 
 Be careful!!
@@ -301,7 +279,7 @@ $$z_i = \frac{x_i - \text{mean}(x)}{\text{SD}(x)}$$
 --
 
 ```{r}
-x <- c(97, 68, 75, 77, 69, 81, 80, 92, 50, 34, 66, 83, 62)
+x <- c(97, 68, 75, 77, 69, 81)
 z <- (x - mean(x)) / sd(x)
 round(z, 2)
 ```
@@ -343,33 +321,6 @@ first_names[c(1,2)]
 first_names[-3]
 ```
 
----
-class:inverse
-## Mini-Check
-
-
-+ What does `sum(c(1,2,NA))` output?
-
---
-
-    + `NA`. The code `sum(c(1,2,NA),na.rm=TRUE)` would output `3`.
-
---
-
-+ What does `rep(c(0,1),times=2)` output?
-
---
-
-    + `c(0,1,0,1)`
-
---
-
-+ I want to get the first and second elements of my vector, `a_vector`. What's wrong with the code `a_vector[1,2]` ?
-
---
-
-    + `a_vector[c(1,2)]`
-
 
 
 ---
@@ -385,7 +336,8 @@ class: inverse
 R fills in a matrix column-by-column (**not** row-by-row!)
 
 ```{r}
-(a_matrix <- matrix(first_names, nrow=2, ncol=3))
+a_matrix <- matrix(first_names, nrow=2, ncol=3)
+a_matrix
 ```
 
 ---
@@ -394,8 +346,10 @@ R fills in a matrix column-by-column (**not** row-by-row!)
 We can also make matrices by *binding* vectors together with `rbind()` (**r**ow **bind**) and `cbind()` (**c**olumn **bind**).
 
 ```{r}
-(b_matrix <- cbind(c(1, 2), c(3, 4), c(5, 6)))
-(c_matrix <- rbind(c(1, 2, 3), c(4, 5, 6)))
+b_matrix <- cbind(c(1, 2), c(3, 4), c(5, 6))
+b_matrix
+c_matrix <- rbind(c(1, 2, 3), c(4, 5, 6))
+c_matrix
 ```
 
 ---
@@ -440,7 +394,8 @@ a_matrix[, 1, drop=FALSE]
 Matrices can contain numeric, integer, factor, character, or logical. But just like vectors, *all elements must be the same data type*.
 
 ```{r}
-(bad_matrix <- cbind(1:2, c("Michael","Pearce")))
+bad_matrix <- cbind(1:2, c("Michael","Pearce"))
+bad_matrix
 ```
 
 In this case, everything was converted to characters!
@@ -472,7 +427,8 @@ matrix(c(2,4,6,8),nrow=2,ncol=2) / matrix(c(2,1,3,1),nrow=2,ncol=2)
 To do matrix transpositions, use `t()`.
 
 ```{r}
-(e_matrix <- t(c_matrix))
+e_matrix <- t(c_matrix)
+e_matrix
 ```
 
 --
@@ -480,7 +436,8 @@ To do matrix transpositions, use `t()`.
 To do actual matrix multiplication (not entry-wise), use `%*%`.
 
 ```{r}
-(f_matrix <- c_matrix %*% e_matrix)
+f_matrix <- c_matrix %*% e_matrix
+f_matrix
 ```
 
 ---
@@ -489,44 +446,38 @@ To do actual matrix multiplication (not entry-wise), use `%*%`.
 To invert an invertible square matrix, use `solve()`.
 
 ```{r}
-(g_matrix <- solve(f_matrix))
+g_matrix <- solve(f_matrix)
+g_matrix
 ```
 
 ---
-class:inverse
+## Matrices vs. data.frames and tibbles
 
-## Check Your Understanding
+All of these structures display data in two dimensions
 
-+ Write code to create the following matrix:
++ `matrix`
 
-```{r echo=FALSE}
-matrix(c("A","B","C","D","E","F"),nrow=2,byrow=TRUE)
-```
-
-+ Write a line of code to extract the second column. Ensure the output is still a *matrix*.
-
-```{r echo=FALSE}
-matrix(c("A","B","C","D","E","F"),nrow=2,byrow=TRUE)[,2,drop=FALSE]
-```
-
----
-
-## My Answers
-
-+ Write code to create the following matrix:
-
-```{r eval=FALSE}
-mat_test <- matrix(c("A","B","C","D","E","F"),nrow=2,byrow=TRUE)
-```
+    + Base R
+    + Single data type allowed
 
 --
 
-+ Write a line of code to extract the second column. Ensure the output is still a *matrix*.
++ `data.frame`
 
-```{r eval=FALSE}
-mat_test[,2,drop=FALSE]
-```
+    + Base R (default for data storage)
+    + Stores multiple data types
+    
+--
 
++ `tibbles`
+
+    + tidyverse
+    + Stores multiple data types
+    + Displays nicely
+
+--
+
+In practice, data.frames and tibbles are very similar!
 
 ---
 class: inverse
@@ -537,13 +488,13 @@ class: inverse
 
 **Lists** are objects that can store multiple types of data.
 
-.small[
+
 ```{r}
 my_list <- list("first_thing"  = 1:5,
                  "second_thing" = matrix(8:11, nrow = 2))
 my_list
 ```
-]
+
 
 ---
 ## Accessing List Elements
@@ -597,61 +548,131 @@ lm_output$coefficients
 
 
 
+
 ---
 class:inverse
 
-# 5. Matrices, Data Frames, and Tibbles
+# Summary
 
-+ `matrix`
-+ `data.frame`
-+ `tibble`
+1. Types of Data: `numeric`, `character`, `factor`, `logical`, `NA`, `NaN`, `Inf`
+1. Vectors: `c()`
+1. Matrices: `matrix`, `data.frame`, `tibble`
+1. Lists: `list`
 
+*Let's take a 10 minute break, then come back together for some practice!*
 
 ---
-## Matrices, Data Frames, and Tibbles
+class:inverse
 
-All of these structures display data in two dimensions
+## Mini-Check 1: Types of Data
 
-+ `matrix`
+In each case, what will R return?
 
-    + Base R
-    + Single data type allowed
++ `is.numeric(3.14)`
 
 --
 
-+ `data.frame`
+    + `TRUE`
 
-    + Base R (default for data storage)
-    + Stores multiple data types
+--
+
++ `is.numeric(pi)`
+
+--
+
+    + `TRUE`
+
+--
+
++ `is.logical(FALSE)`
+
+--
+
+    + `TRUE`
+
+--
+
++ `is.nan(NA)`
+
+--
+
+    + `FALSE`
     
+---
+class:inverse
+
+## Mini-Check 2: Vectors
+
+
++ What does `sum(c(1,2,NA))` output?
+
 --
 
-+ `tibbles`
-
-    + tidyverse
-    + Stores multiple data types
-    + Displays nicely
+    + `NA`. The code `sum(c(1,2,NA),na.rm=TRUE)` would output `3`.
 
 --
 
-In practice, data.frames and tibbles are very similar!
++ What does `rep(c(0,1),times=2)` output?
+
+--
+
+    + `c(0,1,0,1)`
+
+--
+
++ I want to get the first and second elements of my vector, `a_vector`. What's wrong with the code `a_vector[1,2]` ?
+
+--
+
+    + `a_vector[c(1,2)]`
+
 
 ---
 class:inverse
 
-## Check Your Understanding
+## Activity: Matrices and Lists
 
-1. Complete the following sentence: "Lists are to vectors, what data frames are to..."
+1\. Write code to create the following matrix:
+```{r echo=FALSE}
+matrix(c("A","B","C","D","E","F"),nrow=2,byrow=TRUE)
+```
 
-1. Create a list that contains 3 elements: "ten_numbers" (integers between 1 and 10), "my_name" (your name as a character), and "booleans" (vector of `TRUE` and `FALSE` alternating three times).
+2\. Write a line of code to extract the second column. Ensure the output is still a *matrix*.
+```{r echo=FALSE}
+matrix(c("A","B","C","D","E","F"),nrow=2,byrow=TRUE)[,2,drop=FALSE]
+```
+
+3\. Complete the following sentence: "Lists are to vectors, what data frames are to..."
+
+4\. Create a list that contains 3 elements: "ten_numbers" (integers between 1 and 10), "my_name" (your name as a character), and "booleans" (vector of `TRUE` and `FALSE` alternating three times).
 
 ---
 
-## My Solution
+## My Answers
 
-1. Complete the following sentence: "Lists are to vectors, what data frames are to...**Matrices!**" Lists and data frames can contain mixed data types, while vectors and matrices can only contain one data type.
+1\. Write code to create the following matrix:
 
-1. Create a list that contains 3 elements:
+```{r eval=FALSE}
+mat_test <- matrix(c("A","B","C","D","E","F"),nrow=2,byrow=TRUE)
+```
+
+--
+
+2\. Write a line of code to extract the second column. Ensure the output is still a *matrix*.
+
+```{r eval=FALSE}
+mat_test[,2,drop=FALSE]
+```
+
+---
+
+## My Answers (cont.)
+
+3\. Complete the following sentence: "Lists are to vectors, what data frames are to...**Matrices!**" *Lists and data frames can contain mixed data types, while vectors and matrices can only contain one data type.*
+
+--
+
+4\. Create a list that contains 3 elements:
 
 ```{r}
 my_new_list <- list("ten_numbers"=1:10,
@@ -670,7 +691,7 @@ For Homework 4, you will fill in an RMarkdown template on my website that walks 
 
 + *Knit after entering each answer!!*  If you get an error, check to see if undoing your last edit solves the problem. Coding an assignment to handle all possible mistakes is really hard! 
 
-+ This assignment is also long, so *start early*.
++ This assignment is *long*, so *start early*.
 
 On the due date, I will provide a key for the written answers. You will grade those answers as part of your peer review. In addition, you'll be asked to comment on the style of your peer's code and what you yourself did similarly/different. Please remember to provide a numerical grade (0-3), as always.
 

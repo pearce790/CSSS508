@@ -2,7 +2,7 @@
 title: "CSSS 508, Lecture 3"
 subtitle: "Manipulating and Summarizing Data"
 author: "Michael Pearce<br>(based on slides from Chuck Lanfear)"
-date: "April 12, 2022"
+date: "April 12, 2023"
 output:
   xaringan::moon_reader:
     lib_dir: libs
