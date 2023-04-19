@@ -739,6 +739,26 @@ All of these structures display data in two dimensions
 In practice, data.frames and tibbles are very similar!
 
 ---
+## Creating `data.frame`s
+
+We create a `data.frame` by specifying the columns separately:
+
+
+```r
+data.frame(Column1Name = c(1,2,3),
+           Column2Name = c("A","B","C"))
+```
+
+```
+##   Column1Name Column2Name
+## 1           1           A
+## 2           2           B
+## 3           3           C
+```
+
+*Note:* `data.frame`s allow for **mixed data types!**
+
+---
 class: inverse
 # 4. Lists
 

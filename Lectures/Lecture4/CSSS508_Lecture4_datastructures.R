@@ -110,6 +110,9 @@ f_matrix
 g_matrix <- solve(f_matrix)
 g_matrix
 
+data.frame(Column1Name = c(1,2,3),
+           Column2Name = c("A","B","C"))
+
 my_list <- list("first_thing"  = 1:5,
                  "second_thing" = matrix(8:11, nrow = 2))
 my_list
