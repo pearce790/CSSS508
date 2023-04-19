@@ -1,0 +1,72 @@
+---
+title: "Homework 3"
+author: "Michael Pearce"
+date: "`r Sys.time()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+We begin the assignment by loading the packages `ggplot2`, `dplyr`, and `nycflights13`
+
+```{r warning=FALSE,message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(nycflights13)
+```
+
+## Question 1
+
+*Choose an airport outside New York, and count how many flights went to that airport from NYC in 2013. How many of those flights started at JFK, LGA, and EWR? (Hint: Use `filter`, `group_by`, and `summarize`)*
+
+I chose my hometown airport of Minneapolis-St.Paul International Airport, abbreviated MSP. Answers and code are below.
+
+```{r}
+MSP <- flights %>% filter(dest == "MSP")
+MSP %>% summarize(num_flights = n())
+MSP %>% group_by(origin) %>% summarize(num_flights = n())
+```
+
+## Question 2
+
+*The variable `arr_delay` contains arrival delays in minutes (negative values represent early arrivals). Make a `ggplot` histogram displaying arrival delays for 2013 flights from NYC to the airport you chose.*
+
+```{r warning=FALSE}
+ggplot(MSP,aes(x=arr_delay))+
+  theme_bw(base_size=20)+
+  geom_histogram(bins=30)+
+  xlab("Arrival Delay (minutes)")+ylab("Frequency (Number of Flights)")+
+  ggtitle("Histogram of Flight Delays to MSP","Flights in 2013 Starting in NYC")
+```
+
+
+## Question 3
+
+*Use `left_join` to add weather data at departure to the subsetted data (Hint 1: Match on `origin`, `year`, `month`, `day`, and `hour`!!). Calculate the mean temperature by month at departure (`temp`) across all flights (Hint 2: Use `mean(temp,na.rm=T)` to have R calculate an average after ignoring missing data values).*
+
+```{r}
+MSP_weather <- MSP %>% left_join(weather,by=c("origin","year","month","day","hour"))
+MSP_weather %>% group_by(month) %>% summarize(Average_Temp = mean(temp,na.rm=T))
+```
+
+## Question 4
+
+
+*Investigate if there is a relationship between departure delay (`dep_delay`) and wind speed (`wind_speed`). Is the relationship different between JFK, LGA, and EWR? I suggest answering this question by making a plot and writing down a one-sentence interpretation.*
+
+```{r warning=FALSE}
+ggplot(MSP_weather,aes(wind_speed,dep_delay,color=origin))+
+  theme_bw(base_size=20)+
+  geom_point(alpha=.8)+
+  xlab("Wind Speed")+ylab("Departure Delay (minutes)")+
+  ggtitle("Departure Delay vs. Wind Speed","Flights from NYC to MSP in 2013")+
+  scale_color_discrete(name="Origin")+
+  theme(legend.position = c(.85,.7))
+```
+
+There does not seem to be any clear pattern between departure delay and wind speed, either overall or for each NYC airport on its own.
+
