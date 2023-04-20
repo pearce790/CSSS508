@@ -9,7 +9,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="YOUR NAME" />
+<meta name="author" content="[YOUR NAME]" />
 
 
 <title>Homework 5: 2016 Elections</title>
@@ -1491,8 +1491,8 @@ border-radius: 0px;
 
 
 <h1 class="title toc-ignore">Homework 5: 2016 Elections</h1>
-<h4 class="author">YOUR NAME</h4>
-<h4 class="date">DATE</h4>
+<h4 class="author">[YOUR NAME]</h4>
+<h4 class="date">[DATE]</h4>
 
 </div>
 
@@ -1500,100 +1500,103 @@ border-radius: 0px;
 <div id="instructions" class="section level1">
 <h1>Instructions</h1>
 <blockquote>
-<p>Questions for you to answer are as quoted blocks of text. Put your
-code used to address these questions and interpretation below each
-block. Make sure your answers are NOT in block quotes like these. Load
-all libraries you want to use in the <code>setup</code> chunk; when you
-discover you want to use a library later, add it to the setup chunk at
-the top. You will turn in Part 1 for the coming week and Part 2 for the
-following week. You will upload the entire template each time, with
-whatever progress you have made.</p>
+<p>For Homework 5, you will fill out this RMarkdown template. Throughout
+the document, create code (in chunks) and write text answers (outside
+chunks) to answer the provided questions in an analysis of King County
+election data from 2016. IMPORTANT: Do NOT add any additional code
+chunks, and do NOT modify any chunk options! This week’s homework will
+become “part 1” for next week’s homework.</p>
 </blockquote>
 </div>
 <div id="homework-5" class="section level1">
 <h1>Homework 5</h1>
-<div id="getting-the-data-in" class="section level2">
-<h2>Getting the data in</h2>
+<div id="importing-the-data" class="section level2">
+<h2>Importing the Data</h2>
 <blockquote>
 <p>Download the data from <a href="https://raw.githubusercontent.com/breonh/breonh.github.io/main/csss_508/homework/homework_5/king_county_elections_2016.txt" class="uri">https://raw.githubusercontent.com/breonh/breonh.github.io/main/csss_508/homework/homework_5/king_county_elections_2016.txt</a>.
 It is a plain text file of data, about 60 MB in size. Values are
-separated with commas. Read the file into R. You will want to use the
-<code>cache=TRUE</code> chunk option for this (and potentially other
-chunks). <code>cache=TRUE</code> will allow R to read the file only once
-to save time.</p>
+separated with commas. Read the file into R. Note the
+<code>cache=TRUE</code> chunk option, which allows R to store the file
+between “knits” of the RMarkdown document and thus save memory/time.</p>
 </blockquote>
-<pre class="r"><code># [YOUR CODE HERE]</code></pre>
+<pre class="r"><code># [Your Code Here!]</code></pre>
 </div>
-<div id="inspecting-the-data" class="section level2">
-<h2>Inspecting the data</h2>
+<div id="exploratory-data-analysis-eda" class="section level2">
+<h2>Exploratory Data Analysis (EDA)</h2>
 <blockquote>
-<p>Use <code>str()</code> and/or <code>summary()</code> to look at the
-data. Describe the data in their current state. How many rows are there?
-What variables are there? What kinds of values do they take (don’t list
-them all if there are many)? Are the column types sensible?</p>
+<p>Use functions <code>str</code> and/or <code>summary</code> to look at
+the data. Describe the data in their current state. How many rows are
+there? What variables are there? What kinds of values do they take? Are
+the column types sensible?</p>
 </blockquote>
-<pre class="r"><code># [YOUR CODE HERE]</code></pre>
+<pre class="r"><code># [Your Code Here!]</code></pre>
 <p>[YOUR ANSWER HERE]</p>
 <blockquote>
-<p>Now that you’ve looked at the data holistically, consider each
-variable individually (or in the case of <code>LEG</code>,
-<code>CC</code>, and <code>CG</code>, as a trio; I will tell you now
-that these variables won’t be useful, but try to guess what they are).
-Remember these are real administrative data so they may be <em>really
-strangely structured</em> and some variables are indecipherable; in real
-world data work, you often have to get by with intuition or poking
-around online with regard to the nature of your data. As you look at
-each variable, present 1-2 reasonable summaries (such as a histogram,
-frequency table, etc.). If there are many categories,
-<strong>don’t</strong> print them all out. Instead, print just the first
-few or provide a different type of summary.</p>
+<p>This real-world election data is provided to you in “tidy” format!
+That is, each row is an observation: The number of votes given to a
+candidate/ballot measure/answer type in a given political race across
+voters in a precinct. We will ignore the variables <code>LEG</code>,
+<code>CC</code>, and <code>CG</code> as they are not of practical use.
+For the remaining variables, we will explore them graphically and
+attempt to figure out what they mean. Remember that in real world data
+work, you often have to get by with intuition or poking around online to
+figure out the nature of the data.</p>
+</blockquote>
+<blockquote>
+<p>In each code chunk below, present a summary of each variable on it’s
+own (such as a histogram, frequency table, barplot, etc.). If there are
+<em>many</em> categories, it’s fine to print just the first few. If you
+create a figure, use ggplot. After, write down a one sentence
+interpretation for each summary.</p>
 </blockquote>
 <div id="precinct" class="section level3">
 <h3>Precinct</h3>
-<pre class="r"><code># [YOUR CODE HERE]</code></pre>
+<pre class="r"><code># [Your Code Here!]</code></pre>
+<p>[YOUR ANSWER HERE]</p>
 </div>
 <div id="race" class="section level3">
 <h3>Race</h3>
-<pre class="r"><code># [YOUR CODE HERE]</code></pre>
-</div>
-<div id="leg-cc-cg" class="section level3">
-<h3>LEG, CC, CG</h3>
-<pre class="r"><code># [YOUR CODE HERE]</code></pre>
+<pre class="r"><code># [Your Code Here!]</code></pre>
+<p>[YOUR ANSWER HERE]</p>
 </div>
 <div id="countergroup" class="section level3">
 <h3>CounterGroup</h3>
-<pre class="r"><code># [YOUR CODE HERE]</code></pre>
+<pre class="r"><code># [Your Code Here!]</code></pre>
+<p>[YOUR ANSWER HERE]</p>
 </div>
 <div id="party" class="section level3">
 <h3>Party</h3>
-<pre class="r"><code># [YOUR CODE HERE]</code></pre>
+<pre class="r"><code># [Your Code Here!]</code></pre>
+<p>[YOUR ANSWER HERE]</p>
 </div>
 <div id="countertype" class="section level3">
 <h3>CounterType</h3>
-<pre class="r"><code># [YOUR CODE HERE]</code></pre>
+<pre class="r"><code># [Your Code Here!]</code></pre>
+<p>[YOUR ANSWER HERE]</p>
 <blockquote>
 <p>Notice something odd about CounterType in particular? It tells you
 what a given row of votes was for… but it also has
 <code>Registered Voters</code> and <code>Times Counted</code>. What are
-these variables?</p>
+these values?</p>
 </blockquote>
 </div>
 <div id="sumofcount" class="section level3">
 <h3>SumOfCount</h3>
-<pre class="r"><code># [YOUR CODE HERE]</code></pre>
+<pre class="r"><code># [Your Code Here!]</code></pre>
+<p>[YOUR ANSWER HERE]</p>
 </div>
 </div>
 <div id="the-quantities-of-interest" class="section level2">
 <h2>The quantities of interest</h2>
 <blockquote>
-<p>We will focus on only the three major executive races in Washington
-in 2016:</p>
+<p>In this assignment (and the next), we will focus on three major races
+in Washington in 2016:</p>
 </blockquote>
 <blockquote>
 <ul>
-<li>President (and Vice-President)</li>
-<li>Governor</li>
-<li>Lieutenant Governor</li>
+<li>“US President &amp; Vice President”</li>
+<li>“Governor”</li>
+<li>“Lieutenant Governor”</li>
 </ul>
 </blockquote>
 <blockquote>
@@ -1602,16 +1605,15 @@ in 2016:</p>
 <blockquote>
 <ol style="list-style-type: decimal">
 <li><strong>Turnout rates</strong> for each of these races in each
-precinct. We will measure turnout as times votes were counted (including
-for a candidate, blank, write-in, or “over vote”) divided by the number
-of registered voters.</li>
+precinct. We will measure turnout as total number of submitted votes
+(including for a candidate, blank, write-in, or “over vote”) divided by
+the number of registered voters.</li>
 </ol>
 </blockquote>
 <blockquote>
 <ol start="2" style="list-style-type: decimal">
 <li>Differences between precincts <em>in Seattle</em> and precincts
-<em>elsewhere in King County</em>. Again, these data are not documented,
-so you will have to figure out how to do this.</li>
+<em>elsewhere in King County</em>.</li>
 </ol>
 </blockquote>
 <blockquote>
@@ -1619,87 +1621,89 @@ so you will have to figure out how to do this.</li>
 <li>Precinct-level support for the Democratic candidates in King County
 in 2016 for each contest. We will measure support as the percentage of
 votes in a precinct for the Democratic candidate out of all votes for
-candidates or write-ins. Do not include blank votes or “over votes”
-(where the voter indicated multiple choices) in the overall vote count
-for the denominator.</li>
+candidates or write-ins.</li>
 </ol>
 </blockquote>
 <blockquote>
-<p>You will perform most of the data management for #1 and #2 in this
-homework. Next week’s homework will contain most of the work for #3 and
-also covers visualizing results.</p>
-</blockquote>
-<blockquote>
-<p>The goal to accomplish over Homeworks 5 and 6 will be to get the data
-to one <strong>row per precinct</strong> with the following 7
-columns:</p>
-</blockquote>
-<blockquote>
-<ul>
-<li>Precinct identifier</li>
-<li>Indicator for whether the precinct is in Seattle or not</li>
-<li>Precinct size in terms of registered voters</li>
-<li>Turnout rate</li>
-<li>Percentage Democratic support for President</li>
-<li>Percentage Democratic support for Governor</li>
-<li>Percentage Democratic support for Lieutenant Governor</li>
-</ul>
-</blockquote>
-<blockquote>
-<p>The sections below describe steps you may want to do to get your data
-organized, and provide some hints and suggestions for methods, in
-particular using <code>dplyr</code> and <code>tidyr</code>.</p>
+<p>You will answer Questions #1 and #2 in this homework (Question #3
+will be completed in homework 6). The sections below describe steps you
+may want to take to answer Questions 1 and 2. I suggest loading
+<code>dplyr</code> and <code>tidyr</code> (in the very first code chunk
+of this Rmd) to start!</p>
 </blockquote>
 </div>
 <div id="filtering-down-the-data" class="section level2">
 <h2>Filtering down the data</h2>
 <blockquote>
 <p>For what we want to do, there are a lot of rows that are not useful.
-We only want ones pertaining to races for <strong>President</strong>,
-<strong>Governor</strong>, and <strong>Lieutenant Governor</strong>. So
-let’s trim everything down. You will want to see how these things show
-up in the data. The easiest way may be to (1) display every unique value
-of <code>Race</code> and find which ones match our races of interest,
-then (2) filter the data to those races.</p>
+Start by filtering the dataset to only includes rows in which the race
+is one of: “US President &amp; Vice President”, “Governor”, or
+“Lieutenant Governor”. Save this subsetted dataset as a new object,
+called <code>king_county_elections_2016_Exec</code></p>
 </blockquote>
-<pre class="r"><code># [YOUR CODE HERE]</code></pre>
+<pre class="r"><code># [Your Code Here!]</code></pre>
 </div>
 <div id="seattle-precincts" class="section level2">
 <h2>Seattle precincts</h2>
 <blockquote>
-<p>We want to determine which precincts are in Seattle and which are
-not. The following code will create a vector indicating if a precinct is
-in Seattle or not:</p>
+<p>In our subsetted data, we want to add a “boolean” variable (TRUE or
+FALSE) for a precinct belonging to Seattle. The following code will
+create a vector of booleans. Using this code, add it to your dataset
+king_county_elections_2016_Exec as a new variable called “Seattle”</p>
 </blockquote>
-<p><code>ifelse(substr(YOUR_DATA_NAME$Precinct, start = 1, stop = 4) == &quot;SEA &quot;,&quot;Seattle&quot;,&quot;Not Seattle&quot;)</code></p>
-<blockquote>
-<p>Use and modify this code to create a variable in your dataset that
-indicates if a precinct is in Seattle or not. I would recommend using
-the <code>mutate()</code> function to make the new variable!</p>
-</blockquote>
-<pre class="r"><code># [YOUR CODE HERE]</code></pre>
+<p><code>ifelse(substr(king_county_elections_2016_Exec$Precinct, start = 1, stop = 4) == &quot;SEA &quot;,&quot;Seattle&quot;,&quot;Not Seattle&quot;)</code></p>
+<pre class="r"><code># [Your Code Here!]</code></pre>
 </div>
 <div id="registered-voters-and-turnout-rates" class="section level2">
 <h2>Registered voters and turnout rates</h2>
 <blockquote>
-<p>We want to calculate turnout rates as total votes (including normal
-votes, blank votes, over votes, write-ins) for each race divided by
-registered voters. <span class="math inline">\(Turnout = \frac{Total
-Votes}{Registered Voters}\)</span>. Once you’ve calculated turnout by
-race and precinct, display the first 9 rows. Be sure to still include
-whether or not the precinct is in Seattle!</p>
+<p>We want to calculate turnout rates for each race. We define <span class="math inline">\(Turnout = \frac{Total Votes}{Registered
+Voters}\)</span>, where total votes are listed in rows where the
+variable <code>CounterType</code> equals ‘Times Counted’, and registered
+votes are listed in rows where <code>CounterType</code> equals
+‘Registered Voters’. We can calculate turnout rates in three steps:
+Total votes by race/precinct, Registered votes by race/precinct, and
+finally turnout by race/precinct. Let’s do it!</p>
 </blockquote>
 <blockquote>
-<p>Hint 1: The “Times Counted” rows in the <code>CounterType</code>
-variable includes the total number of votes in each race and
-precinct.</p>
+<p>First, create a dataset called <code>Votes</code> in which you filter
+<code>king_county_elections_2016_Exec</code> to contain rows only where
+CounterType == ‘Times Counted’. You should now have on row per
+Precint/Race. Add a variable called “TotalVotes” to the
+<code>Votes</code> dataset, which contains the number of total votes by
+race/precinct (currently in the “SumOfCount” variable in
+<code>Votes</code>).</p>
 </blockquote>
+<pre class="r"><code># [Your Code Here!]</code></pre>
 <blockquote>
-<p>Hint 2: Consider filtering your data to get the total votes and
-number of registered voters into unique columns; you <em>could</em>
-<code>left_join()</code> after to combine the datasets.</p>
+<p>Second, create a dataset called <code>Registered</code> which
+contains rows only where CounterType == ‘Registered Voters’. The
+“SumOfCount” variable in this dataset includes the number of registered
+votes by precinct/race. Add a variable called “Registered” to the
+<code>Votes</code> dataset, which contains the number of registered
+voters by race/precinct (currently in the “SumOfCount” variable in
+<code>Registered</code>).</p>
 </blockquote>
-<pre class="r"><code># [YOUR CODE HERE]</code></pre>
+<pre class="r"><code># [Your Code Here!]</code></pre>
+<blockquote>
+<p>Third, create a new variable in <code>Votes</code> called “Turnout”,
+which includes turnout calculated by dividing total votes by registered
+voters. Then, subset <code>Votes</code> to contain only the following
+variables: Precinct, Seattle, Race, TotalVotes, Registered, and Turnout.
+Display the first 10 rows of <code>Votes</code>, and print the number of
+rows/columns (there should be 7551 rows and 6 columns!).</p>
+</blockquote>
+<pre class="r"><code># [Your Code Here!]</code></pre>
+</div>
+<div id="quick-plot" class="section level2">
+<h2>Quick Plot!</h2>
+<blockquote>
+<p>Create ggplot histograms of turnout rates, first by “Race” and second
+by “Seattle”. Do you notice any changes in turnout based on race or
+whether or not a precinct was located in Seattle?</p>
+</blockquote>
+<pre class="r"><code># [Your Code Here!]</code></pre>
+<p>[YOUR ANSWER HERE]</p>
 <blockquote>
 <p>That’s it for Homework 5!</p>
 </blockquote>
