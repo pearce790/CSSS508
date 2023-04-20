@@ -2,7 +2,7 @@
 title: "CSSS508, Lecture 5"
 subtitle: "Importing, Exporting, and Cleaning Data"
 author: "Michael Pearce<br>(based on slides from Chuck Lanfear)"
-date: "October 27, 2022"
+date: "April 26, 2023"
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -28,19 +28,22 @@ Last time, we learned about,
 1. Vectors
 1. Matrices
 1. Lists
-1. Data Frames and Tibbles
 
 --
 
 Today, we will cover,
 
 1. Importing and exporting data
-1. Cleaning and reshaping data
+1. Reshaping data
 1. Dates and times
 
 ---
 class: inverse
 # 1. Importing and Exporting Data
+
++ Data packages
++ Imporing data with code
++ Importing data by "point-and-click"
 
 ---
 ## Data Packages
@@ -53,14 +56,13 @@ Examples:
 
 * `WDI`: World Development Indicators (World Bank)
 * `WHO`: World Health Organization API
-* `tidycensus`: Census and American Community Survey <sup>1</sup>
+* `tidycensus`: Census and American Community Survey
 * `quantmod`: financial data from Yahoo, FRED, Google
 
-.footnote[[1] We'll use this in our lecture on geographical data!]
 
 --
 
-You can also import data into R in a few ways...
+If you have an actual data file, you'll have to import it yourself...
 
 ---
 ## Delimited Text Files
@@ -111,41 +113,22 @@ Let's import some data about song ranks on the Billboard Hot 100 in 2000:
 
 .small[
 ```{r}
-billboard_2000_raw <- read_csv(file = "https://clanfear.github.io/CSSS508/Lectures/Week5/data/billboard.csv")
+billboard_2000_raw <- read_csv(file = 
+"https://clanfear.github.io/CSSS508/Lectures/Week5/data/billboard.csv")
 ```
 ]
 
 ---
 ## Did It Load?
 
-Look at the data types for the last few columns:
 
 .small[
-```{r}
-str(billboard_2000_raw[, 65:ncol(billboard_2000_raw)])
+```{r warning=FALSE,message=FALSE}
+library(dplyr)
+dim(billboard_2000_raw)
+names(billboard_2000_raw) %>% head(20)
 ```
 ]
-
----
-## What Went Wrong?
-
-Importing data can be tricky! 
-
---
-
-`readr` uses the first 1000 rows to guess the data type of each column (integer, logical, numeric, character). 
-
-In this case, there was enough missing data that R wasn't able to successfully choose the data type!
-
---
-
-You can address this using the `guess_max` argument (default is 1000).
-
-```{r, eval=FALSE}
-billboard_2000_raw <- read_csv(
-  file = "https://clanfear.github.io/CSSS508/Lectures/Week5/data/billboard.csv",
-  guess_max = 5000) # Default is 1000
-```
 
 
 ---
@@ -190,7 +173,7 @@ This saved the data we pulled off the web in a file called `billboard_data.csv` 
 
 ---
 class: inverse
-# 2. Cleaning and Reshaping Data
+# 2. Reshaping Data
 
 .image-full[
 ![](img/tidyr.svg)
@@ -199,45 +182,32 @@ class: inverse
 ---
 ## Initial Spot Checks
 
-.smallish[
+
 First things to check after loading new data:
-]
+
 --
 
-.smallish[
+
 * Did all the rows/columns from the original file make it in?
 
     + Check using `dim()` or `str()`
-]
+
 
 --
 
-.smallish[
+
 * Are the column names in good shape?
 
     + Use `names()` to check; fix with `rename()`
-]
+
 --
-.smallish[
+
 
 * Are there "decorative" blank rows or columns to remove?
 
     + `filter()` or `select()` out those rows/columns
-]
---
-.smallish[
 
-* How are missing values represented: `NA`, `" "` (blank), `.` (period), `999`?
 
-    + Use `mutate()`
-]
---
-.smallish[
-
-* Are there character data being incorrectly represented as numeric, or vice versa?
-
-    + Use `mutate()` and `as.numeric()`
-]
 
 ---
 ## Tidy Data
@@ -278,16 +248,14 @@ Why do we want tidy data?
 * What is an **observation**?
     + A group of students from a program of a given year
     
---
 
 * What are the **variables**?
     + Program, Year
 
---
 
 * What are the **values**?
     + Program: Evans School, Arts & Sciences, Public Health, Other
-    + Year: First, Second -- **in column headings!**
+    + Year: First, Second -- **in column headings. Bad!**
     + Count: **spread over two columns!**
 
 ---
@@ -307,7 +275,9 @@ Why do we want tidy data?
 --
 
 + Each variable is a column.
+
 + Each observation is a row.
+
 + Each cell has a single value.
 
 
@@ -316,8 +286,7 @@ Why do we want tidy data?
 
 .small[
 ```{r, echo=FALSE}
-library(pander)
-pander(head(billboard_2000_raw[,1:10], 10), split.tables=120, style="rmarkdown")
+billboard_2000_raw %>% head(10)
 ```
 ]
 
@@ -330,7 +299,7 @@ Week columns continue up to `wk76`!
 
 --
 
-    + Week since entering the Billboard Hot 100 per song
+    + Song on the Billboard chart each week
 --
 
 * What are the **variables** in the data?
@@ -382,7 +351,6 @@ This function usually takes three arguments:
 
 ```{r, message=FALSE, warning=FALSE}
 library(tidyr)
-library(dplyr)
 billboard_2000 <- billboard_2000_raw %>%
   pivot_longer(cols=wk1:wk76,#<<
                names_to ="week", #<<
@@ -494,6 +462,16 @@ leap_year(billboard_2000$date.entered) %>% head(5)
 ```
 
 ---
+class:inverse
+# Summary
+
+1. Importing/Exporting Data: `readr`
+2. Reshaping data: `tidyr`
+3. Dates and times `lubridate`
+
+*Let's take a 10 minute break, then reconvene for an activity!*
+
+---
 class: inverse
 # Activity!
 
@@ -562,6 +540,6 @@ Songs that reach #1 on the Billboard charts appear to last >20 weeks on the char
 ---
 class:inverse
 
-# Homework
+# Homework 5
 
-*Coming soon!*
+*On Course Website!*
