@@ -228,7 +228,7 @@ test_x(mat_big, class="matrix", dims=c(14,4), numeric=FALSE, na_check=3, c_pos=c
 What about `colnames()`? What about `rownames()`? Can you guess why you get all these results?
 
 > Answer: You get NULL for "names" and "rownames", but the underlying vector names 
-> with "rownames". That's because matrices stores "column names" but nothing else!
+> with "colnames". That's because matrices stores "column names" but nothing else!
 > "names" is a command reserved for data.frames and tibbles.
 
 2) Consider the code below:
