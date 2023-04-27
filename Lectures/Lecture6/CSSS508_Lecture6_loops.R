@@ -1,64 +1,48 @@
-library(ggplot2)
 library(dplyr)
 
-#### Why Loops? ####
-# mean1 <- mean(swiss$Fertility)
-# mean2 <- mean(swiss$Agriculture)
-# mean3 <- mean(swissExamination)
-# mean4 <- mean(swiss$Fertility)
-# mean5 <- mean(swiss$Catholic)
-# mean5 <- mean(swiss$Infant.Mortality)
+mean1 <- mean(swiss$Fertility)
+mean2 <- mean(swiss$Agriculture)
+mean3 <- mean(swissExamination)
+mean4 <- mean(swiss$Fertility)
+mean5 <- mean(swiss$Catholic)
+mean5 <- mean(swiss$Infant.Mortality)
 # c(mean1, mean2 mean3, mean4, mean5, man6)
 
-
-
-means <- numeric(ncol(swiss))
+means <- rep(NA, ncol(swiss))
 for(i in 1:ncol(swiss)){
   means[i] <- mean(swiss[,i])
 }
 data.frame(Variable=names(swiss),Mean=means)
-
-####  `for()` Loops ####
-
 
 for(i in 1:5) {
   # inside for, output won't show up without print()
   print(i^2) 
 }
 
-for(i in 1:3) {
+    for(i in 1:3) {
+      print(i^2) 
+    }
+ 
+  i <- 1
   print(i^2) 
-}
+  i <- 2
+  print(i^2)
+  i <- 3
+  print(i^2)
 
-i <- 1
-print(i^2) 
-i <- 2
-print(i^2)
-i <- 3
-print(i^2)
-  
-
-some_letters <- letters[4:6] # Vector of letters d,e,f
-for(i in some_letters) {
+for(i in letters[1:3]) {
     print(i)
 }
 i # in R, this will exist outside of the loop!
 
-some_letters <- letters[4:6]
-for(a in seq_along(some_letters)) {
-  print(paste0("Letter ", a, ": ", some_letters[a]))
-}
-a # The object `a` contains the number of the last iteration
-
 iters <- 10 # Set number of interations
-output <- numeric(iters) # Pre-allocate numeric vector 
+output <- rep(NA,iters) # Pre-allocate numeric vector 
 output
 
 for(i in 1:iters) { # Run code below iters times
-    output[i] <- (i-1)^2 + (i-2)^2
+  output[i] <- (i-1)^2 + (i-2)^2
 }
 output # Display output
-
 
 rownums <- 3
 colnums <- 6
@@ -94,8 +78,6 @@ for(i in 1:5){
   }
 }
 
-#### `while()` Loops ####
-
 x <- 0 
 while(x < 3){
   x <- x + 1
@@ -115,7 +97,6 @@ x <- x+1
 print(x)
 x <- x+1
 print(x)
-
 
 num_heads <- 0
 num_flips <- 0
