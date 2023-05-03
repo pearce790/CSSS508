@@ -2,7 +2,7 @@
 title: "CSSS508, Lecture 7"
 subtitle: "Functions"
 author: "Michael Pearce<br>(based on slides from Chuck Lanfear)"
-date: "November 10, 2022"
+date: "May 10, 2022"
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -20,22 +20,6 @@ options(width=70)
 knitr::opts_chunk$set(comment = "##")
 ```
 
-# Reminders
-
-+ Homework 6 is due at *midnight* tonight!
-
-+ Lab/Office Hours for next week are *modified:*
-
-  + Office Hours: Monday (11/14) 8:30-10:30am; Thursday (11/17) 10am-12pm
-  + Lab (11/15): Replaced with additional office hours (above!)
-  
-+ Homework 7 will be due on on 11/17 at *midnight*
-
-  + You will have time in class today to work on this homework!
-  + *No assignment due Thanksgiving!*
-
----
-class:inverse
 # Topics
 
 Last time, we learned about,
@@ -270,51 +254,6 @@ If you type a function name without any parentheses or arguments, you can see it
 smarter_first_and_last
 ```
 
----
-class:inverse
-
-## Activity: Writing A Function
-
-In Olympic diving, a panel of 7 judges provide scores. After removing the worst and best scores, the mean of the remaining scores is given to the diver. We'll write code to calculate this score!
-
-1. Suppose I give you an ordered vector (lowest to greatest) of length 7. How can you keep elements 2 through 6 (i.e., remove the first and last values).
-
-2. Write a function to calculate a diver's score:
-  + Input: Ordered vector of length 7
-  + Output: Mean score after removing the first and last scores.
-  + Checks: Check that the vector has length 7.
-  
-3. Calculate the diver's score given `x <- c(1,3:7,10)`
-
----
-## Activity: My Solution
-
-1. Extract elements 2 through 6:
-
-  + **Answer:** Given vector `x`, use `x[2:6]`
-  
---
-
-2. Function
-
-```{r}
-divers_score <- function(x){
-  if(length(x) != 7){
-    stop("x is not of length 7!")
-  } else{
-    x_nofirst_nolast <- x[2:6]
-    return(mean(x_nofirst_nolast))
-  }
-}
-```
-
---
-
-3. Calculate the diver's score given `x <- c(1,3:7,10)`
-
-```{r}
-divers_score(x = c(1,3:7,10))
-```
 
 ---
 class: inverse
@@ -326,7 +265,7 @@ class: inverse
 Last week, we saw an example where we wanted to take the mean of each column in the `swiss` data:
 
 ```{r}
-for(col_index in seq_along(swiss)){
+for(col_index in 1:ncol(swiss)){
   mean_swiss_col <- mean(swiss[,col_index])
   names_swiss_col <- names(swiss)[col_index]
   print(c(names_swiss_col,round(mean_swiss_col,3)))
@@ -394,7 +333,54 @@ apply(swiss,2,summary) # summary of each column
 ```{r}
 scores <- matrix(1:21,nrow=3)
 print(scores)
-apply(scores,1,divers_score)
+my_function <- function(x){ mean(x+10,na.rm=T) }
+apply(scores,1,my_function)
+```
+
+---
+class:inverse
+
+## Activity: Writing A Function
+
+In Olympic diving, a panel of 7 judges provide scores. After removing the worst and best scores, the mean of the remaining scores is given to the diver. We'll write code to calculate this score!
+
+1. Suppose I get you a vector, `x`, of length 7. Write code that will sort the vector from least to greatest, then keep the 2nd-6th elements. (HINT: Use the `sort()` function and square brackets `[ ]` for subsetting).
+
+2. Write a function to calculate a diver's score:
+  + Input: Vector of length 7
+  + Checks: Check that the vector has length 7 (if not, stop!)
+  + Output: Mean score after removing the lowest and greatest scores.
+  
+3. Calculate the diver's score given `x <- c(2,1:5,3)`
+
+---
+## Activity: My Solution
+
+1. Sort and xtract elements 2 through 6:
+
+  + **Answer:** Given vector `x`, use `sort(x)[2:6]`
+  
+--
+
+2. Function
+
+```{r}
+divers_score <- function(x){
+  if(length(x) != 7){
+    stop("x is not of length 7!")
+  } else{
+    x_nofirst_nolast <- sort(x)[2:6]
+    return(mean(x_nofirst_nolast))
+  }
+}
+```
+
+--
+
+3. Calculate the diver's score given `x <- c(2,1:5,3)`
+
+```{r}
+divers_score(x = c(2,1:5,3) )
 ```
 
 ---
@@ -403,7 +389,7 @@ class:inverse
 
 *These are homework questions!!*
 
-1. What's similar/different between a `for` loop and `apply`?
+1. Preallocate a matrix of NAs with 3 rows and 8 columns, called `double_matrix`. Manually specify the first column equal to the values 1, 2, and 3. Using a nested loop, fill in the matrix, row by row, such that each value is double that to its left.
 
 1. Write an `apply()` function to take the median value of each column in the `cars` dataset
 
@@ -414,15 +400,25 @@ class:inverse
 ---
 ## My Answers
 
-1. What's similar/different between a `for` loop and `apply`?
+1. Preallocate a matrix of NAs with 3 rows and 8 columns, called `double_matrix`. Manually specify the first column equal to the values 1, 2, and 3. Using a nested loop, fill in the matrix, row by row, such that each value is double that to its left.
 
-  + **Possible Answer:** `for` loops and `apply` can usually accomplish the same tasks: Each uses code iteratively. 
-  + `for` loops are more flexible, in that you can provide different data using indices to the loop; they are harder to write. 
-  + `apply` loops are simpler and don't require preallocation; they require your data be a matrix or dataframe.
+```{r}
+double_matrix <- matrix(NA,nrow=3,ncol=8)
+double_matrix[,1] <- 1:3
+for(row in 1:3){
+  for(col in 2:8){
+    double_matrix[row,col] <- double_matrix[row,col-1]*2
+  }
+}
+double_matrix
+```
 
---
 
-1. Write an `apply()` function to take the median value of each column in the `cars` dataset
+---
+## My Answers
+
+
+2\. Write an `apply()` function to take the median value of each column in the `cars` dataset
 
 ```{r}
 median_cars <- apply(cars,2,median)
@@ -432,7 +428,7 @@ median_cars
 ---
 ## My Answers
 
-3. Make a ggplot
+3\. Make a ggplot
 
 
 ```{r fig.height=4}
