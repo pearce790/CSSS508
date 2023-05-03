@@ -1,5 +1,5 @@
 ---
-title: "Homework 7: Loops and Functions"
+title: "Homework 7: Loops, Functions, and Apply"
 author: "YOUR NAME"
 date: "DATE"
 output: 
@@ -25,7 +25,7 @@ library(ggplot2)
 
 > ANSWER: YOUR ANSWER HERE
 
-### Question 1.2: Create a matrix with 3 rows and 8 columns, called `double_matrix`. Make the first column equal to the values 1, 2, and 3. Using a loop, fill in the matrix, row by row, such that each value is double that to its left.
+### Question 1.2: Preallocate a matrix of NAs with 3 rows and 8 columns, called `double_matrix`. Manually specify the first column equal to the values 1, 2, and 3. Using a nested loop, fill in the matrix, row by row, such that each value is double that to its left.
 
 For example, the first row of the matrix should be: `r c(1,2,4,8,16,32,64,128)`
 
@@ -33,13 +33,22 @@ For example, the first row of the matrix should be: `r c(1,2,4,8,16,32,64,128)`
 # [YOUR CODE HERE]
 ```
 
-### Question 1.3: Write a while loop that keeps "flipping 5 coins" until all are heads. Have the function count how many sets of 5 coin flips it took until getting 5 heads, and return that number.
+### Question 1.3: Ask ChatGPT the following question: "Write a while loop in R that samples the integers randomly between 1 and 100 until the number 50 is selected. Print how many iterations it took." Then, display the code ChatGPT wrote, say if it worked or not, and describe the steps ChatGPT took to reach a solution! (If it does not run, change the chunk option to `eval=FALSE`). ChatGPT can be accessed at chat.openai.com.
 
-*Hint:* You can flip 5 coins using the code `rbinom(n=5,size=1,prob=.5)`. A heads is when you return a `1`.
+```{r eval=TRUE}
+# [ChatGPT's CODE HERE]
+```
+
+> ANSWER: YOUR ANSWER HERE
+
+### Question 1.4: Write a while loop that keeps "flipping 5 coins" until you get 5 heads. Have the function count how many sets of 5 coin flips it took until getting 5 heads, and return that number.
+
+*Hint:* You can flip 5 coins using the code `rbinom(n=1,size=5,prob=.5)`. You have gotten 5 heads when the output is `5`.
 
 ```{r}
 # [YOUR CODE HERE]
 ```
+
 
 # 2. Functions
 
@@ -63,11 +72,7 @@ For example, the first row of the matrix should be: `r c(1,2,4,8,16,32,64,128)`
 
 # 3. Apply
 
-### Question 3.1 What's similar/different between a `for` loop and `apply`?
-
-> ANSWER: YOUR ANSWER HERE
-
-### Question 3.2 Write an `apply()` statement to take the median value of each column in the `cars` dataset.
+### Question 3.1 Write an `apply()` statement to take the median value of each column in the `cars` dataset.
 
 *Hint: Use the `median()` function inside your `apply()` command!*
 
@@ -75,17 +80,9 @@ For example, the first row of the matrix should be: `r c(1,2,4,8,16,32,64,128)`
 # [YOUR CODE HERE]
 ```
 
-### Question 3.3 Using `ggplot`, make a scatterplot of the `speed` and `dist` variables in `cars`. Then, add an appropriate horizontal and vertical line symbolizing the median value of each variable.
+### Question 3.2 Using `ggplot`, make a scatterplot of the `speed` and `dist` variables in `cars`. Then, add an appropriate horizontal and vertical line symbolizing the median value of each variable.
 
 *Hint:* Using the layers `geom_vline(xintercept = )` and `geom_hline(yintercept = )`
-
-```{r}
-# [YOUR CODE HERE]
-```
-
-### Question 3.4: Repeat steps 3.2 and 3.3, but this time using a function you create called `half_max`. This function should return the maximum value of a vector divided by 2.
-
-*Hint:* Given the vector `1:6`, `half_max` should return 3 (since 6/2 = 3).
 
 ```{r}
 # [YOUR CODE HERE]

@@ -12,7 +12,7 @@
 <meta name="author" content="YOUR NAME" />
 
 
-<title>Homework 7: Loops and Functions</title>
+<title>Homework 7: Loops, Functions, and Apply</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1490,7 +1490,8 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">Homework 7: Loops and Functions</h1>
+<h1 class="title toc-ignore">Homework 7: Loops, Functions, and
+Apply</h1>
 <h4 class="author">YOUR NAME</h4>
 <h4 class="date">DATE</h4>
 
@@ -1506,22 +1507,36 @@ border-radius: 0px;
 <p>ANSWER: YOUR ANSWER HERE</p>
 </blockquote>
 </div>
-<div id="question-1.2-create-a-matrix-with-3-rows-and-8-columns-called-double_matrix.-make-the-first-column-equal-to-the-values-1-2-and-3.-using-a-loop-fill-in-the-matrix-row-by-row-such-that-each-value-is-double-that-to-its-left." class="section level3">
-<h3>Question 1.2: Create a matrix with 3 rows and 8 columns, called
-<code>double_matrix</code>. Make the first column equal to the values 1,
-2, and 3. Using a loop, fill in the matrix, row by row, such that each
-value is double that to its left.</h3>
+<div id="question-1.2-preallocate-a-matrix-of-nas-with-3-rows-and-8-columns-called-double_matrix.-manually-specify-the-first-column-equal-to-the-values-1-2-and-3.-using-a-nested-loop-fill-in-the-matrix-row-by-row-such-that-each-value-is-double-that-to-its-left." class="section level3">
+<h3>Question 1.2: Preallocate a matrix of NAs with 3 rows and 8 columns,
+called <code>double_matrix</code>. Manually specify the first column
+equal to the values 1, 2, and 3. Using a nested loop, fill in the
+matrix, row by row, such that each value is double that to its
+left.</h3>
 <p>For example, the first row of the matrix should be: 1, 2, 4, 8, 16,
 32, 64, 128</p>
 <pre class="r"><code># [YOUR CODE HERE]</code></pre>
 </div>
-<div id="question-1.3-write-a-while-loop-that-keeps-flipping-5-coins-until-all-are-heads.-have-the-function-count-how-many-sets-of-5-coin-flips-it-took-until-getting-5-heads-and-return-that-number." class="section level3">
-<h3>Question 1.3: Write a while loop that keeps “flipping 5 coins” until
-all are heads. Have the function count how many sets of 5 coin flips it
-took until getting 5 heads, and return that number.</h3>
+<div id="question-1.3-ask-chatgpt-the-following-question-write-a-while-loop-in-r-that-samples-the-integers-randomly-between-1-and-100-until-the-number-50-is-selected.-print-how-many-iterations-it-took.-then-display-the-code-chatgpt-wrote-say-if-it-worked-or-not-and-describe-the-steps-chatgpt-took-to-reach-a-solution-if-it-does-not-run-change-the-chunk-option-to-evalfalse.-chatgpt-can-be-accessed-at-chat.openai.com." class="section level3">
+<h3>Question 1.3: Ask ChatGPT the following question: “Write a while
+loop in R that samples the integers randomly between 1 and 100 until the
+number 50 is selected. Print how many iterations it took.” Then, display
+the code ChatGPT wrote, say if it worked or not, and describe the steps
+ChatGPT took to reach a solution! (If it does not run, change the chunk
+option to <code>eval=FALSE</code>). ChatGPT can be accessed at
+chat.openai.com.</h3>
+<pre class="r"><code># [ChatGPT&#39;s CODE HERE]</code></pre>
+<blockquote>
+<p>ANSWER: YOUR ANSWER HERE</p>
+</blockquote>
+</div>
+<div id="question-1.4-write-a-while-loop-that-keeps-flipping-5-coins-until-you-get-5-heads.-have-the-function-count-how-many-sets-of-5-coin-flips-it-took-until-getting-5-heads-and-return-that-number." class="section level3">
+<h3>Question 1.4: Write a while loop that keeps “flipping 5 coins” until
+you get 5 heads. Have the function count how many sets of 5 coin flips
+it took until getting 5 heads, and return that number.</h3>
 <p><em>Hint:</em> You can flip 5 coins using the code
-<code>rbinom(n=5,size=1,prob=.5)</code>. A heads is when you return a
-<code>1</code>.</p>
+<code>rbinom(n=1,size=5,prob=.5)</code>. You have gotten 5 heads when
+the output is <code>5</code>.</p>
 <pre class="r"><code># [YOUR CODE HERE]</code></pre>
 </div>
 </div>
@@ -1551,34 +1566,21 @@ you get the same values as in question 1.2? (You should!)</h3>
 </div>
 <div id="apply" class="section level1">
 <h1>3. Apply</h1>
-<div id="question-3.1-whats-similardifferent-between-a-for-loop-and-apply" class="section level3">
-<h3>Question 3.1 What’s similar/different between a <code>for</code>
-loop and <code>apply</code>?</h3>
-<blockquote>
-<p>ANSWER: YOUR ANSWER HERE</p>
-</blockquote>
-</div>
-<div id="question-3.2-write-an-apply-function-to-take-the-median-value-of-each-column-in-the-cars-dataset" class="section level3">
-<h3>Question 3.2 Write an <code>apply()</code> function to take the
-median value of each column in the <code>cars</code> dataset</h3>
+<div id="question-3.1-write-an-apply-statement-to-take-the-median-value-of-each-column-in-the-cars-dataset." class="section level3">
+<h3>Question 3.1 Write an <code>apply()</code> statement to take the
+median value of each column in the <code>cars</code> dataset.</h3>
+<p><em>Hint: Use the <code>median()</code> function inside your
+<code>apply()</code> command!</em></p>
 <pre class="r"><code># [YOUR CODE HERE]</code></pre>
 </div>
-<div id="question-3.3-using-ggplot-make-a-scatterplot-of-the-speed-and-dist-variables-in-cars.-then-add-an-appropriate-horizontal-and-vertical-line-symbolizing-the-median-value-of-each-variable." class="section level3">
-<h3>Question 3.3 Using <code>ggplot</code>, make a scatterplot of the
+<div id="question-3.2-using-ggplot-make-a-scatterplot-of-the-speed-and-dist-variables-in-cars.-then-add-an-appropriate-horizontal-and-vertical-line-symbolizing-the-median-value-of-each-variable." class="section level3">
+<h3>Question 3.2 Using <code>ggplot</code>, make a scatterplot of the
 <code>speed</code> and <code>dist</code> variables in <code>cars</code>.
 Then, add an appropriate horizontal and vertical line symbolizing the
 median value of each variable.</h3>
 <p><em>Hint:</em> Using the layers
 <code>geom_vline(xintercept = )</code> and
 <code>geom_hline(yintercept = )</code></p>
-<pre class="r"><code># [YOUR CODE HERE]</code></pre>
-</div>
-<div id="question-3.4-repeat-steps-3.2-and-3.3-but-this-time-using-a-function-you-create-called-half_max.-this-function-should-return-the-maximum-value-of-a-vector-divided-by-2." class="section level3">
-<h3>Question 3.4: Repeat steps 3.2 and 3.3, but this time using a
-function you create called <code>half_max</code>. This function should
-return the maximum value of a vector divided by 2.</h3>
-<p><em>Hint:</em> Given the vector <code>1:6</code>,
-<code>half_max</code> should return 3 (since 6/2 = 3).</p>
 <pre class="r"><code># [YOUR CODE HERE]</code></pre>
 </div>
 </div>
