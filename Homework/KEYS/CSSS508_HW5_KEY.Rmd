@@ -1,6 +1,6 @@
 ---
-title: "Homework 6: 2016 Elections"
-author: "NAME"
+title: "Homework 5: 2016 Elections"
+author: "Key"
 date: "`r Sys.time()`"
 output: 
   html_document:
@@ -12,7 +12,7 @@ published: false
 
 # Instructions
 
-> For Homework 6, you will fill out this RMarkdown template. The first half is both a key for HW 5, and code to get you set up for HW 6! As before, create code (in chunks) and write text answers (outside chunks) to answer the provided questions in an analysis of King County election data from 2016. IMPORTANT: Do NOT add any additional code chunks, and do NOT modify any chunk options!
+> For Homework 5, you will fill out this RMarkdown template. Throughout the document, create code (in chunks) and write text answers (outside chunks) to answer the provided questions in an analysis of King County election data from 2016. IMPORTANT: Do NOT add any additional code chunks, and do NOT modify any chunk options! This week's homework will become "part 1" for next week's homework.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -180,7 +180,7 @@ ggplot(Votes,aes(Turnout))+theme_bw()+
 ggplot(Votes,aes(Turnout))+theme_bw()+
   geom_histogram(bins=30)+facet_wrap(~Seattle)+
   xlab("Turnout Rate")+ylab("Count")+
-  ggtitle("Turnout Race by Seattlevs. Non-Seattle Precinct",
+  ggtitle("Turnout Race by Seattle vs. Non-Seattle Precincts",
           "2016 King County Election Results")+
   xlim(c(0,1))
 ```
@@ -189,56 +189,6 @@ Turnout seems quite consistent across different races; however, turnout in Seatt
 
 > That's it for Homework 5!
 
-# Homework 6
+# Next Time
 
-In today's homework, we'll analyze the support for democratic candidates by precinct and political race using 2016 King County Election data. Prior to editing the code below, be sure you've run all the code above (you can run all chunks above by clicking the downward facing arrow in the upper-right corner of the first code chunk *beneath* this text).
-
-## Calculating number of votes for Democrats
-
-Let's first create a data.frame called `DemVotes` which includes three variables: "Precinct", "Race", and "DemVotes", which contains the total number of votes received by candidates from the Democratic party in each precinct and political race. To create this dataset, I recommend following these steps:
-
-1. Start with the `king_county_elections_2016_Exec`, and filter to rows in which "Party" is either "Dem" or "DPN" (both correspond to Democrats).
-1. `group_by` Precinct and Race
-1. `summarize` the total number of votes (i.e., `sum` together the values in the "SumOfCount" variable) into a new variable called "DemVotes".
-
-```{r}
-# [CODE HERE]
-```
-
-## Combining with previous vote data by precinct and race
-
-Now, use the `left_join` function to merge the "Votes" data from last week with the "DemVotes" data you just created. Be sure you have merged the two data.frames by the "Precinct" and "Race" variables. Save the joined data.frame as "Votes_HW6".
-
-```{r}
-# [CODE HERE]
-```
-
-## Calculating Democratic support
-
-Now, create a new variable in the "Votes_HW6" data.frame called "DemPercent", in which DemPercent is calculated by dividing the number of votes received by Democrats by the total number of votes (in each precinct and race). Create a histogram in ggplot of the "DemPercent" variable. (NOTE: All values should be between 0 and 1!!!). Write a one-sentence interpretation of the distribution you observe.
-
-```{r}
-# [CODE HERE]
-```
-
-ANSWER: [ANSWER HERE!]
-
-## Is Democratic support different by race or Seattle precincts?
-
-Using the `facet_grid()` or `facet_wrap()` layer functions, create side-by-side histograms in ggplot to explore whether or not democratic support varies based on (1) precincts located in Seattle or not, and (2) political race. Write a one or two-sentence explanation of your findings.
-
-```{r}
-# [CODE HERE]
-```
-
-ANSWER: [ANSWER HERE!]
-
-## What if we only consider "large" precincts?
-
-Repeat the previous question, but this time using only data from precincts with at least 500 registered voters. Are the patterns you observed any different now?
-
-```{r}
-# [CODE HERE]
-```
-
-ANSWER: [ANSWER HERE!]
+> In the next homework, we'll continue this analysis! 
