@@ -1,7 +1,7 @@
 ---
 title: "Homework 8: Strings and Mapping"
 author: "Name"
-date: "Due: 12/8"
+date: "Due: 5/31"
 output: 
   html_document:
     preserve_yaml: true
@@ -72,7 +72,7 @@ load(url("https://pearce790.github.io/CSSS508/Lectures/Lecture8/restaurants.Rdat
 # YOUR CODE HERE
 ```
 
-### Question 1.8: Create a plot (you chose precisely what plot) using the variables Year, Maximum Score, and Name. Get creative!
+### Question 1.8: Create a line plot of maximum score ("MaxScore") over time ("Year"), by business ("Name"). That is, you should have a single line for each business. (Don't try to label them, as there are far too many!)
 
 ```{r warning=FALSE}
 # YOUR CODE HERE
@@ -81,7 +81,7 @@ load(url("https://pearce790.github.io/CSSS508/Lectures/Lecture8/restaurants.Rdat
 
 # 2. Mapping
 
-### Question 2.1: Using your data from part 1, create a `basic` ggplot (using the `ggplot2` function) displaying the latitude/longitude of each coffee shop in King County.
+### Question 2.1: Using your data from part 1, create a ggplot displaying each coffee shop in King County by their latitude/longitude. For this question, no need to display any actual map data!
 
 
 ```{r warning=FALSE,message=FALSE}

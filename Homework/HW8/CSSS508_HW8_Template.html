@@ -1372,23 +1372,17 @@ overflow-y: auto;
 border: 1px solid #ddd;
 border-radius: 4px;
 }
-.tabset-dropdown > .nav-tabs > li.active:before {
-content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+content: "\e259";
 font-family: 'Glyphicons Halflings';
 display: inline-block;
 padding: 10px;
 border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-content: "";
-border: none;
-}
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-content: "";
+content: "\e258";
 font-family: 'Glyphicons Halflings';
-display: inline-block;
-padding: 10px;
-border-right: 1px solid #ddd;
+border: none;
 }
 .tabset-dropdown > .nav-tabs > li.active {
 display: block;
@@ -1492,7 +1486,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Homework 8: Strings and Mapping</h1>
 <h4 class="author">Name</h4>
-<h4 class="date">Due: 12/8</h4>
+<h4 class="date">Due: 5/31</h4>
 
 </div>
 
@@ -1543,19 +1537,20 @@ business name vs. year.</h3>
 business (<code>Name</code>) and <code>Year</code>.</h3>
 <pre class="r"><code># YOUR CODE HERE</code></pre>
 </div>
-<div id="question-1.8-create-a-plot-you-chose-precisely-what-plot-using-the-variables-year-maximum-score-and-name.-get-creative" class="section level3">
-<h3>Question 1.8: Create a plot (you chose precisely what plot) using
-the variables Year, Maximum Score, and Name. Get creative!</h3>
+<div id="question-1.8-create-a-line-plot-of-maximum-score-maxscore-over-time-year-by-business-name.-that-is-you-should-have-a-single-line-for-each-business.-dont-try-to-label-them-as-there-are-far-too-many" class="section level3">
+<h3>Question 1.8: Create a line plot of maximum score (“MaxScore”) over
+time (“Year”), by business (“Name”). That is, you should have a single
+line for each business. (Don’t try to label them, as there are far too
+many!)</h3>
 <pre class="r"><code># YOUR CODE HERE</code></pre>
 </div>
 </div>
 <div id="mapping" class="section level1">
 <h1>2. Mapping</h1>
-<div id="question-2.1-using-your-data-from-part-1-create-a-basic-ggplot-using-the-ggplot2-function-displaying-the-latitudelongitude-of-each-coffee-shop-in-king-county." class="section level3">
-<h3>Question 2.1: Using your data from part 1, create a
-<code>basic</code> ggplot (using the <code>ggplot2</code> function)
-displaying the latitude/longitude of each coffee shop in King
-County.</h3>
+<div id="question-2.1-using-your-data-from-part-1-create-a-ggplot-displaying-each-coffee-shop-in-king-county-by-their-latitudelongitude.-for-this-question-no-need-to-display-any-actual-map-data" class="section level3">
+<h3>Question 2.1: Using your data from part 1, create a ggplot
+displaying each coffee shop in King County by their latitude/longitude.
+For this question, no need to display any actual map data!</h3>
 <pre class="r"><code># YOUR CODE HERE</code></pre>
 </div>
 <div id="question-2.2-modify-the-city-variable-so-that-it-is-in-title-case.-then-modify-your-plot-from-2.1-such-that-each-city-has-a-different-color." class="section level3">
