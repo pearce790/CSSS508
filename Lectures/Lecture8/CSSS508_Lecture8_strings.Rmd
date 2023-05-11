@@ -1,8 +1,8 @@
 ---
 title: "CSSS508, Lecture 8"
-subtitle: "Strings"
+subtitle: "Working with Text Data"
 author: "Michael Pearce<br>(based on slides from Chuck Lanfear)"
-date: "November 17, 2022"
+date: "May 17, 2022"
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -13,42 +13,13 @@ output:
       countIncrementalSlides: false
       titleSlideClass: ["center","top"]
 ---
-
+class:inverse
 ```{r setup, include=FALSE, purl=FALSE}
 options(htmltools.dir.version = FALSE, width = 70)
 knitr::opts_chunk$set(comment = "##")
 set.seed(7)
 ```
 
-# Reminders
-
-+ Homework 7 is due at *midnight* tonight!
-
-+ Lab on Tuesday will review previous homeworks!
-  
-+ *No assignment next week* due to Thanksgiving!!
-
----
-class:inverse
-# Mid-Quarter Feedback
-
-*Thank you very much* for your feedback! Here are some findings:
-
-+ Students generally preferred the current course structure.
-
-+ There were generally positive feelings towards the lectures, balance between material/activities, and usefulness of homework/peer review.
-
-+ Many students provided helpful suggestions for change:
-
-  + Workload: 2 credit course instead of 1? (*let's discuss!*)
-  + Homework: Many thought the homework was too challenging (*I will be sure to include more questions to build up the basic skills, as well as some challenge questions*)
-  + Lectures: Many thought the lectures cover too much material (*I agree! This course actually covers much less than previous iterations, but with more activities. I will work to make the course content more manageable, without removing the key info!*)
-  
-If you have any additional thoughts, let's chat!!
-
-
----
-class:inverse
 # Topics
 
 Last time, we learned about,
@@ -64,7 +35,7 @@ Today, we will cover,
 
 1. Basics of Strings
 1. Strings in Base R
-1. Strings in `stringr` (Tidyverse)
+1. Strings in `stringr` (tidyverse)
 
 ---
 class:inverse
@@ -189,8 +160,7 @@ Let's extract the first five chararacters from each zip code in the restaurants 
 
 ```{r warning=FALSE,message=FALSE}
 library(dplyr)
-restaurants <- restaurants %>%
-    mutate(ZIP_5 = substr(Zip_Code, 1, 5))
+restaurants$ZIP_5 <- substr(restaurants$Zip_Code,1,5)
 restaurants %>% distinct(ZIP_5) %>% head()
 ```
 
@@ -233,57 +203,11 @@ paste(c("CSSS","STAT"),"508",sep= "_",collapse=" , ")
 Let's use `paste()` to create complete mailing addresses for each restaurant:
 
 ```{r mailing_address}
-restaurants <- restaurants %>%
-    mutate(mailing_address = 
-           paste(Address, ", ", City, ", WA ", ZIP_5, sep = ""))
+restaurants$mailing_address <- 
+  paste(restaurants$Address,", ",
+        restaurants$City,", WA ",restaurants$ZIP_5,
+        sep = "")
 restaurants %>% distinct(mailing_address) %>% head()
-```
-
-
----
-class:inverse
-## Activity
-
-The variable `Inspection_Date` is in the format "MM/DD/YYYY". In this question, we'll change the format using functions for strings.
-
-1. How long is each character string in this variable?
-1. Use `substr()` to extract the month of each entry and save it to an object called "months"
-1. Use `substr()` to extract the year of each entry and save it to an object called "years"
-1. Use `paste()` to combine each month and year, separated by an underscore (`_`). Save this as a new variable in the data called "Inspection_Date_Formatted"
-
----
-## Activity: My Answers
-
-The variable `Inspection_Date` is in the format "MM/DD/YYYY". In this question, we'll change the format using functions for strings.
-
-1.How long is each character string in this variable?
-
-```{r}
-table(nchar(restaurants$Inspection_Date))
-```
-
---
-
-2.Use `substr()` to extract the month of each entry and save it to an object called "months"
-
-3.Use `substr()` to extract the year of each entry and save it to an object called "years"
-
-```{r}
-months <- substr(restaurants$Inspection_Date,1,2)
-years <- substr(restaurants$Inspection_Date,7,10)
-```
-
----
-## Activity: My Answers
-
-4.Use `paste()` to combine each month and year, separated by an underscore (`_`). Save this as a new variable in the data called "Inspection_Date_Formatted"
-
-```{r}
-restaurants <- restaurants %>% 
-  mutate("Inspection_Date_Formatted"=paste(months,years,sep="_"))
-restaurants %>% 
-  select(Inspection_Date,Inspection_Date_Formatted) %>%
-  head(5)
 ```
 
 
@@ -436,21 +360,6 @@ str_detect(string = c("Hello","my name","is Michael"),
 
 Results are case-sensitive!!
 
----
-## Patterns: `str_detect()`
-
-We can test for more complex patterns using "|" and "&":
-
-```{r}
-str_detect(string = c("Hello","my name","is Michael"),
-           pattern = "m|M")
-str_detect(string = c("Hello","my name","is Michael"),
-           pattern = "m&M")
-```
-
---
-
-*Note:* Using "|" and "&" inside the pattern creates a **regular expression**. This is a fancy technique that we won't go into any more depth on. Still, it's helpful to know that there are more tools out there if you want to learn. Check out the links on our course website!
 
 ---
 ## Patterns: `str_detect()`
@@ -515,7 +424,7 @@ str_replace_all(dates,"-","_") %>% tail(3)
 
 ---
 class:inverse
-## Quick Summary
+# Quick Summary
 
 We've seen lots of functions today! 
 
@@ -533,12 +442,59 @@ We've seen lots of functions today!
 
 + Pattern Detection/Replacement: `str_detect()` and `str_replace()`
 
+
 ---
 class:inverse
-# Activity: Exploratory Analyses
+# Activity 1: Base R Functions
+
+The variable `Inspection_Date` is in the format "MM/DD/YYYY". In this question, we'll change the format using functions for strings.
+
+1. How long is each character string in this variable?
+1. Use `substr()` to extract the month of each entry and save it to an object called "months"
+1. Use `substr()` to extract the year of each entry and save it to an object called "years"
+1. Use `paste()` to combine each month and year, separated by an underscore (`_`). Save this as a new variable in the data called "Inspection_Date_Formatted"
+
+---
+## Activity: My Answers
+
+The variable `Inspection_Date` is in the format "MM/DD/YYYY". In this question, we'll change the format using functions for strings.
+
+1.How long is each character string in this variable?
+
+```{r}
+table(nchar(restaurants$Inspection_Date))
+```
+
+--
+
+2.Use `substr()` to extract the month of each entry and save it to an object called "months"
+
+3.Use `substr()` to extract the year of each entry and save it to an object called "years"
+
+```{r}
+months <- substr(restaurants$Inspection_Date,1,2)
+years <- substr(restaurants$Inspection_Date,7,10)
+```
+
+---
+## Activity: My Answers
+
+4.Use `paste()` to combine each month and year, separated by an underscore (`_`). Save this as a new variable in the data called "Inspection_Date_Formatted"
+
+```{r}
+restaurants$Inspection_Date_Formatted <- 
+  paste(months,years,sep="_")
+restaurants %>% 
+  select(Name,Inspection_Date,Inspection_Date_Formatted) %>%
+  head(5)
+```
+
+
+---
+class:inverse
+# Activity 2: HW 8
 
 Let's examine the coffee shops of King County!
-
 
 1. Filter your data to only include rows in which the `Name` includes the word "coffee" (in any case!)
 
@@ -550,12 +506,12 @@ Let's examine the coffee shops of King County!
 
 1. Calculate the maximum `Inspection_Score` by business and year.
 
-1. Create a plot (you chose precisely what plot) using the variables Year, Maximum Score, and Business. Get creative!
+1. Create a line plot of maximum score ("MaxScore") over time ("Year"), by business ("Name"). That is, you should have a single line for each business. (Don't try to label them, as there are far too many!)
 
 ---
-# Activity: My Solutions
+## Activity: My Solutions
 
-1. Filter your data to only include rows in which the `Name` includes the word "coffee" (in any case!)
+1\. Filter your data to only include rows in which the `Name` includes the word "coffee" (in any case!)
 
 ```{r}
 coffee <- restaurants
@@ -564,9 +520,11 @@ coffee <- coffee %>% filter(str_detect(Name,"coffee"))
 ```
 
 ---
-# Activity: My Solutions
+## Activity: My Solutions
 
-2.Create a new variable in your data which includes the length of the business name, after removing beginning/trailing whitespace.
+2\.Create a new variable in your data which includes the length of the business name, after removing beginning/trailing whitespace.
+
+3\. Create a new variable in your data for the inspection year.
 
 ```{r}
 coffee$NameLength <- str_length(str_trim(coffee$Name))
@@ -574,9 +532,9 @@ coffee$Year <- str_sub(coffee$Inspection_Date,-4,-1)
 ```
 
 ---
-# Activity: My Solutions
+## Activity: My Solutions
 
-3.Create a new variable in your data for the inspection year.
+4\.  Create side-by-side boxplots for the length of business name vs. year.
 
 ```{r warning=FALSE,message=FALSE,fig.height=5}
 library(ggplot2)
@@ -584,9 +542,9 @@ ggplot(coffee,aes(Year,NameLength))+geom_boxplot()
 ```
 
 ---
-# Activity: My Solutions
+## Activity: My Solutions
 
-4.Calculate the maximum `Inspection_Score` by business and year.
+5\. Calculate the maximum `Inspection_Score` by business and year.
 
 ```{r}
 coffee_summary <- coffee %>% group_by(Name,Year) %>% 
@@ -595,25 +553,11 @@ coffee_summary <- coffee %>% group_by(Name,Year) %>%
 
 
 ---
-# Activity: My Solutions
+## Activity: My Solutions
 
 
-5.Create a plot (you chose precisely what plot) using the variables Year, Maximum Score, and Business.
+6\. Create a line plot of maximum score ("MaxScore") over time ("Year"), by business ("Name"). That is, you should have a single line for each business. (Don't try to label them, as there are far too many!)
 ```{r warning=FALSE,fig.height=4.5}
 ggplot(coffee_summary,aes(Year,MaxScore,group=Name))+
   geom_line(alpha=.2)
 ```
-
-
-
----
-class: inverse
-# Coming Up 
-
-* Remember: No homework due next week, and no lecture on Thanksgiving!
-
-* Homework 7 is due tonight!
-
-* Lab on Tuesday will be a review of past homework!
-
-* Have a wonderful and restful Thanksgiving!!
