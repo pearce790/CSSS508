@@ -1,0 +1,279 @@
+---
+title: "Homework 6: 2016 Elections"
+author: "Key"
+date: "`r Sys.time()`"
+output: 
+  html_document:
+    preserve_yaml: true
+    toc: true
+    toc_float: true
+published: false
+---
+
+# Instructions
+
+> For Homework 6, you will fill out this RMarkdown template. The first half is both a key for HW 5, and code to get you set up for HW 6! As before, create code (in chunks) and write text answers (outside chunks) to answer the provided questions in an analysis of King County election data from 2016. IMPORTANT: Do NOT add any additional code chunks, and do NOT modify any chunk options!
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+# Homework 5
+
+## Importing the Data
+
+> Download the data from <https://raw.githubusercontent.com/breonh/breonh.github.io/main/csss_508/homework/homework_5/king_county_elections_2016.txt>. It is a plain text file of data, about 60 MB in size. Values are separated with commas. Read the file into R. Note the `cache=TRUE` chunk option, which allows R to store the file between "knits" of the RMarkdown document and thus save memory/time.
+
+```{r import_data, message=FALSE,warning=FALSE,cache=TRUE}
+king_county_elections_2016 <- read_csv("https://raw.githubusercontent.com/breonh/breonh.github.io/main/csss_508/homework/homework_5/king_county_elections_2016.txt")
+```
+
+## Exploratory Data Analysis (EDA)
+
+> Use functions `str` and/or `summary` to look at the data.  Describe the data in their current state. How many rows are there? What variables are there? What kinds of values do they take? Are the column types sensible? 
+
+```{r}
+dim(king_county_elections_2016)
+summary(king_county_elections_2016)
+```
+
+The data includes 643,163 rows and 9 columns. The variables include Precint, Race, LEG, CC, CG, CounterGroup, Party, CounterType, and SumOfCount, some of which are numeric and some of which are characters. The current column types (numeric vs. char) seem sensible.
+
+> This real-world election data is provided to you in "tidy" format! That is, each row is an observation: The number of votes given to a candidate/ballot measure/answer type in a given political race across voters in a precinct. We will ignore the variables `LEG`, `CC`, and `CG` as they are not of practical use. For the remaining variables, we will explore them graphically and attempt to figure out what they mean. Remember that in real world data work, you often have to get by with intuition or poking around online to figure out the nature of the data. 
+
+> In each code chunk below, present a summary of each variable on it's own (such as a histogram, frequency table, barplot, etc.). If there are *many* categories, it's fine to print just the first few. If you create a figure, use ggplot. After, write down a one sentence interpretation for each summary.
+
+### Precinct
+
+```{r}
+table(king_county_elections_2016$Precinct) %>% head(20)
+```
+
+This variable appears to contain election precincts from King County, in slightly varying numbers.
+
+### Race
+
+```{r}
+table(king_county_elections_2016$Race) %>% head(20)
+```
+
+This variable seems to contain election races from King County in 2016.
+
+
+### CounterGroup
+
+```{r}
+table(king_county_elections_2016$CounterGroup)
+```
+
+Every value in this variable is "Total", which makes the variable useless!
+
+### Party
+
+```{r}
+ggplot(king_county_elections_2016,aes(Party))+
+  geom_bar()+theme_bw()+ylab("Count")+ggtitle("Number of Observations by Party")
+```
+
+This variable seems to contain political parties, although, "NP" (which probably stands for "No Party" or "Non-Partisan") is very prevalent. Perhaps this stands for races which are non-partisan.
+
+### CounterType
+
+```{r}
+table(king_county_elections_2016$CounterType) %>% head(10)
+```
+
+This variable seems to contain candidate names.
+
+> Notice something odd about CounterType in particular? It tells you what a given row of votes was for... but it also has `Registered Voters` and `Times Counted`. What are these values?
+
+### SumOfCount
+
+```{r}
+ggplot(king_county_elections_2016,aes(SumOfCount))+geom_histogram(bins=30)+
+  xlab("Number of Votes by Race and Precinct")+ylab("Count")+theme_bw()
+```
+
+This variable seems to include the number of votes by precinct and race. Many precincts have no votes for particular races, it appears.
+
+## The quantities of interest
+
+> In this assignment (and the next), we will focus on three major races in Washington in 2016:
+
+> * "US President & Vice President"
+> * "Governor"
+> * "Lieutenant Governor"
+
+> With these races, we are interested in:
+
+> 1. **Turnout rates** for each of these races in each precinct. We will measure turnout as total number of submitted votes  (including for a candidate, blank, write-in, or "over vote") divided by the number of registered voters.
+
+> 2. Differences between precincts *in Seattle* and precincts *elsewhere in King County*.
+
+> 3. Precinct-level support for the Democratic candidates in King County in 2016 for each contest. We will measure support as the percentage of votes in a precinct for the Democratic candidate out of all votes for candidates or write-ins.
+
+> You will answer Questions #1 and #2 in this homework (Question #3 will be completed in homework 6). The sections below describe steps you may want to take to answer Questions 1 and 2. I suggest loading `dplyr` and `tidyr` (in the very first code chunk of this Rmd) to start!
+
+## Filtering down the data
+
+> For what we want to do, there are a lot of rows that are not useful. Start by filtering the dataset to only includes rows in which the race is one of: "US President & Vice President", "Governor", or "Lieutenant Governor". Save this subsetted dataset as a new object, called `king_county_elections_2016_Exec`
+
+```{r}
+king_county_elections_2016_Exec <- king_county_elections_2016 %>% 
+  filter(Race %in% c("US President & Vice President", "Governor", "Lieutenant Governor"))
+```
+
+## Seattle precincts
+
+> In our subsetted data, we want to add a "boolean" variable (TRUE or FALSE) for a precinct belonging to Seattle. The following code will create a vector of booleans. Using this code, add it to your dataset king_county_elections_2016_Exec as a new variable called "Seattle"
+
+`ifelse(substr(king_county_elections_2016_Exec$Precinct, start = 1, stop = 4) == "SEA ","Seattle","Not Seattle")`
+
+```{r}
+king_county_elections_2016_Exec$Seattle <- ifelse(substr(king_county_elections_2016_Exec$Precinct, start = 1, stop = 4) == "SEA ",TRUE,FALSE)
+```
+
+
+## Registered voters and turnout rates
+
+> We want to calculate turnout rates for each race. We define $Turnout = \frac{Total Votes}{Registered Voters}$, where total votes are listed in rows where the variable `CounterType` equals 'Times Counted', and registered votes are listed in rows where `CounterType` equals 'Registered Voters'. We can calculate turnout rates in three steps: Total votes by race/precinct, Registered votes by race/precinct, and finally turnout by race/precinct. Let's do it!
+
+> First, create a dataset called `Votes` in which you filter `king_county_elections_2016_Exec` to contain rows only where CounterType == 'Times Counted'. You should now have on row per Precint/Race. Add a variable called "TotalVotes" to the `Votes` dataset, which contains the number of total votes by race/precinct (currently in the "SumOfCount" variable in `Votes`).
+
+```{r}
+Votes <- king_county_elections_2016_Exec %>% filter(CounterType == 'Times Counted')
+Votes$TotalVotes <- Votes$SumOfCount
+```
+
+> Second, create a dataset called `Registered` which contains rows only where CounterType == 'Registered Voters'. The "SumOfCount" variable in this dataset includes the number of registered votes by precinct/race. Add a variable called "Registered" to the `Votes` dataset, which contains the number of registered voters by race/precinct (currently in the "SumOfCount" variable in `Registered`).
+
+```{r}
+Registered <- king_county_elections_2016_Exec %>% filter(CounterType == 'Registered Voters')
+Votes$Registered <- Registered$SumOfCount
+```
+
+> Third, create a new variable in `Votes` called "Turnout", which includes turnout calculated by dividing total votes by registered voters. Then, subset `Votes` to contain only the following variables: Precinct, Seattle, Race, TotalVotes, Registered, and Turnout. Display the first 10 rows of `Votes`, and print the number of rows/columns (there should be 7551 rows and 6 columns!).
+
+```{r}
+Votes$Turnout <- Votes$TotalVotes/Votes$Registered
+Votes <- Votes %>% select(Precinct,Seattle,Race,TotalVotes,Registered,Turnout)
+Votes %>% head(10)
+dim(Votes)
+```
+
+
+## Quick Plot!
+
+> Create ggplot histograms of turnout rates, first by "Race" and second by "Seattle". Do you notice any changes in turnout based on race or whether or not a precinct was located in Seattle?
+
+```{r}
+ggplot(Votes,aes(Turnout))+theme_bw()+
+  geom_histogram(bins=30)+facet_wrap(~Race)+
+  xlab("Turnout Rate")+ylab("Count")+
+  ggtitle("Turnout Race by Executive Race",
+          "2016 King County Election Results")+
+  xlim(c(0,1))
+ggplot(Votes,aes(Turnout))+theme_bw()+
+  geom_histogram(bins=30)+facet_wrap(~Seattle)+
+  xlab("Turnout Rate")+ylab("Count")+
+  ggtitle("Turnout Race by Seattle (TRUE) vs. Non-Seattle (FALSE) Precinct",
+          "2016 King County Election Results")+
+  xlim(c(0,1))
+```
+
+Turnout seems quite consistent across different races; however, turnout in Seattle seems slightly higher on average than turnout in other parts of King County.
+
+> That's it for Homework 5!
+
+# Homework 6
+
+In today's homework, we'll analyze the support for democratic candidates by precinct and political race using 2016 King County Election data. Prior to editing the code below, be sure you've run all the code above (you can run all chunks above by clicking the downward face arrow in the upper-right corner of the code chunk *beneath* this text).
+
+## Calculating number of votes for Democrats
+
+Let's first create a data.frame called `DemVotes` which includes three variables: "Precinct", "Race", and "DemVotes", which contains the total number of votes received by candidates from the Democratic party in each precinct and political race. To create this dataset, I recommend following these steps:
+
+1. Start with the `king_county_elections_2016_Exec`, and filter to rows in which "Party" is either "Dem" or "DPN" (both correspond to Democrats).
+1. `group_by` Precinct and Race
+1. `summarize` the total number of votes (i.e., `sum` together the values in the "SumOfCount" variable) into a new variable called "DemVotes".
+
+```{r}
+DemVotes <- king_county_elections_2016_Exec %>% 
+  filter(Party %in% c("Dem","DPN")) %>%
+  group_by(Precinct,Race) %>%
+  summarize(DemVotes = sum(SumOfCount))
+```
+
+## Combining with previous vote data by precinct and race
+
+Now, use the `left_join` function to merge the "Votes" data from last week with the "DemVotes" data you just created. Be sure you have merged the two data.frames by the "Precinct" and "Race" variables. Save the joined data.frame as "Votes_HW6".
+
+```{r}
+Votes_HW6 <- Votes %>% left_join(DemVotes)
+```
+
+## Calculating Democratic support
+
+Now, create a new variable in the "Votes_HW6" data.frame called "DemPercent", in which DemPercent is calculated by dividing the number of votes received by Democrats by the total number of votes (in each precinct and race). Create a histogram in ggplot of the "DemPercent" variable. (NOTE: All values should be between 0 and 1!!!). Write a one-sentence interpretation of the distribution you observe.
+
+```{r}
+Votes_HW6$DemPercent <- Votes_HW6$DemVotes/Votes_HW6$TotalVotes
+ggplot(Votes_HW6,aes(DemPercent))+
+  theme_bw(base_size=15)+
+  labs(x="Percentage Democratic Support",y="Count")+
+  ggtitle("Histogram of Democratic Support by Race and Precinct","2016 King County Election Data in Three Races")+
+  geom_histogram(bins=30)
+```
+
+ANSWER: We notice that the percentage of support for Democrats is generally above 50%, which makes sense given that we are looking at King County election data (a liberal-leaning county). We do notice a bi-modal distribution, with one-peak around 60% support and another around 80% support.
+
+## Is Democratic support different by race or Seattle precincts?
+
+Using the `facet_grid()` or `facet_wrap()` layer functions, create side-by-side histograms in ggplot to explore whether or not democratic support varies based on (1) precincts located in Seattle or not, and (2) political race. Write a one-sentence explanation of your findings.
+
+```{r}
+ggplot(Votes_HW6,aes(DemPercent))+
+  theme_bw(base_size=15)+
+  labs(x="Percentage Democratic Support",y="Count")+
+  ggtitle("Histogram of Democratic Support, By Seattle Precincts",
+          "2016 King County Election Data in Three Races")+
+  geom_histogram(bins=30)+
+  facet_grid(~Seattle,labeller=label_both)
+ggplot(Votes_HW6,aes(DemPercent))+
+  theme_bw(base_size=15)+
+  labs(x="Percentage Democratic Support",y="Count")+
+  ggtitle("Histogram of Democratic Support, By Race",
+          "2016 King County Election Data in Three Races")+
+  geom_histogram(bins=30)+
+  facet_grid(~Race)
+```
+
+ANSWER: There appears to be substantial more support for Democrats in Seattle than in the rest of King County, while the results by race do not appear to be particularly different (although there is slightly more support for the Democratic candidates for President/Vice President than for Governor or Lt. Governor).
+
+## What if we only consider "large" precincts?
+
+Repeat the previous question, but this time using only data from precincts with at least 500 registered voters. Are the patterns you observed any different now?
+
+```{r}
+Votes_HW6_BigPrecincts <- Votes_HW6 %>% filter(Registered >= 500)
+ggplot(Votes_HW6_BigPrecincts,aes(DemPercent))+
+  theme_bw(base_size=15)+
+  labs(x="Percentage Democratic Support",y="Count")+
+  ggtitle("Histogram of Democratic Support, By Seattle Precincts",
+          "2016 King County Election Data in Large Precincts")+
+  geom_histogram(bins=30)+
+  facet_grid(~Seattle,labeller=label_both)
+ggplot(Votes_HW6_BigPrecincts,aes(DemPercent))+
+  theme_bw(base_size=15)+
+  labs(x="Percentage Democratic Support",y="Count")+
+  ggtitle("Histogram of Democratic Support, By Race",
+          "2016 King County Election Data in Large Precincts")+
+  geom_histogram(bins=30)+
+  facet_grid(~Race)
+```
+
+ANSWER: Although the histograms appear "smoother" now, in general the same patterns hold as in the previous question.
