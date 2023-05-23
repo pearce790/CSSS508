@@ -4,7 +4,7 @@
     <title>CSSS508, Lecture 9</title>
     <meta charset="utf-8" />
     <meta name="author" content="Michael Pearce (based on slides from Chuck Lanfear)" />
-    <meta name="date" content="2022-12-01" />
+    <meta name="date" content="2023-05-24" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -22,7 +22,7 @@ class: center, top, title-slide
 ### Michael Pearce<br>(based on slides from Chuck Lanfear)
 ]
 .date[
-### December 1, 2022
+### May 24, 2023
 ]
 
 ---
@@ -42,9 +42,14 @@ Last time, we learned about,
 
 Today, we will cover,
 
-1. `ggmap` for mapping in `ggplot2`
-2. Density plots
-3. Labeling points
+1. Basic mapping: 
+  + Simple `ggplot`s with coordinates
+  + Density plots in `ggmap`
+  + Labeling points with `ggrepel`
+
+2. Advanced mapping:
+  + GIS with `sf`
+  + `tidycensus`
 
 
 ---
@@ -64,13 +69,13 @@ Mapping can be **complex!** If you are interested in digging deeper, here are so
 
 * [RSpatial.org](http://rspatial.org/) is a great resource for working with spatial data.
 
-* For more information on *spatial statistics*, consider taking Jon Wakefield's **CSSS 554: Statistical Methods for Spatial Data** this winter.
+* For more information on *spatial statistics*, consider taking Jon Wakefield's **CSSS 554: Statistical Methods for Spatial Data** in the winter quarter.
 
 ]
 
 ---
 class: inverse
-# 1. `ggmap`
+# 1. Basic mapping with `ggmap`
 
 ---
 ## One Day of SPD Incidents
@@ -87,6 +92,8 @@ The data can be downloaded from my predecessor's Github using the code below (co
 library(ggplot2)
 library(readr)
 library(dplyr)
+library(tidyr)
+library(stringr)
 ```
 
 ```r
@@ -267,8 +274,6 @@ qmplot(data = spd_raw,
 ---
 ## Nicer Example
 
-
-
 .pull-left[
 
 Add *transparency*
@@ -290,7 +295,7 @@ qmplot(data = spd_raw,
 
 ---
 class:inverse
-# 2. Density plots
+# Density plots
 
 ---
 ## Density Layers
@@ -423,7 +428,7 @@ Done!
 ]
 ---
 class:inverse
-# 3. Labeling points
+# Labeling points with `ggrepel`
 
 ---
 ## Focus in on Downtown Seattle
@@ -514,19 +519,460 @@ qmplot(data =
 
 
 ---
+class:inverse
+# 2. Advanced mapping
+
+
+---
+## `sf`
+
+Until recently, the main way to work with geospatial data in R was through the `sp` 
+package. `sp` works well but does not store data the same way as most GIS packages
+and can be bulky and complicated.
+
+--
+
+The more recent `sf` package implements the GIS standard of [**Simple Features**](https://en.wikipedia.org/wiki/Simple_Features) in R.
+
+`sf` is also integrated into the `tidyverse`: e.g. `geom_sf()` in `ggplot2`.
+
+--
+
+The package is somewhat new but is expected to *replace* `sp` eventually. The principle
+authors and contributors to `sf` are the same authors as `sp` but with new developers
+from the `tidyverse` as well.
+
+Because `sf` is the new standard, we will focus on it today.
+
+
+```r
+library(sf)
+```
+
+
+
+---
+## Simple Features
+
+A [**Simple Feature**](https://en.wikipedia.org/wiki/Simple_Features) is a single observation with some defined geospatial location(s). Features are stored in special data frames (class `sf`) with two properties:
+
+--
+
+* **Geometry**: Properties describing a location (usually on Earth).
+   * Usually 2 dimensions, but support for up to 4. 
+   * Stored in a single reserved *list-column* (`geom`, of class `sfc`).&lt;sup&gt;1&lt;/sup&gt;
+   * Contain a defined coordinate reference system.
+
+.footnote[
+[1] A list-column is the same length as all other columns in the data, but each element contains *sub-elements* (class `sfg`) with all the geometrical components. 
+
+*List-columns* require special functions to manipulate, *including removing them*.
+]
+
+--
+
+* **Attributes**: Characteristics of the location (such as population).
+   * These are non-spatial measures that describe a feature.
+   * Standard data frame columns.
+
+
+
+---
+## Coordinate Reference Systems
+
+**Coordinate reference systems** (**CRS**) specify what location on Earth geometry coordinates are *relative to* (e.g. what location is (0,0) when plotting).
+
+--
+
+The most commonly used is [**WGS84**](https://en.wikipedia.org/wiki/World_Geodetic_System), the standard for Google Earth, the Department of Defense, and GPS satellites.
+
+--
+
+There are two common ways to define a CRS in `sf`:
+
+* [**EPSG codes**](http://spatialreference.org/ref/epsg/) (`epsg` in R)
+
+   * Numeric codes which *refer to a predefined CRS*
+   * Example: WGS84 is `4326`
+
+--
+
+* [**PROJ.4 strings**](https://proj4.org/usage/quickstart.html) (`proj4string` in R)
+
+   * Text strings of parameters that *define a CRS*
+   * Example: NAD83(NSRS2007) / Washington North
+
+```
++proj=lcc +lat_1=48.73333333333333 +lat_2=47.5 +lat_0=47 
++lon_0=-120.8333333333333 +x_0=500000 +y_0=0 +ellps=GRS80 
++towgs84=0,0,0,0,0,0,0 +units=m +no_defs 
+```
+
+---
+## Shapefiles
+
+Geospatial data is typically stored in **shapefiles** which store geometric data as **vectors** with associated attributes (variables)
+
+--
+
+Shapefiles actually consist of multiple individual files. There are usually at least three (but up to 10+):
+
+* `.shp`: The feature geometries
+
+* `.shx`: Shape positional index
+
+* `.dbf`: Attributes describing features&lt;sup&gt;1&lt;/sup&gt;
+
+Often there will also be a `.prj` file defining the coordinate system.
+
+.footnote[[2] This is just a dBase IV file which is an ancient and common database storage file format.]
+
+---
+class: inverse
+# Using `sf`
+
+---
+## Selected `sf` Functions
+
+`sf` is a huge, feature-rich package. Here is a sample of useful functions:
+
+* `st_read()`, `st_write()`: Read and write shapefiles.
+
+* `geom_sf()`: `ggplot()` layer for `sf` objects.
+
+* `st_as_sf()`: Convert a data frame into an `sf` object.
+
+* `st_join()`: Join data by spatial relationship.
+
+* `st_transform()`: Convert between CRS.
+
+* `st_drop_geometry()`: Remove geometry from a `sf` data frame. 
+
+* `st_relate()`: Compute relationships between geometries (like neighbor matrices).
+
+* `st_interpolate_aw()`: Areal-weighted interpolation of polygons.&lt;sup&gt;1&lt;/sup&gt;
+
+.footnote[[1] I recommend the dedicated `areal` package for this though!]
+
+---
+## Loading Data
+
+We will work with the voting data from Homework 5. You can obtain a shape file of King County voting precincts from the [county GIS data portal](https://gis-kingcounty.opendata.arcgis.com/datasets/voting-districts-of-king-county--votdst-area).
+
+--
+
+We can load the file using `st_read()`.
+
+
+```r
+precinct_shape &lt;- st_read("./data/district/votdst.shp",
+                          stringsAsFactors = F) %&gt;% 
+  select(Precinct=NAME, geometry)
+```
+
+```
+## Reading layer `votdst' from data source 
+##   `/Users/pearce790/CSSS508/Lectures/Lecture9/data/district/votdst.shp' 
+##   using driver `ESRI Shapefile'
+## Simple feature collection with 2592 features and 5 fields
+## Geometry type: MULTIPOLYGON
+## Dimension:     XY
+## Bounding box:  xmin: 1220179 ymin: 31555.16 xmax: 1583562 ymax: 287678
+## Projected CRS: NAD83(HARN) / Washington North (ftUS)
+```
+
+[If following along, click here to download a zip of the shapefile.](https://github.com/clanfear/CSSS508/raw/master/Lectures/Week9/data/district.zip)
+
+---
+## Voting Data: Processing
+
+.small[
+
+```r
+precincts_votes_sf &lt;- 
+  read_csv("./data/king_county_elections_2016.txt") %&gt;%
+  filter(Race=="US President &amp; Vice President",
+         str_detect(Precinct, "SEA ")) %&gt;% 
+  select(Precinct, CounterType, SumOfCount) %&gt;%
+  group_by(Precinct) %&gt;%
+  filter(CounterType %in% 
+           c("Donald J. Trump &amp; Michael R. Pence",
+             "Hillary Clinton &amp; Tim Kaine",
+             "Registered Voters",
+             "Times Counted")) %&gt;%
+  mutate(CounterType =
+           recode(CounterType, 
+                  `Donald J. Trump &amp; Michael R. Pence` = "Trump",
+                  `Hillary Clinton &amp; Tim Kaine` = "Clinton",
+                  `Registered Voters`="RegisteredVoters",
+                  `Times Counted` = "TotalVotes")) %&gt;%
+  spread(CounterType, SumOfCount) %&gt;%
+  mutate(P_Dem = Clinton / TotalVotes, 
+         P_Rep = Trump / TotalVotes, 
+         Turnout = TotalVotes / RegisteredVoters) %&gt;%
+  select(Precinct, P_Dem, P_Rep, Turnout) %&gt;% 
+  filter(!is.na(P_Dem)) %&gt;%
+  left_join(precinct_shape) %&gt;%
+  st_as_sf() # Makes sure resulting object is an sf dataframe
+```
+]
+
+---
+## Taking a `glimpse()`
+
+.smallish[
+
+```r
+glimpse(precincts_votes_sf)
+```
+
+```
+## Rows: 960
+## Columns: 5
+## Groups: Precinct [960]
+## $ Precinct &lt;chr&gt; "SEA 11-1256", "SEA 11-1550", "SEA 11-1552", "SEA 1…
+## $ P_Dem    &lt;dbl&gt; 0.7707510, 0.8168421, 0.7507987, 0.8376328, 0.83259…
+## $ P_Rep    &lt;dbl&gt; 0.15612648, 0.07789474, 0.13418530, 0.08649469, 0.0…
+## $ Turnout  &lt;dbl&gt; 0.6931507, 0.7274119, 0.7347418, 0.7522831, 0.75792…
+## $ geometry &lt;MULTIPOLYGON [US_survey_foot]&gt; MULTIPOLYGON (((1273698 1…
+```
+]
+
+Notice the `geometry` column and its unusual class: `MULTIPOLYGON`
+
+A single observation (row) has a geometry which may consist of multiple polygons.
+
+---
+
+.pull-left[
+## Voting Map
+
+We can plot `sf` geometry using `geom_sf()`.
+
+
+
+```r
+ggplot(precincts_votes_sf, 
+*      aes(fill=P_Dem)) +
+  geom_sf(size=NA) +
+  theme_void() +
+  theme(legend.position = 
+          "right")
+```
+
+* `fill=P_Dem` maps color inside precincts to `P_Dem`.
+* `size=NA` removes precinct outlines.
+* `theme_void()` removes axes and background.
+
+]
+
+.pull-right[
+.image-100[
+&lt;img src="CSSS508_Lecture9_mapping_files/figure-html/unnamed-chunk-30-1.png" width="360" /&gt;
+]
+]
+
+---
+class: inverse
+# `tidycensus`
+
+---
+## `tidycensus`
+
+`tidycensus` can be used to search the American Community Survey (ACS) and Dicennial
+Census for variables, then download them and automatically format them as tidy dataframes.
+
+**These dataframes include geographical boundaries such as tracts!**
+
+--
+
+This package utilizes the Census API, so you will need to obtain a [Census API key](https://api.census.gov/data/key_signup.html).
+
+**Application Program Interface (API)**: A type of computer interface that exists as the 
+"native" method of communication between computers, often via http (usable via `httr` package).
+* R packages that interface with websites and databases typically use APIs.
+* APIs make accessing data easy while allowing websites to control access.
+
+See [the developer's GitHub page](https://walkerke.github.io/tidycensus/articles/basic-usage.html) for detailed instructions.
+
+
+
+---
+## Key `tidycensus` Functions
+
+* `census_api_key()` - Install a census api key.
+   * Note you will need to run this prior to using any `tidycensus` functions.
+
+* `load_variables()` - Load searchable variable lists.
+   * `year =`: Sets census year or endyear of 5-year ACS
+   * `dataset =`: Sets dataset (see `?load_variables`)
+
+* `get_decennial()` - Load Census variables and geographical boundaries.
+   * `variables = `: Provide vector of variable IDs
+   * `geography =`: Sets unit of analysis (e.g. `state`, `tract`, `block`)
+   * `year =`: Census year (`1990`, `2000`, or `2010`)
+   * `geometry = TRUE`: Returns `sf` geometry
+
+* `get_acs()` - Load ACS variables and boundaries.
+
+---
+## Searching for Variables
+
+
+
+
+```r
+library(tidycensus)
+# census_api_key("PUT YOUR KEY HERE", install=TRUE)
+acs_2015_vars &lt;- load_variables(2015, "acs5")
+acs_2015_vars[10:18,] %&gt;% print() 
+```
+
+```
+## # A tibble: 9 × 4
+##   name        label                                  concept geography
+##   &lt;chr&gt;       &lt;chr&gt;                                  &lt;chr&gt;   &lt;chr&gt;    
+## 1 B01001A_008 Estimate!!Total!!Male!!20 to 24 years  SEX BY… tract    
+## 2 B01001A_009 Estimate!!Total!!Male!!25 to 29 years  SEX BY… tract    
+## 3 B01001A_010 Estimate!!Total!!Male!!30 to 34 years  SEX BY… tract    
+## 4 B01001A_011 Estimate!!Total!!Male!!35 to 44 years  SEX BY… tract    
+## 5 B01001A_012 Estimate!!Total!!Male!!45 to 54 years  SEX BY… tract    
+## 6 B01001A_013 Estimate!!Total!!Male!!55 to 64 years  SEX BY… tract    
+## 7 B01001A_014 Estimate!!Total!!Male!!65 to 74 years  SEX BY… tract    
+## 8 B01001A_015 Estimate!!Total!!Male!!75 to 84 years  SEX BY… tract    
+## 9 B01001A_016 Estimate!!Total!!Male!!85 years and o… SEX BY… tract
+```
+
+---
+## Getting Data
+
+
+
+
+```r
+king_county &lt;- get_acs(geography="tract", state="WA", 
+                       county="King", geometry = TRUE,
+                       variables=c("B02001_001E", 
+                                   "B02009_001E"), 
+                       output="wide")
+```
+
+What do these look like?
+
+.smallish[
+
+```r
+glimpse(king_county)
+```
+
+```
+## Rows: 495
+## Columns: 7
+## $ GEOID       &lt;chr&gt; "53033010102", "53033005803", "53033004901", "53…
+## $ NAME        &lt;chr&gt; "Census Tract 101.02, King County, Washington", …
+## $ B02001_001E &lt;dbl&gt; 4539, 3268, 4126, 2574, 4032, 3274, 3421, 3652, …
+## $ B02001_001M &lt;dbl&gt; 697, 394, 532, 473, 531, 534, 367, 306, 488, 455…
+## $ B02009_001E &lt;dbl&gt; 876, 138, 143, 225, 1187, 229, 215, 276, 16, 101…
+## $ B02009_001M &lt;dbl&gt; 445, 133, 95, 207, 382, 239, 144, 178, 16, 90, 4…
+## $ geometry    &lt;MULTIPOLYGON [°]&gt; MULTIPOLYGON (((-122.291 47..., MUL…
+```
+]
+
+With `output="wide"`, **estimates** end in `E` and *error margins* in `M`.
+
+---
+## Processing Data
+
+We can drop the margins of error, rename the estimates then, `mutate()` into a proportion `Any Black` measure.
+
+
+```r
+king_county &lt;-  king_county %&gt;%
+  select(-ends_with("M")) %&gt;%
+  rename(`Total Population`=B02001_001E,
+         `Any Black`=B02009_001E) %&gt;%
+  mutate(`Any Black` = `Any Black` / `Total Population`)
+glimpse(king_county)
+```
+
+```
+## Rows: 495
+## Columns: 5
+## $ GEOID              &lt;chr&gt; "53033010102", "53033005803", "5303300490…
+## $ NAME               &lt;chr&gt; "Census Tract 101.02, King County, Washin…
+## $ `Total Population` &lt;dbl&gt; 4539, 3268, 4126, 2574, 4032, 3274, 3421,…
+## $ `Any Black`        &lt;dbl&gt; 0.192994052, 0.042227662, 0.034658265, 0.…
+## $ geometry           &lt;MULTIPOLYGON [°]&gt; MULTIPOLYGON (((-122.291 47.…
+```
+
+---
+## Mapping Code
+
+
+```r
+king_county %&gt;% 
+  ggplot(aes(fill = `Any Black`)) + 
+  geom_sf(size = NA) + 
+  coord_sf(crs = "+proj=longlat +datum=WGS84", datum=NA) + 
+  scale_fill_continuous(name = "Any Black\n", 
+                        low  = "#d4d5f9",
+                        high = "#00025b") + 
+  theme_minimal() + ggtitle("Proportion Any Black")
+```
+
+New functions:
+
+* `geom_sf()` draws Simple Features coordinate data.
+   * `size = NA` removes outlines
+* `coord_sf()` is used here with these arguments:
+   * `crs`: Modifies the coordinate reference system (CRS); WGS84 is possibly the most commonly used CRS.
+   * `datum=NA`: Removes graticule lines, which are geographical lines such as meridians and parallels.
+
+---
+
+![](CSSS508_Lecture9_mapping_files/figure-html/king_plot-1.svg)&lt;!-- --&gt;
+
+---
+## Removing Water
+
+With a simple function and boundaries of water bodies in King County, we can replace water with empty space.
+
+
+
+
+```r
+st_erase &lt;- function(x, y) {
+  st_difference(x, st_make_valid(st_union(st_combine(y))))
+}
+kc_water &lt;- tigris::area_water("WA", "King", class = "sf")
+kc_nowater &lt;- king_county %&gt;% 
+  st_erase(kc_water)
+```
+
+* `st_combine()` merges all geometries into one
+* `st_union()` resolves internal boundaries
+* `st_difference()` subtracts `y` geometry from `x`
+* `st_make_valid()` fixes geometry errors from subtraction
+* `area_water()` obtains `sf` geometry of water bodies
+
+Then we can reproduce the same plot using `kc_nowater`...
+
+---
+![](CSSS508_Lecture9_mapping_files/figure-html/unnamed-chunk-41-1.svg)&lt;!-- --&gt;
+
+
+---
 class: inverse
 # Lab/Homework
 
-For the remainder of class, we'll use breakout rooms on Zoom to work on homework. Please *assign yourself* to a breakout room, then start working on Homework 8!
+For the remainder of class, we'll work on Homework 8, which is due next week!
 
 + The first part is based on Lecture 8 (strings)
   + This includes lab questions from last lecture!
 + The second part is based on Lecture 9 (mapping)
   + This includes an analysis of the restaurant data from last week!
-
-You can call me to your breakout room in Zoom! Otherwise, I will be moving between rooms.
-
-
+  
+*There is no lab next week due to Memorial Day!*
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

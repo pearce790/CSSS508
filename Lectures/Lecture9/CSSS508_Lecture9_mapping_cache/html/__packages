@@ -3,3 +3,7 @@ readr
 dplyr
 ggmap
 ggrepel
+sf
+tidyr
+stringr
+tidycensus
