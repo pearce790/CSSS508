@@ -4,7 +4,7 @@
     <title>CSSS508, Lecture 10</title>
     <meta charset="utf-8" />
     <meta name="author" content="Michael Pearce (based on slides from Chuck Lanfear)" />
-    <meta name="date" content="2022-12-08" />
+    <meta name="date" content="2023-05-31" />
     <script src="libs/header-attrs/header-attrs.js"></script>
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
@@ -22,7 +22,7 @@ class: center, top, title-slide
 ### Michael Pearce<br>(based on slides from Chuck Lanfear)
 ]
 .date[
-### December 8, 2022
+### May 31, 2023
 ]
 
 ---
@@ -34,374 +34,17 @@ class:inverse
 
 Last time, we learned about,
 
-1. `ggmap` for mapping in `ggplot2`
-2. Density plots
-3. Labeling points
+1. Basic mapping: `ggplot`, `ggmap`, and `ggrepel`
+2. Advanced mapping: GIS with `sf` and `tidycensus`
 
 --
 
 Today, we will cover,
 
-1. Working with Model Results
-  + Tidy model output with `broom`
-  + Visualizing models with `geom_smooth`
-  + Tables with `pander`
-2. Reproducible research
-3. Best practices
-4. Wrapping up the course!
+1. Reproducible research
+2. Best practices
+3. Wrapping up the course!
 
-
----
-class: inverse
-# Working with Model Results
-
----
-## `broom`
-
-`broom` is a package that "tidies up" the output from models such a `lm()` and `glm()`.
-
---
-
-It has a small number of key functions:
-
-* `tidy()` - Creates a dataframe summary of a model.
-* `augment()` - Adds columns—such as fitted values—to the data used in the model.
-* `glance()` - Provides one row of fit statistics for models.
-
-
-```r
-library(broom)
-```
-
----
-## Model Output is a List
-
-`lm()` and `summary()` produce lists as output, which **cannot** go directly into 
-tidyverse functions, like `ggplot`.
-
-.smaller[
-
-```r
-lm_1 &lt;- lm(yn ~ num1 + fac1, data = ex_dat)
-summary(lm_1)
-```
-
-```
-## 
-## Call:
-## lm(formula = yn ~ num1 + fac1, data = ex_dat)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -12.354  -1.803  -0.211   1.995   6.994 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)   0.4024     0.3924   1.025   0.3064    
-## num1          0.6464     0.1055   6.128 4.80e-09 ***
-## fac1B         1.0415     0.5164   2.017   0.0451 *  
-## fac1C         2.9500     0.5064   5.825 2.31e-08 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 2.906 on 196 degrees of freedom
-## Multiple R-squared:  0.2767,	Adjusted R-squared:  0.2657 
-## F-statistic:    25 on 3 and 196 DF,  p-value: 9.729e-14
-```
-]
-
----
-## Model Output Varies!
-
-**Different models --&gt; Different outputs!** You can't reuse the same code to handle output from every model.
-
-.smaller[
-
-```r
-glm_1 &lt;- glm(yb ~ num1 + fac1, data = ex_dat, family=binomial(link="logit"))
-summary(glm_1)
-```
-
-```
-## 
-## Call:
-## glm(formula = yb ~ num1 + fac1, family = binomial(link = "logit"), 
-##     data = ex_dat)
-## 
-## Deviance Residuals: 
-##     Min       1Q   Median       3Q      Max  
-## -1.9021  -1.0383   0.4636   0.9609   2.0082  
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept) -1.12865    0.31448  -3.589 0.000332 ***
-## num1         0.39370    0.08903   4.422 9.77e-06 ***
-## fac1B        0.59368    0.38510   1.542 0.123166    
-## fac1C        1.47743    0.39745   3.717 0.000201 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 277.18  on 199  degrees of freedom
-## Residual deviance: 239.93  on 196  degrees of freedom
-## AIC: 247.93
-## 
-## Number of Fisher Scoring iterations: 3
-```
-]
-
----
-## `broom::tidy()`
-
-`tidy()` solve this problem, giving results as a dataframe.
-
-
-```r
-lm_1 %&gt;% tidy()
-```
-
-```
-## # A tibble: 4 × 5
-##   term        estimate std.error statistic       p.value
-##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
-## 1 (Intercept)    0.402     0.392      1.03 0.306        
-## 2 num1           0.646     0.105      6.13 0.00000000480
-## 3 fac1B          1.04      0.516      2.02 0.0451       
-## 4 fac1C          2.95      0.506      5.83 0.0000000231
-```
-
-Each type of model (e.g. `glm`, `lmer`) has a different *method* with its own additional arguments. See `?tidy.lm` for an example.
-
----
-## `broom::tidy()`
-
-This output is also completely identical between different models.
-
-This can be very 
-useful and important if running models with different test statistics... or just running
-a lot of models!
-
-
-```r
-glm_1 %&gt;% tidy()
-```
-
-```
-## # A tibble: 4 × 5
-##   term        estimate std.error statistic    p.value
-##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;      &lt;dbl&gt;
-## 1 (Intercept)   -1.13     0.314      -3.59 0.000332  
-## 2 num1           0.394    0.0890      4.42 0.00000977
-## 3 fac1B          0.594    0.385       1.54 0.123     
-## 4 fac1C          1.48     0.397       3.72 0.000201
-```
-
----
-## `broom::glance()`
-
-`glance()` similarly produces dataframes of fit statistics.
-
-
-.small[
-
-```r
-glance(lm_1)
-```
-
-```
-## # A tibble: 1 × 12
-##   r.squared adj.r.sq…¹ sigma stati…²  p.value    df logLik   AIC   BIC
-##       &lt;dbl&gt;      &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-## 1     0.277      0.266  2.91    25.0 9.73e-14     3  -495. 1000. 1017.
-## # … with 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;,
-## #   nobs &lt;int&gt;, and abbreviated variable names ¹​adj.r.squared,
-## #   ²​statistic
-```
-]
-
----
-## `broom::augment()`
-
-`augment()` takes values generated by a model and adds them back to the original data.
-+ E.g. fitted values, residuals, and leverage statistics.
-
-.small[
-
-```r
-augment(lm_1) %&gt;% head()
-```
-
-```
-## # A tibble: 6 × 9
-##       yn  num1 fac1  .fitted .resid   .hat .sigma    .cooksd .std.re…¹
-##    &lt;dbl&gt; &lt;dbl&gt; &lt;fct&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;      &lt;dbl&gt;     &lt;dbl&gt;
-## 1  1.17   1.37 A       1.29  -0.117 0.0168   2.91 0.00000707   -0.0407
-## 2 -2.70  -1.13 A      -0.330 -2.37  0.0232   2.91 0.00406      -0.827 
-## 3  3.17   1.27 A       1.23   1.95  0.0167   2.91 0.00194       0.676 
-## 4  6.18   1.67 B       2.52   3.66  0.0154   2.90 0.00628       1.27  
-## 5  5.78   1.19 C       4.12   1.66  0.0137   2.91 0.00114       0.574 
-## 6  0.595 -1.48 C       2.40  -1.80  0.0231   2.91 0.00233      -0.627 
-## # … with abbreviated variable name ¹​.std.resid
-```
-]
-
-See `?augment.lm` for examples of what `augment()` can do.
-
----
-## Plotting Model Results
-
----
-## `geom_smooth()`
-
-I have used `geom_smooth()` in many past examples.
-
-`geom_smooth()` generates "smoothed conditional means" including loess curves and generalized additive models (GAMs).
-
---
-
-Note, however, that most regression models are conditional mean models, such as ordinary least squares and generalized linear models. 
-
---
-
-We can use `geom_smooth()` to add a layer depicting common bivariate models.
-
-We'll look at this with the `gapminder` data from Week 2.
-
-
-```r
-library(gapminder)
-```
-
----
-## Default `geom_smooth()`
-
-
-```r
-ggplot(data = gapminder, 
-       aes(x = year, y = lifeExp, color = continent)) +
-  geom_point(position = position_jitter(1,0), size = 0.5) +
-  geom_smooth()
-```
-
-![](CSSS508_Lecture10_Reproducibility_files/figure-html/unnamed-chunk-8-1.svg)&lt;!-- --&gt;
-
-By default, `geom_smooth()` chooses either a loess smoother (N &lt; 1000) or a GAM depending on the number of observations.
-
-
----
-## Linear `glm`
-
-
-```r
-ggplot(data = gapminder, 
-       aes(x = year, y = lifeExp, color = continent)) +
-  geom_point(position = position_jitter(1,0), size = 0.5) +
-* geom_smooth(method = "glm", formula = y ~ x)
-```
-
-![](CSSS508_Lecture10_Reproducibility_files/figure-html/unnamed-chunk-9-1.svg)&lt;!-- --&gt;
-
----
-## Polynomial `glm`
-
-```r
-ggplot(data = gapminder, 
-       aes(x = year, y = lifeExp, color = continent)) +
-  geom_point(position = position_jitter(1,0), size = 0.5) +
-* geom_smooth(method = "glm", formula = y ~ poly(x, 2))
-```
-
-![](CSSS508_Lecture10_Reproducibility_files/figure-html/unnamed-chunk-10-1.svg)&lt;!-- --&gt;
-
-`poly(x, 2)` produces a quadratic model which contains a linear term (`x`) and a quadratic term (`x^2`).
-
----
-## Making Tables
-
----
-## `pander` Regression Tables
-
-We've used `pander` to create nice tables for dataframes. But `pander` has *methods*
-to handle all sort of objects that you might want displayed nicely.
-
-This includes 
-model output, such as from `lm()`, `glm()`, and `summary()`.
-
-
-
-```r
-library(pander)
-```
-
-
-
----
-## `pander()` and `lm()`
-
-You can send an `lm()` object straight to `pander`:
-
-
-```r
-pander(lm_1)
-```
-
-| &amp;nbsp;          | Estimate | Std. Error | t value | Pr(&gt;t)    |
-|:----------------|:--------:|:----------:|:-------:|:---------:|
-| **(Intercept)** |  37.23   |   1.599    |  23.28  | 2.565e-20 |
-| **wt**          |  -3.878  |   0.6327   | -6.129  | 1.12e-06  |
-| **hp**          | -0.03177 |  0.00903   | -3.519  | 0.001451  |
-
-Table: Fitting linear model: mpg ~ wt + hp
-
----
-## `pander()` and `summary()`
-
-You can do this with `summary()` as well, for added information:
-
-
-```r
-pander(summary(lm_1))
-```
-
-| &amp;nbsp;          | Estimate | Std. Error | t value | Pr(&gt;t)  |
-|:----------------|:--------:|:----------:|:-------:|:---------:|
-| **(Intercept)** |  37.23   |   1.599    |  23.28  | 2.565e-20 |
-| **wt**          |  -3.878  |   0.6327   | -6.129  | 1.12e-06  |
-| **hp**          | -0.03177 |  0.00903   | -3.519  | 0.001451  |
-
-
-
-| Observations | Residual Std. Error | `\(R^2\)`  | Adjusted `\(R^2\)` |
-|:------------:|:-------------------:|:------:|:--------------:|
-|      32      |        2.593        | 0.8268 |     0.8148     |
-
-Table: Fitting linear model: mpg ~ wt + hp
-
----
-## Bonus: `corrplot`
-
-The `corrplot` package creates **correlograms**:
-
-+ Interpreting correlations easier than in a table.
-+ First argument is to call `cor()`, a base R function for calculating correlations.
-+ [See the vignette for customization options.](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html)
-
-
-```r
-library(corrplot)
-corrplot(
-  cor(mtcars),
-  addCoef.col = "white",
-  addCoefasPercent=T,
-  type="upper", 
-  order="AOE")
-```
-
----
-## Correlogram
-
-![](CSSS508_Lecture10_Reproducibility_files/figure-html/unnamed-chunk-15-1.svg)&lt;!-- --&gt;
 
 ---
 class: inverse
@@ -512,9 +155,6 @@ For academic papers, degrees of reproducibility vary:
 
 4. **Research compendium**
 
---
-
-5. Docker compendium: Self-contained ecosystem
 
 ---
 ## Interactive Documents
@@ -767,10 +407,9 @@ They waste time by leading you to format instead of writing.
 --
 
 Find a good modular text editor and learn to use it:
+   * [Overleaf] (https://www.overleaf.com)
    * [Atom](https://atom.io/)
    * [Sublime](https://www.sublimetext.com/) (Commercial)
-   * Emacs
-   * Vim
 
 ---
 ## On Version Control
@@ -859,6 +498,7 @@ You all are now **R**ockstars!!
 ## What Comes Next?
 
 * **Learn more statistics!!  (e.g. take more CSSS courses)**
+
     + Learn foundations to statistical inference, create and evaluate models, consider survey design, make fancy visualizations, etc.
     + All of this is much easier to do if you already know R!
     
@@ -902,8 +542,8 @@ If you...
 class: inverse
 # Thank you!
 
-+ Please submit your course evals! I *greatly appreciate* any feedback you may have.
-+ Remember to submit your final assignment (HW 8; due now!) and provide peer review feedback by Tuesday.
++ Please submit your [course evals!](https://uw.iasystem.org/survey/273632) I *greatly appreciate* any feedback you may have.
++ Remember to submit your final assignment (HW 8; due now!) and provide peer review feedback by Monday at 11:59pm!
 + Hand in (optional) HW 9 if you are short of the 20 points necessary to pass.
 + Feel free to reach out at any point in the future with questions or comments!
 
